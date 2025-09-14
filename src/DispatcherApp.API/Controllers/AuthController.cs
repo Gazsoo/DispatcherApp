@@ -1,8 +1,13 @@
-﻿using System.Security.Claims;
+﻿using System.Net;
+using System.Security.Claims;
+using Ardalis.GuardClauses;
 using DispatcherApp.BLL.Interfaces;
+using DispatcherApp.BLL.Model;
 using DispatcherApp.Models.DTOs.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DispatcherApp.API.Controllers;
@@ -11,73 +16,72 @@ namespace DispatcherApp.API.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthenticationService _authService;
-    private readonly ILogger<AuthController> _logger;
 
-    public AuthController(IAuthenticationService authService, ILogger<AuthController> logger)
+
+
+    public AuthController(
+        IAuthenticationService authService
+        )
     {
         _authService = authService;
-        _logger = logger;
     }
 
-    //[HttpPost("register")]
-    //[ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
-    //[ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-    //public async Task<ActionResult> Register([FromBody] RegisterRequest request)
-    //{
-    //    var success = await _authService.RegisterAsync(request);
-    //    if (!success)
-    //        return BadRequest("Registration failed");
+    [HttpPost("register")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> Register([FromBody] RegisterRequest request)
+    {
+        var confirmationBaseUrl = Url.Action("ConfirmEmail", "Auth", null, Request.Scheme);
+        Guard.Against.Null(confirmationBaseUrl, nameof(confirmationBaseUrl));
+        var success = await _authService.RegisterAsync(request, confirmationBaseUrl);
 
-    //    return Ok(new { message = "User registered successfully. Please check your email to confirm your account." });
-    //}
+        return Ok(new { message = "Confirmation email sent if your account exists." });
+    }
 
-    //[ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
-    //[ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-    //[HttpGet("confirmEmail")]
-    //public async Task<ActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
-    //{
-    //    if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
-    //        return BadRequest("Invalid confirmation link");
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [HttpGet("confirmEmail")]
+    public async Task<ActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
+    {
+        if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
+            return BadRequest("Invalid confirmation link");
 
-    //    var success = await _authService.ConfirmEmailAsync(userId, token);
-    //    if (!success)
-    //        return BadRequest("Email confirmation failed");
+        var success = await _authService.ConfirmEmailAsync(userId, token);
+        if (!success)
+            return BadRequest("Email confirmation failed");
 
-    //    return Ok(new { message = "Email confirmed successfully" });
-    //}
+        return Ok(new { message = "Email confirmed successfully" });
+    }
 
-    //[HttpPost("resendConfirmationEmail")]
-    //public async Task<ActionResult> ResendConfirmationEmail([FromBody] EmailRequest request)
-    //{
-    //    if (!ModelState.IsValid)
-    //        return BadRequest(ModelState);
+    [HttpPost("resendConfirmationEmail")]
+    public async Task<ActionResult> ResendConfirmationEmail([FromBody] EmailRequest request)
+    {
+        var confirmationBaseUrl = Url.Action("ConfirmEmail", "Auth", null, Request.Scheme);
+        Guard.Against.Null(confirmationBaseUrl, nameof(confirmationBaseUrl));
+        var success = await _authService.ResendConfirmationEmailAsync(request.Email, confirmationBaseUrl);
 
-    //    await _authService.ResendConfirmationEmailAsync(request.Email);
-    //    return Ok(new { message = "If the email exists, a confirmation link has been sent" });
-    //}
+        return Ok(new { message = "Confirmation email sent if your account exists." });
+    }
 
-    //[HttpPost("forgotPassword")]
-    //public async Task<ActionResult> ForgotPassword([FromBody] EmailRequest request)
-    //{
-    //    if (!ModelState.IsValid)
-    //        return BadRequest(ModelState);
+    [HttpPost("forgotPassword")]
+    public async Task<ActionResult> ForgotPassword([FromBody] EmailRequest request)
+    {
+        var resetBaseUrl = Url.Action("ResetPassword", "Auth", null, Request.Scheme);
+        Guard.Against.Null(resetBaseUrl, nameof(resetBaseUrl));
+        var success = await _authService.ForgotPasswordAsync(request.Email, resetBaseUrl);
 
-    //    await _authService.ForgotPasswordAsync(request.Email);
-    //    return Ok(new { message = "If the email exists, a reset link has been sent" });
-    //}
+        return Ok(new { message = "If your email exists, you'll receive a reset link." });
+    }
 
-    //[HttpPost("resetPassword")]
-    //public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
-    //{
-    //    if (!ModelState.IsValid)
-    //        return BadRequest(ModelState);
+    [HttpPost("resetPassword")]
+    public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+    {
+        var success = await _authService.ResetPasswordAsync(request);
+        if (!success)
+            return BadRequest("Password reset failed");
 
-    //    var success = await _authService.ResetPasswordAsync(request);
-    //    if (!success)
-    //        return BadRequest("Password reset failed");
-
-    //    return Ok(new { message = "Password reset successfully" });
-    //}
+        return Ok(new { message = "Password reset successfully" });
+    }
 
     [HttpGet("manage/info")]
     [Authorize]
@@ -98,9 +102,6 @@ public class AuthController : ControllerBase
     [Authorize]
     public async Task<ActionResult> UpdateUserInfo([FromBody] UserInfoResponse request)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId))
             return Unauthorized();
@@ -118,8 +119,6 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
 
         var result = await _authService.LoginAsync(request);
         if (result == null)

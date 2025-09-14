@@ -1,8 +1,12 @@
 ﻿
-using DispatcherApp.BLL.Services;
+using DispatcherApp.API.Services;
 using DispatcherApp.BLL.Configurations;
 using DispatcherApp.BLL.Extentions;
 using DispatcherApp.BLL.Interfaces;
+using DispatcherApp.BLL.Services;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Hosting;
 
 
@@ -25,7 +29,13 @@ namespace Microsoft.Extensions.DependencyInjection
 
             builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
             builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddSingleton<IEmailSender<IdentityUser>, DummyEmailSender>();
+            builder.Services.AddSingleton<IEmailSender, DummyEmailSender>();
 
+        }
+        public static async Task<WebApplication> SeedDatabaseAsync(this WebApplication app)
+        {
+            return await app.RoleSeedDatabaseAsync();
         }
     }
 }

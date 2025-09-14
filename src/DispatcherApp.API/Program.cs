@@ -29,7 +29,6 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapHealthChecks("/health");
-app.MapGroup("/account").MapIdentityApi<IdentityUser>();
 app.MapControllers();
 
 app.Run();

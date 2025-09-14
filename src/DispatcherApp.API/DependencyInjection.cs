@@ -40,8 +40,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 
             });
             //builder.Services.AddSingleton<IEmailSender<IdentityUser>, DummyEmailSender>();
-            builder.Services.AddSingleton<IEmailSender<IdentityUser>, DummyEmailSender>();
-            //builder.Services.AddSingleton<IEmailSender, DummyEmailSender>();
+            
     }
 
         public static void AddKeyVaultIfConfigured(this IHostApplicationBuilder builder)

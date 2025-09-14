@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using DispatcherApp.BLL.Configurations;
+using DispatcherApp.BLL.Model;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -29,7 +30,7 @@ public class TokenService : ITokenService
         _configuration = configuration;
         _userManager = userManager;
     }
-    public async Task<string>  GenerateAccessTokenAsync(IdentityUser user)
+    public async Task<TokenResult>  GenerateAccessTokenAsync(IdentityUser user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
@@ -49,17 +50,23 @@ public class TokenService : ITokenService
             claims.Add(new Claim(ClaimTypes.Role, role));
         }
 
+        var expiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
+            Expires = expiresAt,
             Issuer = _jwtSettings.Issuer,
             Audience = _jwtSettings.Audience,
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
+
+        return new TokenResult
+        {
+            AccessToken = tokenHandler.WriteToken(token),
+            ExpiresAt = expiresAt
+        };
     }
 
     public async Task<string> GenerateRefreshTokenAsync(IdentityUser user)

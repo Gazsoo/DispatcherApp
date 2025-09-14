@@ -2,10 +2,11 @@
 using Azure.Core;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.Extensions.Logging;
 
 namespace DispatcherApp.API.Services;
 
-public class DummyEmailSender: IEmailSender<IdentityUser>
+public class DummyEmailSender: IEmailSender<IdentityUser> , IEmailSender
 {
     private readonly ILogger<DummyEmailSender> _logger;
 
@@ -25,9 +26,11 @@ public class DummyEmailSender: IEmailSender<IdentityUser>
 
     public Task SendEmailAsync(string email, string subject, string htmlMessage)
     {
-        Console.WriteLine($"Email would be sent to {email}:");
-        Console.WriteLine($"subject: {subject}");
-        Console.WriteLine($"htmlMessage: {htmlMessage}");
+        var decoded = WebUtility.HtmlDecode(htmlMessage);
+        // Use structured logging instead of Console.WriteLine
+        _logger.LogInformation("Email would be sent to {Email} with link {decoded}",
+            email, decoded);
+
         return Task.CompletedTask;
     }
 
