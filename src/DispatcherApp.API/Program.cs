@@ -1,18 +1,15 @@
+using DispatcherApp.Models.CommonConfigurations;
+using Microsoft.AspNetCore.Identity;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-//builder.Services.AddOpenApi();
+builder.AddCommonConfiguration();
 builder.AddDataAccessServices();
 builder.AddApiServices();
+builder.AddBusinessLogicServices();
 
 var app = builder.Build();
 
-app.UseHttpsRedirection();
-app.UseRouting();
-//app.UseAuthorization();
-app.MapControllers();
-app.MapHealthChecks("/health");
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -27,10 +24,12 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseHttpsRedirection();
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapHealthChecks("/health");
+app.MapGroup("/account").MapIdentityApi<IdentityUser>();
+app.MapControllers();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
