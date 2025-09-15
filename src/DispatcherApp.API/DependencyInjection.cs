@@ -12,6 +12,18 @@ namespace Microsoft.Extensions.DependencyInjection;
     {
         public static void AddApiServices(this IHostApplicationBuilder builder)
         {
+        var corsSettings = builder.Configuration.GetSection("CorsSettings").Get<CorsSettings>();
+
+        builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("DefaultPolicy", policy =>
+                {
+                    policy.WithOrigins(corsSettings?.AllowedOrigins ?? new CorsSettings().AllowedOrigins)
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                });
+            });
             builder.Configuration.AddApiConfigurations();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddControllers();
@@ -39,8 +51,8 @@ namespace Microsoft.Extensions.DependencyInjection;
                 configure.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("Bearer"));
 
             });
-            //builder.Services.AddSingleton<IEmailSender<IdentityUser>, DummyEmailSender>();
-            
+
+
     }
 
         public static void AddKeyVaultIfConfigured(this IHostApplicationBuilder builder)

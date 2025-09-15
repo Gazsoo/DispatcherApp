@@ -19,3 +19,13 @@ dotnet sln add DispatcherApp.API/DispatcherApp.API.csproj
 - Micrososft nem támogatja a jwt alapú asp inentity használatát, saját tokenjeik vannak, ha nem tudja valami a cookiekat támogatni. https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity-api-authorization?view=aspnetcore-9.0
 - saját jwt endpointok
 - adatbázis userek módosítása hogy jwt token refresh expiary is tárolható legyen
+
+## day three:
+- runtime seeder, a szerepkörök feltötése
+- egy enlőre csak role based authorizaton, nincs permission
+    - Dispatcher
+    - User
+    - Admin
+- kihagyom a respository patternt, entity framework direkt használata
+- post build eventet az NSwag generáláshoz, configuration fájl
+- Cross Origin Resource beállítások development környezetben.

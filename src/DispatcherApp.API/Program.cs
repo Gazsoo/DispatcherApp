@@ -1,5 +1,5 @@
 using DispatcherApp.Models.CommonConfigurations;
-using Microsoft.AspNetCore.Identity;
+using DispatcherApp.BLL.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +13,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    await app.RoleSeed();
     app.UseOpenApi(settings =>
     {
         settings.Path = "/api/specification.json";
@@ -25,6 +26,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("DefaultPolicy");
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
