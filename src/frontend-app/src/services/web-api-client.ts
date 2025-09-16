@@ -7,15 +7,17 @@
 /* eslint-disable */
 // ReSharper disable InconsistentNaming
 
-import axios, { AxiosError } from 'axios';
+import { ApiClientBase } from './api-client-base';import axios, { AxiosError } from 'axios';
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, CancelToken } from 'axios';
 
-export class Client {
+export class Client extends ApiClientBase {
     protected instance: AxiosInstance;
     protected baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
     constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        super();
 
         this.instance = instance || axios.create();
 
@@ -421,8 +423,66 @@ export class Client {
         return Promise.resolve<FileResponse>(null as any);
     }
 
-    auth_Login(request: LoginRequest, signal?: AbortSignal): Promise<AuthResponse> {
+    auth_Login(request: LoginRequest, signal?: AbortSignal): Promise<void> {
         let url_ = this.baseUrl + "/api/Auth/login";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processAuth_Login(_response);
+        });
+    }
+
+    protected processAuth_Login(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 401) {
+            const _responseText = response.data;
+            let result401: any = null;
+            let resultData401  = _responseText;
+            result401 = JSON.parse(resultData401);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result401);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    auth_Refresh(request: RefreshRequest, signal?: AbortSignal): Promise<AuthResponse> {
+        let url_ = this.baseUrl + "/api/Auth/refresh";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(request);
@@ -445,11 +505,11 @@ export class Client {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processAuth_Login(_response);
+            return this.processAuth_Refresh(_response);
         });
     }
 
-    protected processAuth_Login(response: AxiosResponse): Promise<AuthResponse> {
+    protected processAuth_Refresh(response: AxiosResponse): Promise<AuthResponse> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -465,20 +525,6 @@ export class Client {
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
             return Promise.resolve<AuthResponse>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status === 401) {
-            const _responseText = response.data;
-            let result401: any = null;
-            let resultData401  = _responseText;
-            result401 = JSON.parse(resultData401);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result401);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
@@ -588,6 +634,11 @@ export interface UserInfoResponse {
     twoFactorEnabled?: boolean;
 }
 
+export interface LoginRequest {
+    email?: string;
+    password?: string;
+}
+
 export interface AuthResponse {
     accessToken?: string;
     refreshToken?: string;
@@ -595,9 +646,9 @@ export interface AuthResponse {
     expiresIn?: number;
 }
 
-export interface LoginRequest {
-    email?: string;
-    password?: string;
+export interface RefreshRequest {
+    accessToken?: string;
+    refreshToken?: string;
 }
 
 export interface FileResponse {

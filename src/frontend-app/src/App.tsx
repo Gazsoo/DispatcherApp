@@ -1,13 +1,44 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import { Client } from './services/web-api-client'
+import { AuthenticatedApiClient } from './services/jwt/AuthenticatedApiClient'
+import { BrowserRouter } from "react-router";
+import { useNavigate } from "react-router";
 
 function App() {
+  const navigate = useNavigate();
   const [count, setCount] = useState(0)
-const a = new Client("https://localhost:19955")
-a.auth_Login({email: "administrator@localhost", password: "Administrator1!"})
+  const [user, setUser] = useState(null)
+  const a = new AuthenticatedApiClient()
+
+  
+  useEffect(() => {
+    const handleAuthLogout = (event: CustomEvent) => {
+      console.log('Authentication failed:', event.detail);
+
+      // Your app decides what to do:
+      // - Show a toast notification
+      // - Redirect to login page  
+      // - Show a modal asking user to re-authenticate
+      // - Clear user state
+
+      navigate('/login');
+      // or
+      setUser(null);
+      // or  
+      console.log('Session expired. Please log in again.');
+    };
+
+    window.addEventListener('auth:logout', handleAuthLogout as EventListener);
+
+    return () => {
+      window.removeEventListener('auth:logout', handleAuthLogout as EventListener);
+    };
+  }, []);
+  
+  a.auth_Login({ email: "administrator@localhost", password: "Administrator1!" })
+
   return (
     <>
       <div>

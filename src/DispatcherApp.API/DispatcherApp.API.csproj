@@ -36,14 +36,9 @@
   <ItemGroup>
     <Folder Include="Extentions\" />
     <Folder Include="Interfaces\" />
+    <Folder Include="Services\" />
   </ItemGroup>
 
-  <Target Name="DebugNSwag" BeforeTargets="NSwag">
-    <Message Text="NSwag Path: $(NSwagExe_Net90)" Importance="high" />
-    <Message Text="Project Dir: $(ProjectDir)" Importance="high" />
-    <Message Text="Configuration: $(Configuration)" Importance="high" />
-    <Message Text="Skip Flag: $(SkipNSwagGen)" Importance="high" />
-  </Target>
   
   <!-- NSwag code generation -->  
   <PropertyGroup>

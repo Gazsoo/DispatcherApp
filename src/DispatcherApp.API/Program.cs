@@ -11,6 +11,11 @@ builder.AddBusinessLogicServices();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseHttpsRedirection();
+app.UseCors("DefaultPolicy");
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
 if (app.Environment.IsDevelopment())
 {
     await app.RoleSeed();
@@ -24,12 +29,6 @@ if (app.Environment.IsDevelopment())
         settings.DocumentPath = "/api/specification.json";
     });
 }
-
-app.UseHttpsRedirection();
-app.UseCors("DefaultPolicy");
-app.UseRouting();
-app.UseAuthentication();
-app.UseAuthorization();
 app.MapHealthChecks("/health");
 app.MapControllers();
 

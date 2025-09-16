@@ -12,18 +12,18 @@ namespace Microsoft.Extensions.DependencyInjection;
     {
         public static void AddApiServices(this IHostApplicationBuilder builder)
         {
-        var corsSettings = builder.Configuration.GetSection("CorsSettings").Get<CorsSettings>();
+            var corsSettings = builder.Configuration.GetSection("CorsSettings").Get<CorsSettings>();
 
-        builder.Services.AddCors(options =>
-            {
-                options.AddPolicy("DefaultPolicy", policy =>
+            builder.Services.AddCors(options =>
                 {
-                    policy.WithOrigins(corsSettings?.AllowedOrigins ?? new CorsSettings().AllowedOrigins)
-                          .AllowAnyHeader()
-                          .AllowAnyMethod()
-                          .AllowCredentials();
+                    options.AddPolicy("DefaultPolicy", policy =>
+                    {
+                        policy.WithOrigins(corsSettings?.AllowedOrigins ?? new CorsSettings().AllowedOrigins)
+                              .AllowAnyHeader()
+                              .AllowAnyMethod()
+                              .AllowCredentials();
+                    });
                 });
-            });
             builder.Configuration.AddApiConfigurations();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddControllers();

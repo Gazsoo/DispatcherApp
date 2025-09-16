@@ -27,7 +27,6 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Register([FromBody] RegisterRequest request)
     {
@@ -38,7 +37,6 @@ public class AuthController : ControllerBase
         return Ok(new { message = "Confirmation email sent if your account exists." });
     }
 
-    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [HttpGet("confirmEmail")]
     public async Task<ActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
@@ -114,7 +112,6 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request)
@@ -123,6 +120,19 @@ public class AuthController : ControllerBase
         var result = await _authService.LoginAsync(request);
         if (result == null)
             return Unauthorized("Invalid credentials or unconfirmed email");
+
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Refresh JWT token
+    /// </summary>
+    [HttpPost("refresh")]
+    public async Task<ActionResult<AuthResponse>> Refresh([FromBody] RefreshRequest request)
+    {
+        var result = await _authService.RefreshTokenAsync(request);
+        if (result == null)
+            return BadRequest("Invalid token");
 
         return Ok(result);
     }

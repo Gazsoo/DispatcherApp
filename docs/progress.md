@@ -28,4 +28,6 @@ dotnet sln add DispatcherApp.API/DispatcherApp.API.csproj
     - Admin
 - kihagyom a respository patternt, entity framework direkt használata
 - post build eventet az NSwag generáláshoz, configuration fájl
-- Cross Origin Resource beállítások development környezetben.
+- Cross Origin Resource beállítások development környezetben. cors preflight option calls ütközik ha swgger auth előtt van.
+
+## day four
