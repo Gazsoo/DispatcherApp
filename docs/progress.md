@@ -31,3 +31,10 @@ dotnet sln add DispatcherApp.API/DispatcherApp.API.csproj
 - Cross Origin Resource beállítások development környezetben. cors preflight option calls ütközik ha swgger auth előtt van.
 
 ## day four
+
+- a generált kód axiossal nem kompatibilis, kiegészítés kell "Your C# endpoint returns JSON with proper Content-Type: application/json headers
+Axios automatically parses JSON responses when it sees this content type
+The NSwag-generated code assumes it's receiving raw text and tries to parse it again
+This is a known issue with the TypeScript + Axios template when using certain configurations"
+- exception egyedi kezelése middlewareben, userContext middleware
+- fileok tárolása, blob storage, fájlok feltöltése, letöltése, törlése

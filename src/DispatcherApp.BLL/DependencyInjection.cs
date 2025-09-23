@@ -3,7 +3,6 @@ using DispatcherApp.API.Services;
 using DispatcherApp.BLL.Configurations;
 using DispatcherApp.BLL.Extentions;
 using DispatcherApp.BLL.Interfaces;
-using DispatcherApp.BLL.Seeders;
 using DispatcherApp.BLL.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
@@ -18,6 +17,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static void AddBusinessLogicServices(this IHostApplicationBuilder builder)
         {
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
+            builder.Services.Configure<FileStorageSettings>(builder.Configuration.GetSection(FileStorageSettings.SectionName));
 
             builder.Services.AddJwtAuthentication(builder.Configuration);
 
@@ -33,7 +33,13 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddSingleton<IEmailSender<IdentityUser>, DummyEmailSender>();
             builder.Services.AddSingleton<IEmailSender, DummyEmailSender>();
+            builder.Services.AddScoped<IUserContextService, UserContextService>();
+            builder.Services.AddScoped<IAssignmentService, AssignmentService>();
+            builder.Services.AddScoped<ITutorialService, TutorialService>();
+            builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
 
         }
+
     }
+
 }

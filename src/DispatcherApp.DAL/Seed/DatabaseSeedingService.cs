@@ -7,12 +7,14 @@ using System.Text;
 using System.Threading.Tasks;
 using DispatcherApp.DAL.Data;
 using DispatcherApp.Models.Constants;
+using DispatcherApp.Models.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using File = DispatcherApp.Models.Entities.File;
 
 namespace DispatcherApp.BLL.Services;
 
@@ -54,7 +56,7 @@ public class DatabaseSeedingService
         try
         {
             await _context.Database.EnsureDeletedAsync();
-            await _context.Database.EnsureCreatedAsync();
+            await _context.Database.MigrateAsync();
         }
         catch (Exception ex)
         {
@@ -108,6 +110,28 @@ public class DatabaseSeedingService
                 await _userManager.AddToRolesAsync(administrator, new[] { administratorRole.Name });
             }
         }
+        var tutorial = new Tutorial { 
+            ContentType = "text/markdown",
+            CreatedAt = DateTime.UtcNow,
+            Description = "This is a sample tutorial",
+            Title = "Sample Tutorial",
+            Url = "https://example.com/sample-tutorial",
+            UpdatedAt = DateTime.UtcNow,
+            Files = new List<File>
+            {
+                new File
+                {
+                    FileName = "sample.txt",
+                    ContentType = "text/plain",
+                    FileSize = 1024,
+                    OriginalFileName = "sample_original.txt",
+                    StoragePath = "files/sample.txt",
+                    UploadedAt = DateTime.UtcNow,
+                }
+            }
+        };
+        _context.Tutorials.Add(tutorial);
+        await _context.SaveChangesAsync();
 
     }
 }

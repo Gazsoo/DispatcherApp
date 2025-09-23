@@ -1,5 +1,5 @@
 import { assertRequiredFields } from '../../utils/assertion';
-import type { AuthResponse, RefreshRequest } from '../web-api-client';
+import type { AuthResponse, RefreshRequest } from '../../services/web-api-client';
 
 export class JWTManager {
   private static readonly ACCESS_TOKEN_KEY = 'accessToken';

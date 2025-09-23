@@ -1,5 +1,8 @@
 ﻿using DispatcherApp.API.Configurations;
+using DispatcherApp.API.Midleware;
 using DispatcherApp.API.Services;
+using DispatcherApp.BLL.Interfaces;
+using DispatcherApp.BLL.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -27,8 +30,9 @@ namespace Microsoft.Extensions.DependencyInjection;
             builder.Configuration.AddApiConfigurations();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddControllers();
+            
 
-            //builder.Services.AddExceptionHandler<CustomExceptionHandler>();
+            builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
             // Customise default API behaviour
             builder.Services.Configure<ApiBehaviorOptions>(options =>
@@ -55,6 +59,11 @@ namespace Microsoft.Extensions.DependencyInjection;
 
     }
 
+    public static IApplicationBuilder UseCustomMiddleware(this IApplicationBuilder builder)
+    {
+        return builder
+            .UseMiddleware<UserContextMiddleware>();
+    }
         public static void AddKeyVaultIfConfigured(this IHostApplicationBuilder builder)
         {
             //var keyVaultUri = builder.Configuration["AZURE_KEY_VAULT_ENDPOINT"];

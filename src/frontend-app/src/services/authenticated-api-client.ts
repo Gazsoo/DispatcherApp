@@ -1,5 +1,5 @@
-import { JWTManager } from './jwt-manager';
-import { Client } from '../web-api-client'
+import { JWTManager } from '../auth/jwt/jwt-manager';
+import { Client } from './web-api-client'
 
 export class AuthenticatedApiClient extends Client {
     private isRefreshing = false;

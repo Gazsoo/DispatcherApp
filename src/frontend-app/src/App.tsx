@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import { AuthenticatedApiClient } from './services/jwt/AuthenticatedApiClient'
-import { BrowserRouter } from "react-router";
+import { AuthenticatedApiClient } from './services/authenticated-api-client'
+import { BrowserRouter, Link } from "react-router";
 import { useNavigate } from "react-router";
 
 function App() {
@@ -37,7 +37,6 @@ function App() {
     };
   }, []);
   
-  a.auth_Login({ email: "administrator@localhost", password: "Administrator1!" })
 
   return (
     <>
@@ -51,7 +50,10 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
+      <Link to="/login" className="button-style">
+        Login Page
+      </Link>
+                <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button>
         <p>
