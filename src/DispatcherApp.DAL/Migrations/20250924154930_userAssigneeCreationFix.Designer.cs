@@ -4,6 +4,7 @@ using DispatcherApp.DAL.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DispatcherApp.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250924154930_userAssigneeCreationFix")]
+    partial class userAssigneeCreationFix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -72,7 +75,7 @@ namespace DispatcherApp.DAL.Migrations
 
                     b.HasKey("AssignmentId", "UserId");
 
-                    b.ToTable("AssignmentUsers");
+                    b.ToTable("AssignmentUser");
                 });
 
             modelBuilder.Entity("DispatcherApp.Models.Entities.File", b =>

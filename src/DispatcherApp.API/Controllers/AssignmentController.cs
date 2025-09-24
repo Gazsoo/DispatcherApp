@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using DispatcherApp.BLL.Interfaces;
+using DispatcherApp.Models.DTOs.Assignment;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -8,20 +10,28 @@ namespace DispatcherApp.API.Controllers;
 [Authorize(Roles = "Dispatcher,Administrator")]
 [Route("api/[controller]")]
 [ApiController]
-public class AssignmentController : ControllerBase
+public class AssignmentController (IAssignmentService assignmentService) : ControllerBase
 {
-    // GET: api/<AssignmentController>
+    private readonly IAssignmentService _assignmentService = assignmentService;
+
     [HttpGet]
-    public IEnumerable<string> Get()
+    public async Task<ActionResult<IEnumerable<AssignmentResponse>>> GetAssignments()
     {
-        return new string[] { "value1", "value2" };
+        var result = await _assignmentService.GetAssignmentListAsync();
+        return Ok(result);
+    }
+    [HttpGet("my")]
+    public async Task<ActionResult<IEnumerable<AssignmentResponse>>> GetMyAssignments()
+    {
+        var result = await _assignmentService.GetUserAssignmentAsync();
+        return Ok(result);
     }
 
-    // GET api/<AssignmentController>/5
     [HttpGet("{id}")]
-    public string Get(int id)
+    public async Task<ActionResult<IEnumerable<AssignmentResponse>>> GetAssignment(int id)
     {
-        return "value";
+        var result = await _assignmentService.GetAssignmentAsync(id);
+        return Ok(result);
     }
 
     // POST api/<AssignmentController>

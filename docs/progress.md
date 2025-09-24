@@ -38,3 +38,6 @@ The NSwag-generated code assumes it's receiving raw text and tries to parse it a
 This is a known issue with the TypeScript + Axios template when using certain configurations"
 - exception egyedi kezelése middlewareben, userContext middleware
 - fileok tárolása, blob storage, fájlok feltöltése, letöltése, törlése
+- automapper,
+- fileok letöltése, feltöltése a tutoralhoz
+- tutorial crud

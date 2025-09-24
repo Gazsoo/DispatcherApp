@@ -55,6 +55,7 @@ public class DatabaseSeedingService
     {
         try
         {
+            await Task.CompletedTask;
             await _context.Database.EnsureDeletedAsync();
             await _context.Database.MigrateAsync();
         }
@@ -80,6 +81,7 @@ public class DatabaseSeedingService
     {
         // Admin
         var administratorRole = new IdentityRole(Roles.Administrator);
+        administratorRole.Id = "c90ee222-ccd2-4857-8888-161752decd99";
         if (_roleManager.Roles.All(r => r.Name != administratorRole.Name))
         {
             await _roleManager.CreateAsync(administratorRole);
@@ -131,6 +133,26 @@ public class DatabaseSeedingService
             }
         };
         _context.Tutorials.Add(tutorial);
+        await _context.SaveChangesAsync();
+
+        var assignment1 = new Assignment
+        {
+            Name = "Task1",
+        };
+        var assignment2 = new Assignment
+        {
+            Name = "Task2",
+        };
+        _context.Assignments.Add(assignment1);
+        _context.Assignments.Add(assignment2);
+
+        var assignmentUser1 = new AssignmentUser
+        {
+            Assignment = assignment1,
+            UserId = administrator.Id
+        };
+
+        _context.AssignmentUsers.Add(assignmentUser1);
         await _context.SaveChangesAsync();
 
     }

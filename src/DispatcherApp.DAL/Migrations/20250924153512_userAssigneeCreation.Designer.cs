@@ -4,6 +4,7 @@ using DispatcherApp.DAL.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DispatcherApp.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250924153512_userAssigneeCreation")]
+    partial class userAssigneeCreation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,10 +32,6 @@ namespace DispatcherApp.DAL.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.PrimitiveCollection<string>("AssigneeIds")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -53,26 +52,6 @@ namespace DispatcherApp.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Assignments");
-                });
-
-            modelBuilder.Entity("DispatcherApp.Models.Entities.AssignmentUser", b =>
-                {
-                    b.Property<int>("AssignmentId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("AssignedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit");
-
-                    b.HasKey("AssignmentId", "UserId");
-
-                    b.ToTable("AssignmentUsers");
                 });
 
             modelBuilder.Entity("DispatcherApp.Models.Entities.File", b =>
@@ -364,17 +343,6 @@ namespace DispatcherApp.DAL.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("DispatcherApp.Models.Entities.AssignmentUser", b =>
-                {
-                    b.HasOne("DispatcherApp.Models.Entities.Assignment", "Assignment")
-                        .WithMany("AssignmentUsers")
-                        .HasForeignKey("AssignmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Assignment");
-                });
-
             modelBuilder.Entity("FileTutorial", b =>
                 {
                     b.HasOne("DispatcherApp.Models.Entities.File", null)
@@ -439,11 +407,6 @@ namespace DispatcherApp.DAL.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("DispatcherApp.Models.Entities.Assignment", b =>
-                {
-                    b.Navigation("AssignmentUsers");
                 });
 #pragma warning restore 612, 618
         }

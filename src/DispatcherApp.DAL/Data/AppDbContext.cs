@@ -10,6 +10,7 @@ namespace DispatcherApp.DAL.Data
     public class AppDbContext: IdentityDbContext
     {
         public DbSet<Assignment> Assignments { get; set; }
+        public DbSet<AssignmentUser> AssignmentUsers { get; set; }
         public DbSet<Tutorial> Tutorials { get; set; }
         public DbSet<File> Files { get; set; }
         public AppDbContext(DbContextOptions<AppDbContext> options)
@@ -26,6 +27,9 @@ namespace DispatcherApp.DAL.Data
                 entity.Property(t => t.Description).HasMaxLength(1000);
                 entity.Property(t => t.Url).HasMaxLength(500);
                 entity.HasIndex(t => t.CreatedAt);
+
+                entity.HasMany(t => t.Files)
+                    .WithMany(f => f.Tutorials);
             });
             modelBuilder.Entity<File>(entity =>
             {
@@ -34,9 +38,17 @@ namespace DispatcherApp.DAL.Data
                 entity.Property(f => f.StoragePath).IsRequired();
             });
 
-            modelBuilder.Entity<Tutorial>()
-            .HasMany(t => t.Files)
-            .WithMany(f => f.Tutorials);
+            modelBuilder.Entity<AssignmentUser>(entity =>
+            {
+                entity.HasKey(au => new { au.AssignmentId, au.UserId });
+
+                entity.HasOne(au => au.Assignment)
+                    .WithMany(a => a.AssignmentUsers)
+                    .HasForeignKey(au => au.AssignmentId);
+                entity.Property(au => au.UserId)
+                    .HasMaxLength(450);
+            }
+            );                
         }
     }
 }

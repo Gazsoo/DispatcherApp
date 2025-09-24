@@ -46,8 +46,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project It
 		Directory.Packages.props = Directory.Packages.props
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "codegen", "codegen", "{3E7CADF3-B224-42A0-9177-1CA01D1355E4}"
-EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "frontend-app", "src\frontend-app\frontend-app.esproj", "{6CADF96A-EC26-3B15-F2FF-B5891A230EA6}"
 	ProjectSection(ProjectDependencies) = postProject
 		{5E2CFEB5-BCD0-463C-B1A7-DAC2AB0FAC47} = {5E2CFEB5-BCD0-463C-B1A7-DAC2AB0FAC47}

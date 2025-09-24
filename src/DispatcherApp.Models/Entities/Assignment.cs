@@ -13,6 +13,8 @@ namespace DispatcherApp.Models.Entities
         public string Description { get; set; } = string.Empty;
         public string Type { get; set; } = string.Empty;
         public string Value { get; set; } = string.Empty;
+        public List<string> AssigneeIds { get; set; } = new List<string>();
+        public List<AssignmentUser> AssignmentUsers { get; set; } = new List<AssignmentUser>();
 
     }
 }

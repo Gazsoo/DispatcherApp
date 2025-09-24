@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using DispatcherApp.BLL.Configurations;
 using DispatcherApp.BLL.Interfaces;
+using DispatcherApp.BLL.Model;
+using DispatcherApp.Models.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
@@ -18,11 +20,22 @@ public class LocalFileStorageService : IFileStorageService
         _basePath = Guard.Against.NullOrEmpty(options.Value.BasePath);
     }
 
-    public async Task<string> SaveFileAsync(IFormFile file, int tutorialId)
+    public async Task<byte[]> LoadFileAsync(string relativePath)
+    {
+        var fullPath = GetFullPath(relativePath);
+        var content = await System.IO.File.ReadAllBytesAsync(fullPath);
+        return content;
+    }
+
+    private string GetFullPath(string relativePath, string fileName = "")
+    {
+        return Path.Combine(_basePath, relativePath, fileName);
+    }
+
+    public async Task<SaveFileResult> SaveFileAsync(IFormFile file, string relativePathWithoutFileName)
     {
         var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-        var relativePath = Path.Combine("tutorials", tutorialId.ToString(), fileName);
-        var fullPath = Path.Combine(_basePath, relativePath);
+        var fullPath = GetFullPath(relativePathWithoutFileName, fileName);
 
         Directory.CreateDirectory(Path.GetDirectoryName(fullPath) ??
             throw new ArgumentException("no file path"));
@@ -30,6 +43,11 @@ public class LocalFileStorageService : IFileStorageService
         using var stream = new FileStream(fullPath, FileMode.Create);
         await file.CopyToAsync(stream);
 
-        return relativePath; // Store this in TutorialFile.StoragePath
+        return new SaveFileResult
+        {
+            ContentType = file.ContentType ?? "application/octet-stream",
+            FileName = fileName,
+            StoragePath = Path.Combine(relativePathWithoutFileName, fileName)
+        };
     }
 }

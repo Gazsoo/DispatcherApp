@@ -25,7 +25,7 @@ export class Client extends ApiClientBase {
 
     }
 
-    assignment_GetAll(signal?: AbortSignal): Promise<string[]> {
+    assignment_GetAssignments(signal?: AbortSignal): Promise<AssignmentResponse[]> {
         let url_ = this.baseUrl + "/api/Assignment";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -45,11 +45,11 @@ export class Client extends ApiClientBase {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processAssignment_GetAll(_response));
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processAssignment_GetAssignments(_response));
         });
     }
 
-    protected processAssignment_GetAll(response: AxiosResponse): Promise<string[]> {
+    protected processAssignment_GetAssignments(response: AxiosResponse): Promise<AssignmentResponse[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -64,13 +64,13 @@ export class Client extends ApiClientBase {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<string[]>(result200);
+            return Promise.resolve<AssignmentResponse[]>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<string[]>(null as any);
+        return Promise.resolve<AssignmentResponse[]>(null as any);
     }
 
     assignment_Post(value: string, signal?: AbortSignal): Promise<void> {
@@ -121,7 +121,55 @@ export class Client extends ApiClientBase {
         return Promise.resolve<void>(null as any);
     }
 
-    assignment_Get(id: number, signal?: AbortSignal): Promise<string> {
+    assignment_GetMyAssignments(signal?: AbortSignal): Promise<AssignmentResponse[]> {
+        let url_ = this.baseUrl + "/api/Assignment/my";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processAssignment_GetMyAssignments(_response));
+        });
+    }
+
+    protected processAssignment_GetMyAssignments(response: AxiosResponse): Promise<AssignmentResponse[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<AssignmentResponse[]>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<AssignmentResponse[]>(null as any);
+    }
+
+    assignment_GetAssignment(id: number, signal?: AbortSignal): Promise<AssignmentResponse[]> {
         let url_ = this.baseUrl + "/api/Assignment/{id}";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
@@ -144,11 +192,11 @@ export class Client extends ApiClientBase {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processAssignment_Get(_response));
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processAssignment_GetAssignment(_response));
         });
     }
 
-    protected processAssignment_Get(response: AxiosResponse): Promise<string> {
+    protected processAssignment_GetAssignment(response: AxiosResponse): Promise<AssignmentResponse[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -163,13 +211,13 @@ export class Client extends ApiClientBase {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<string>(result200);
+            return Promise.resolve<AssignmentResponse[]>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<string>(null as any);
+        return Promise.resolve<AssignmentResponse[]>(null as any);
     }
 
     assignment_Put(id: number, value: string, signal?: AbortSignal): Promise<void> {
@@ -823,7 +871,7 @@ export class Client extends ApiClientBase {
         return Promise.resolve<FileResponse>(null as any);
     }
 
-    tutorial_UploadFile(tutorialId: number, file?: FileParameter | null | undefined, signal?: AbortSignal): Promise<FileResponse> {
+    tutorial_UploadFile(tutorialId: number, file?: FileParameter | null | undefined, signal?: AbortSignal): Promise<number> {
         let url_ = this.baseUrl + "/api/Tutorial/{tutorialId}/files";
         if (tutorialId === undefined || tutorialId === null)
             throw new globalThis.Error("The parameter 'tutorialId' must be defined.");
@@ -836,11 +884,10 @@ export class Client extends ApiClientBase {
 
         let options_: AxiosRequestConfig = {
             data: content_,
-            responseType: "blob",
             method: "POST",
             url: url_,
             headers: {
-                "Accept": "application/octet-stream"
+                "Accept": "application/json"
             },
             signal
         };
@@ -856,7 +903,62 @@ export class Client extends ApiClientBase {
         });
     }
 
-    protected processTutorial_UploadFile(response: AxiosResponse): Promise<FileResponse> {
+    protected processTutorial_UploadFile(response: AxiosResponse): Promise<number> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<number>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<number>(null as any);
+    }
+
+    tutorial_GetFile(tutorialId: number, fileId: number, signal?: AbortSignal): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/api/Tutorial/{tutorialId}/files/{fileId}";
+        if (tutorialId === undefined || tutorialId === null)
+            throw new globalThis.Error("The parameter 'tutorialId' must be defined.");
+        url_ = url_.replace("{tutorialId}", encodeURIComponent("" + tutorialId));
+        if (fileId === undefined || fileId === null)
+            throw new globalThis.Error("The parameter 'fileId' must be defined.");
+        url_ = url_.replace("{fileId}", encodeURIComponent("" + fileId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            responseType: "blob",
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/octet-stream"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processTutorial_GetFile(_response));
+        });
+    }
+
+    protected processTutorial_GetFile(response: AxiosResponse): Promise<FileResponse> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -882,6 +984,105 @@ export class Client extends ApiClientBase {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<FileResponse>(null as any);
+    }
+
+    tutorial_GetTutorial(tutorialId: number, signal?: AbortSignal): Promise<TutorialResponse> {
+        let url_ = this.baseUrl + "/api/Tutorial/{tutorialId}";
+        if (tutorialId === undefined || tutorialId === null)
+            throw new globalThis.Error("The parameter 'tutorialId' must be defined.");
+        url_ = url_.replace("{tutorialId}", encodeURIComponent("" + tutorialId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processTutorial_GetTutorial(_response));
+        });
+    }
+
+    protected processTutorial_GetTutorial(response: AxiosResponse): Promise<TutorialResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<TutorialResponse>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<TutorialResponse>(null as any);
+    }
+
+    tutorial_GetTutorialAll(signal?: AbortSignal): Promise<TutorialResponse[]> {
+        let url_ = this.baseUrl + "/api/Tutorial";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processTutorial_GetTutorialAll(_response));
+        });
+    }
+
+    protected processTutorial_GetTutorialAll(response: AxiosResponse): Promise<TutorialResponse[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<TutorialResponse[]>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<TutorialResponse[]>(null as any);
     }
 
     user_GetProfile(signal?: AbortSignal): Promise<FileResponse> {
@@ -936,6 +1137,14 @@ export class Client extends ApiClientBase {
         }
         return Promise.resolve<FileResponse>(null as any);
     }
+}
+
+export interface AssignmentResponse {
+    id?: number;
+    name?: string;
+    description?: string | undefined;
+    type?: string | undefined;
+    value?: string | undefined;
 }
 
 export interface ProblemDetails {
@@ -1000,6 +1209,24 @@ export interface LoginRequest {
 export interface RefreshRequest {
     accessToken?: string;
     refreshToken?: string;
+}
+
+export interface TutorialResponse {
+    id?: number;
+    title?: string;
+    description?: string | undefined;
+    url?: string | undefined;
+    createdAt?: Date | undefined;
+    updatedAt?: Date | undefined;
+    contentType?: string | undefined;
+    files?: FileResponse[];
+}
+
+export interface FileResponse {
+    id?: number;
+    fileName?: string;
+    contentType?: string;
+    fileSize?: number;
 }
 
 export interface FileParameter {
