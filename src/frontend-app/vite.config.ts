@@ -1,4 +1,5 @@
 import plugin from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite'
 import { defineConfig, loadEnv} from 'vite';
 // https://vitejs.dev/config/
 
@@ -8,7 +9,10 @@ export default defineConfig(({ mode }) => {
     // `VITE_` prefix.
     const env = loadEnv(mode, process.cwd(), '')
     return {
-        plugins: [plugin()],
+        plugins: [
+            plugin(),
+            tailwindcss(),
+        ],
         define: {
             // Provide an explicit app-level constant derived from an env var.
             __APP_ENV__: JSON.stringify(env.APP_ENV),

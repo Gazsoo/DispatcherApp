@@ -1,68 +1,54 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@import "tailwindcss";
+@variant dark (&:where(.dark, .dark *));
+@theme {
+  /* Brand accent color */
+  --color-accent: #4FD1C5;
+  --color-accent-light: #81E6D9;
+  --color-accent-dark: #319795;
+  
+  /* Surface colors (backgrounds) */
+  --color-surface-light: #F7FAFC;
+  --color-surface-light-card: #EDF2F7;
+  --color-surface-light-border: #CBD5E0;
+  --color-surface-dark: #1A202C;
+  --color-surface-dark-card: #2D3748;
+  --color-surface-dark-border: #4A5568;
+  
+  /* Content colors (text) */
+  --color-content-light: #2D3748;
+  --color-content-light-muted: #4A5568;
+  --color-content-dark: #E2E8F0;
+  --color-content-dark-muted: #A0AEC0;
+  
+  /* Animation */
+  --animate-spin-slow: spin 3s linear infinite;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
+/* Dark mode configuration */
+@media (prefers-color-scheme: dark) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    color-scheme: dark;
   }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-surface-light dark:bg-surface-dark;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-surface-light-border dark:bg-surface-dark-border rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-accent;
 }
