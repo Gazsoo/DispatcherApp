@@ -1,27 +1,28 @@
 @import "tailwindcss";
 @variant dark (&:where(.dark, .dark *));
 @theme {
-  /* Brand accent color */
-  --color-accent: #4FD1C5;
-  --color-accent-light: #81E6D9;
-  --color-accent-dark: #319795;
-  
+  /* Brand accent color - Green Sage */
+  --color-accent: #8fbc8f;
+  --color-accent-light: #b5d4b5;
+  --color-accent-dark: #6b9b6b;
+
   /* Surface colors (backgrounds) */
-  --color-surface-light: #F7FAFC;
-  --color-surface-light-card: #EDF2F7;
-  --color-surface-light-border: #CBD5E0;
-  --color-surface-dark: #1A202C;
-  --color-surface-dark-card: #2D3748;
-  --color-surface-dark-border: #4A5568;
-  
+  --color-surface-light: #f7fafc;
+  --color-surface-light-card: #edf2f7;
+  --color-surface-light-border: #cbd5e0;
+  --color-surface-dark: #1a202c;
+  --color-surface-dark-card: #2d3748;
+  --color-surface-dark-border: #4a5568;
+
   /* Content colors (text) */
-  --color-content-light: #2D3748;
-  --color-content-light-muted: #4A5568;
-  --color-content-dark: #E2E8F0;
-  --color-content-dark-muted: #A0AEC0;
-  
+  --color-content-light: #2d3748;
+  --color-content-light-muted: #4a5568;
+  --color-content-dark: #e2e8f0;
+  --color-content-dark-muted: #a0aec0;
+
   /* Animation */
   --animate-spin-slow: spin 3s linear infinite;
+  --animate-spin: spin 1s linear infinite;
 }
 
 /* Dark mode configuration */
@@ -51,4 +52,27 @@ html {
 
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-accent;
+}
+
+/* Autofill styles with accent color */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px
+    color-mix(in srgb, var(--color-accent) 20%, var(--color-surface-light-card))
+    inset !important;
+  -webkit-text-fill-color: var(--color-content-light) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Dark mode autofill */
+:is(.dark, .dark *) input:-webkit-autofill,
+:is(.dark, .dark *) input:-webkit-autofill:hover,
+:is(.dark, .dark *) input:-webkit-autofill:focus,
+:is(.dark, .dark *) input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px
+    color-mix(in srgb, var(--color-accent) 30%, var(--color-surface-dark-card))
+    inset !important;
+  -webkit-text-fill-color: var(--color-content-dark) !important;
 }
