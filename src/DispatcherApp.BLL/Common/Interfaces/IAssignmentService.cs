@@ -1,7 +1,7 @@
 ﻿using DispatcherApp.Models.Context;
 using DispatcherApp.Models.DTOs.Assignment;
 
-namespace DispatcherApp.BLL.Interfaces;
+namespace DispatcherApp.BLL.Common.Interfaces;
 public interface IAssignmentService
 {
     UserContext? GetCurrentUserId();

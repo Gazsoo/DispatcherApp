@@ -818,6 +818,292 @@ export class Client extends ApiClientBase {
         return Promise.resolve<AuthResponse>(null as any);
     }
 
+    files_GetFiles(signal?: AbortSignal): Promise<FileMetadataResponse[]> {
+        let url_ = this.baseUrl + "/api/Files";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processFiles_GetFiles(_response));
+        });
+    }
+
+    protected processFiles_GetFiles(response: AxiosResponse): Promise<FileMetadataResponse[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<FileMetadataResponse[]>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<FileMetadataResponse[]>(null as any);
+    }
+
+    files_PostFile(contentType?: string | null | undefined, contentDisposition?: string | null | undefined, headers?: any[] | null | undefined, length?: number | undefined, name?: string | null | undefined, fileName?: string | null | undefined, signal?: AbortSignal): Promise<FileUploadResponse> {
+        let url_ = this.baseUrl + "/api/Files";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = new FormData();
+        if (contentType !== null && contentType !== undefined)
+            content_.append("ContentType", contentType.toString());
+        if (contentDisposition !== null && contentDisposition !== undefined)
+            content_.append("ContentDisposition", contentDisposition.toString());
+        if (headers !== null && headers !== undefined)
+            headers.forEach(item_ => content_.append("Headers", item_.toString()));
+        if (length === null || length === undefined)
+            throw new globalThis.Error("The parameter 'length' cannot be null.");
+        else
+            content_.append("Length", length.toString());
+        if (name !== null && name !== undefined)
+            content_.append("Name", name.toString());
+        if (fileName !== null && fileName !== undefined)
+            content_.append("FileName", fileName.toString());
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processFiles_PostFile(_response));
+        });
+    }
+
+    protected processFiles_PostFile(response: AxiosResponse): Promise<FileUploadResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<FileUploadResponse>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<FileUploadResponse>(null as any);
+    }
+
+    files_Get(fileId: number, signal?: AbortSignal): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/api/Files/{fileId}/download";
+        if (fileId === undefined || fileId === null)
+            throw new globalThis.Error("The parameter 'fileId' must be defined.");
+        url_ = url_.replace("{fileId}", encodeURIComponent("" + fileId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            responseType: "blob",
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/octet-stream"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processFiles_Get(_response));
+        });
+    }
+
+    protected processFiles_Get(response: AxiosResponse): Promise<FileResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers["content-disposition"] : undefined;
+            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
+            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
+            if (fileName) {
+                fileName = decodeURIComponent(fileName);
+            } else {
+                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            }
+            return Promise.resolve({ fileName: fileName, status: status, data: new Blob([response.data], { type: response.headers["content-type"] }), headers: _headers });
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<FileResponse>(null as any);
+    }
+
+    files_DeleteFile(id: string, fileId?: number | undefined, signal?: AbortSignal): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/api/Files/{id}?";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (fileId === null)
+            throw new globalThis.Error("The parameter 'fileId' cannot be null.");
+        else if (fileId !== undefined)
+            url_ += "fileId=" + encodeURIComponent("" + fileId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            responseType: "blob",
+            method: "DELETE",
+            url: url_,
+            headers: {
+                "Accept": "application/octet-stream"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processFiles_DeleteFile(_response));
+        });
+    }
+
+    protected processFiles_DeleteFile(response: AxiosResponse): Promise<FileResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers["content-disposition"] : undefined;
+            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
+            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
+            if (fileName) {
+                fileName = decodeURIComponent(fileName);
+            } else {
+                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            }
+            return Promise.resolve({ fileName: fileName, status: status, data: new Blob([response.data], { type: response.headers["content-type"] }), headers: _headers });
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<FileResponse>(null as any);
+    }
+
+    files_DeleteMutipleFile(fileIds: number[], signal?: AbortSignal): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/files";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(fileIds);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            responseType: "blob",
+            method: "DELETE",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/octet-stream"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processFiles_DeleteMutipleFile(_response));
+        });
+    }
+
+    protected processFiles_DeleteMutipleFile(response: AxiosResponse): Promise<FileResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers["content-disposition"] : undefined;
+            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
+            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
+            if (fileName) {
+                fileName = decodeURIComponent(fileName);
+            } else {
+                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            }
+            return Promise.resolve({ fileName: fileName, status: status, data: new Blob([response.data], { type: response.headers["content-type"] }), headers: _headers });
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<FileResponse>(null as any);
+    }
+
     home_Index(signal?: AbortSignal): Promise<FileResponse> {
         let url_ = this.baseUrl + "/api/Home";
         url_ = url_.replace(/[?&]$/, "");
@@ -871,7 +1157,7 @@ export class Client extends ApiClientBase {
         return Promise.resolve<FileResponse>(null as any);
     }
 
-    tutorial_UploadFile(tutorialId: number, file?: FileParameter | null | undefined, signal?: AbortSignal): Promise<number> {
+    tutorial_UploadTutorialFile(tutorialId: number, file?: FileParameter | null | undefined, signal?: AbortSignal): Promise<number> {
         let url_ = this.baseUrl + "/api/Tutorial/{tutorialId}/files";
         if (tutorialId === undefined || tutorialId === null)
             throw new globalThis.Error("The parameter 'tutorialId' must be defined.");
@@ -899,11 +1185,11 @@ export class Client extends ApiClientBase {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processTutorial_UploadFile(_response));
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processTutorial_UploadTutorialFile(_response));
         });
     }
 
-    protected processTutorial_UploadFile(response: AxiosResponse): Promise<number> {
+    protected processTutorial_UploadTutorialFile(response: AxiosResponse): Promise<number> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -927,7 +1213,7 @@ export class Client extends ApiClientBase {
         return Promise.resolve<number>(null as any);
     }
 
-    tutorial_GetFile(tutorialId: number, fileId: number, signal?: AbortSignal): Promise<FileResponse> {
+    tutorial_GetTutorialFile(tutorialId: number, fileId: number, signal?: AbortSignal): Promise<FileResponse> {
         let url_ = this.baseUrl + "/api/Tutorial/{tutorialId}/files/{fileId}";
         if (tutorialId === undefined || tutorialId === null)
             throw new globalThis.Error("The parameter 'tutorialId' must be defined.");
@@ -954,11 +1240,11 @@ export class Client extends ApiClientBase {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processTutorial_GetFile(_response));
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processTutorial_GetTutorialFile(_response));
         });
     }
 
-    protected processTutorial_GetFile(response: AxiosResponse): Promise<FileResponse> {
+    protected processTutorial_GetTutorialFile(response: AxiosResponse): Promise<FileResponse> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1037,7 +1323,7 @@ export class Client extends ApiClientBase {
         return Promise.resolve<TutorialResponse>(null as any);
     }
 
-    tutorial_GetTutorialAll(signal?: AbortSignal): Promise<TutorialResponse[]> {
+    tutorial_GetTutorials(signal?: AbortSignal): Promise<TutorialResponse[]> {
         let url_ = this.baseUrl + "/api/Tutorial";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1057,11 +1343,11 @@ export class Client extends ApiClientBase {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processTutorial_GetTutorialAll(_response));
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processTutorial_GetTutorials(_response));
         });
     }
 
-    protected processTutorial_GetTutorialAll(response: AxiosResponse): Promise<TutorialResponse[]> {
+    protected processTutorial_GetTutorials(response: AxiosResponse): Promise<TutorialResponse[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1083,6 +1369,58 @@ export class Client extends ApiClientBase {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<TutorialResponse[]>(null as any);
+    }
+
+    tutorial_CreateTutorial(request: CreateTutorialRequest, signal?: AbortSignal): Promise<CreateTutorialResponse> {
+        let url_ = this.baseUrl + "/api/Tutorial";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processTutorial_CreateTutorial(_response));
+        });
+    }
+
+    protected processTutorial_CreateTutorial(response: AxiosResponse): Promise<CreateTutorialResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<CreateTutorialResponse>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<CreateTutorialResponse>(null as any);
     }
 
     user_GetProfile(signal?: AbortSignal): Promise<FileResponse> {
@@ -1192,6 +1530,8 @@ export interface UserInfoResponse {
     firstName?: string;
     lastName?: string;
     twoFactorEnabled?: boolean;
+    id?: string;
+    phone?: string | undefined;
 }
 
 export interface AuthResponse {
@@ -1211,6 +1551,18 @@ export interface RefreshRequest {
     refreshToken?: string;
 }
 
+export interface FileMetadataResponse {
+    id?: number;
+    fileName?: string;
+    contentType?: string;
+    fileSize?: number;
+    uploadedAt?: Date;
+    downloadUrl?: string;
+}
+
+export interface FileUploadResponse {
+}
+
 export interface TutorialResponse {
     id?: number;
     title?: string;
@@ -1227,6 +1579,17 @@ export interface FileResponse {
     fileName?: string;
     contentType?: string;
     fileSize?: number;
+}
+
+export interface CreateTutorialResponse {
+}
+
+export interface CreateTutorialRequest {
+    title?: string;
+    description?: string;
+    categoryIds?: number[];
+    createdById?: number;
+    filesId?: number[];
 }
 
 export interface FileParameter {

@@ -13,11 +13,44 @@ public class CustomExceptionHandler : IExceptionHandler
     {
         _exceptionHandlers = new()
             {
-                { typeof(ValidationException), HandleValidationException },
                 { typeof(Ardalis.GuardClauses.NotFoundException), HandleNotFoundException },
+                { typeof(ValidationException), HandleValidationException },
                 { typeof(UnauthorizedAccessException), HandleUnauthorizedAccessException },
                 { typeof(ForbiddenAccessException), HandleForbiddenAccessException },
             };
+    }
+
+    public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
+    {
+        var exceptionType = exception.GetType();
+
+        if (_exceptionHandlers.ContainsKey(exceptionType))
+        {
+            await _exceptionHandlers[exceptionType].Invoke(httpContext, exception);
+            return true;
+        }
+        //_logger.LogError(exception, "Unhandled exception occurred: {ExceptionType}", exceptionType.Name);
+
+        await HandleUnhandledException(httpContext, exception);
+        return true; 
+    }
+    private async Task HandleUnhandledException(HttpContext httpContext, Exception ex)
+    {
+        httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+
+        var problemDetails = new ProblemDetails
+        {
+            Status = StatusCodes.Status500InternalServerError,
+            Title = "An error occurred while processing your request.",
+            Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1"
+        };
+
+        if (httpContext.RequestServices.GetRequiredService<IHostEnvironment>().IsDevelopment())
+        {
+            problemDetails.Detail = ex.ToString();
+        }
+
+        await httpContext.Response.WriteAsJsonAsync(problemDetails);
     }
     private async Task HandleForbiddenAccessException(HttpContext httpContext, Exception ex)
     {
@@ -30,19 +63,6 @@ public class CustomExceptionHandler : IExceptionHandler
             Type = "https://tools.ietf.org/html/rfc7231#section-6.5.3"
         });
     }
-    public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
-    {
-        var exceptionType = exception.GetType();
-
-        if (_exceptionHandlers.ContainsKey(exceptionType))
-        {
-            await _exceptionHandlers[exceptionType].Invoke(httpContext, exception);
-            return true;
-        }
-
-        return false;
-    }
-
     private async Task HandleValidationException(HttpContext httpContext, Exception ex)
     {
         var exception = (ValidationException)ex;

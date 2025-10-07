@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DispatcherApp.Models.Context;
 
-namespace DispatcherApp.BLL.Interfaces;
+namespace DispatcherApp.BLL.Common.Interfaces;
 public interface IUserContextService
 {
     UserContext? GetCurrentUser();

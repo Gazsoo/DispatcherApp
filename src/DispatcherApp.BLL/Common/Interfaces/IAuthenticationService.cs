@@ -11,7 +11,7 @@ using RefreshRequest = DispatcherApp.Models.DTOs.Auth.RefreshRequest;
 using RegisterRequest = DispatcherApp.Models.DTOs.Auth.RegisterRequest;
 using ResetPasswordRequest = DispatcherApp.Models.DTOs.Auth.ResetPasswordRequest;
 
-namespace DispatcherApp.BLL.Interfaces;
+namespace DispatcherApp.BLL.Common.Interfaces;
 public interface IAuthenticationService
 {
     Task<AuthResponse?> LoginAsync(LoginRequest request);

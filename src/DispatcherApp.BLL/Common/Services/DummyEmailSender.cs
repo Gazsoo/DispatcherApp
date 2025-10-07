@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Logging;
 
-namespace DispatcherApp.API.Services;
+namespace DispatcherApp.BLL.Common.Services;
 
 public class DummyEmailSender: IEmailSender<IdentityUser> , IEmailSender
 {

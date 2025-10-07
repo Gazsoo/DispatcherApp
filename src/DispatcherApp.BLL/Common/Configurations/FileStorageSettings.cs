@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DispatcherApp.BLL.Configurations;
+namespace DispatcherApp.BLL.Common.Configurations;
 public class FileStorageSettings
 {
     public const string SectionName = "FileStorage";

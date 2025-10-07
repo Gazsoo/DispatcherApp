@@ -6,8 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using AutoMapper;
-using DispatcherApp.BLL.Configurations;
-using DispatcherApp.BLL.Interfaces;
+using DispatcherApp.BLL.Common.Configurations;
+using DispatcherApp.BLL.Common.Interfaces;
 using DispatcherApp.BLL.Model;
 using DispatcherApp.DAL.Data;
 using DispatcherApp.Models.DTOs.Tutorial;
@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace DispatcherApp.BLL.Services;
+namespace DispatcherApp.BLL.Common.Services;
 public class TutorialService : ITutorialService
 {
     private readonly AppDbContext _context;
@@ -99,5 +99,10 @@ public class TutorialService : ITutorialService
             .ToListAsync();
 
         return _mapper.Map<List<TutorialResponse>>(tutorials);
+    }
+
+    public Task<CreateTutorialResponse> CreateTutorial(CreateTutorialRequest request)
+    {
+        throw new NotImplementedException();
     }
 }

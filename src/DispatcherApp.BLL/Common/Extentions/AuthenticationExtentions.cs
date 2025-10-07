@@ -7,8 +7,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using DispatcherApp.BLL.Configurations;
-namespace DispatcherApp.BLL.Extentions;
+using DispatcherApp.BLL.Common.Configurations;
+namespace DispatcherApp.BLL.Common.Extentions;
 
 
     public static class AuthenticationExtensions

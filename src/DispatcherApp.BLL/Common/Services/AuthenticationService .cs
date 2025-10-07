@@ -2,7 +2,7 @@
 using System.Net;
 using System.Security.Claims;
 using Ardalis.GuardClauses;
-using DispatcherApp.BLL.Interfaces;
+using DispatcherApp.BLL.Common.Interfaces;
 using DispatcherApp.Models.CommonConfigurations;
 using DispatcherApp.Models.DTOs.Auth;
 using Microsoft.AspNetCore.Http;
@@ -12,7 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace DispatcherApp.BLL.Services;
+namespace DispatcherApp.BLL.Common.Services;
 
 public class AuthenticationService : IAuthenticationService
 {
@@ -106,6 +106,8 @@ public class AuthenticationService : IAuthenticationService
 
             return new UserInfoResponse
             {
+                Id = user.Id,
+                Phone = user.PhoneNumber,
                 Email = user.Email ?? string.Empty,
                 EmailConfirmed = user.EmailConfirmed,
                 TwoFactorEnabled = user.TwoFactorEnabled

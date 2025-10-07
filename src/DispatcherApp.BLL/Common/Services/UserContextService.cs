@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DispatcherApp.BLL.Interfaces;
+using DispatcherApp.BLL.Common.Interfaces;
 using DispatcherApp.Models.Context;
 using Microsoft.AspNetCore.Http;
 
-namespace DispatcherApp.BLL.Services;
+namespace DispatcherApp.BLL.Common.Services;
 public class UserContextService : IUserContextService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;

@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="15.0.1" />
+    <PackageReference Include="FluentValidation" Version="12.0.0" />
+    <PackageReference Include="MediatR" Version="13.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.0" />
   </ItemGroup>
@@ -15,6 +17,12 @@
   <ItemGroup>
     <ProjectReference Include="..\DispatcherApp.DAL\DispatcherApp.DAL.csproj" />
     <ProjectReference Include="..\DispatcherApp.Models\DispatcherApp.Models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Common\Behaviours\" />
+    <Folder Include="Files\Queries\" />
+    <Folder Include="Tutorials\" />
   </ItemGroup>
 
 </Project>

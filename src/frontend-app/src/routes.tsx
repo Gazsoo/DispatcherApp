@@ -3,7 +3,15 @@ import { AppProviders } from "./components/context/AppProvider";
 import { DashboardLayout } from "./components/dashboard/DashboardLayout";
 import Login from "./components/Login";
 import { createBrowserRouter, Outlet } from "react-router";
-import { dashboardNavigation } from "./config/navigation";
+import DashboardOverview from "./components/dashboard/pages/DashboardOverview";
+import Tutorials from "./components/dashboard/pages/Tutorials";
+import TutorialDetails from "./components/dashboard/pages/TutorialDetails";
+import Files from "./components/dashboard/pages/Files";
+import FileDetails from "./components/dashboard/pages/FileDetails";
+import Assignments from "./components/dashboard/pages/Assignments";
+import Settings from "./components/dashboard/pages/Settings";
+import Administration from "./components/dashboard/pages/Administrations";
+import Profile from "./components/dashboard/pages/Profile";
 
 // Layout component that wraps all routes
 function RootLayout() {
@@ -18,32 +26,41 @@ export const router = createBrowserRouter([
   {
     element: <RootLayout />,
     children: [
-      { path: "/", Component: App },
-      { path: "/login", Component: Login },
+      { path: "/", element: <App /> },
+      { path: "/login", element: <Login /> },
       {
         path: "/dashboard",
         element: <DashboardLayout />,
-        children: dashboardNavigation.flatMap(({ path, component: Component, children }, i) => {
-          const routePath = i === 0 ? undefined : path.replace('/dashboard/', '');
-          const mainRoute = i === 0
-            ? { index: true, Component }
-            : { path: routePath, Component };
+        children: [
+          // Index route - shows Overview by default
+          { index: true, element: <DashboardOverview /> },
 
-          // If this nav item has nested children, add them
-          if (children && children.length > 0) {
-            return [
-              {
-                ...mainRoute,
-                children: children.map(child => ({
-                  path: child.path,
-                  Component: child.component
-                }))
-              }
-            ];
-          }
+          // Tutorials with nested detail route
+          {
+            path: "tutorials",
+            element: <Tutorials />,
+          },
+          {
+            path: "tutorials/:tutorialId",
+            element: <TutorialDetails />,
+          },
 
-          return [mainRoute];
-        }),
+          // Files with nested detail route
+          {
+            path: "files",
+            element: <Files />,
+          },
+          {
+            path: "files/:fileId",
+            element: <FileDetails />,
+          },
+
+          // Simple routes without nesting
+          { path: "assignments", element: <Assignments /> },
+          { path: "settings", element: <Settings /> },
+          { path: "administration", element: <Administration /> },
+          { path: "profile", element: <Profile /> },
+        ],
       },
     ],
   },

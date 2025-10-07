@@ -6,14 +6,15 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using DispatcherApp.BLL.Configurations;
+using DispatcherApp.BLL.Common.Configurations;
+using DispatcherApp.BLL.Common.Interfaces;
 using DispatcherApp.BLL.Model;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace DispatcherApp.BLL.Interfaces;
+namespace DispatcherApp.BLL.Common.Services;
 public class TokenService : ITokenService
 {
     private readonly IConfiguration _configuration;

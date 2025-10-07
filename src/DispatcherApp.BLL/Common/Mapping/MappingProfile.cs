@@ -9,7 +9,7 @@ using DispatcherApp.Models.DTOs.Tutorial;
 using DispatcherApp.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 
-namespace DispatcherApp.BLL.Mapping;
+namespace DispatcherApp.BLL.Common.Mapping;
 public class MappingProfile : Profile
 {
     public MappingProfile()

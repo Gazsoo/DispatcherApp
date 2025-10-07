@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Security.Claims;
 using Ardalis.GuardClauses;
-using DispatcherApp.BLL.Interfaces;
+using DispatcherApp.BLL.Common.Interfaces;
 using DispatcherApp.BLL.Model;
 using DispatcherApp.Models.DTOs.Auth;
 using Microsoft.AspNetCore.Authorization;

@@ -1,4 +1,4 @@
-﻿using DispatcherApp.BLL.Interfaces;
+﻿using DispatcherApp.BLL.Common.Interfaces;
 using DispatcherApp.BLL.Services;
 using DispatcherApp.Models.DTOs.Tutorial;
 using Microsoft.AspNetCore.Http;
@@ -12,14 +12,14 @@ public class TutorialController (ITutorialService tutorialService): ControllerBa
     private readonly ITutorialService _tutorialService = tutorialService;
 
     [HttpPost("{tutorialId}/files")]
-    public async Task<ActionResult<int>> UploadFile(int tutorialId, IFormFile file)
+    public async Task<ActionResult<int>> UploadTutorialFile(int tutorialId, IFormFile file)
     {
         var result = await _tutorialService.AddTutorialFileAsync(file, tutorialId);
         return Ok(result);
     }
 
     [HttpGet("{tutorialId}/files/{fileId}")]
-    public async Task<FileContentResult> GetFile(int tutorialId, int fileId)
+    public async Task<FileContentResult> GetTutorialFile(int tutorialId, int fileId)
     {
         var result = await _tutorialService.GetTutorialFileAsync(fileId, tutorialId);
         return File(result.FileContent, result.ContentType);
@@ -33,10 +33,23 @@ public class TutorialController (ITutorialService tutorialService): ControllerBa
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<TutorialResponse>>> GetTutorial()
+    public async Task<ActionResult<List<TutorialResponse>>> GetTutorials()
     {
         var result = await _tutorialService.GetTutorialListAsync();
         return Ok(result);
     }
 
+    [HttpPut]
+    public async Task<ActionResult<CreateTutorialResponse>> CreateTutorial([FromBody]CreateTutorialRequest request)
+    {
+        var result = await _tutorialService.CreateTutorial(request);
+        return Ok(result);
+    }
+
+    //[HttpPost]
+    //public async Task<ActionResult<CreateTutorialResponse>> CreateTutorial([FromBody] CreateTutorialRequest request)
+    //{
+    //    var result = await _tutorialService.CreateTutorial(request);
+    //    return Ok(result);
+    //}
 }

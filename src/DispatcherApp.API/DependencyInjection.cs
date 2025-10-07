@@ -1,7 +1,5 @@
 ﻿using DispatcherApp.API.Configurations;
 using DispatcherApp.API.Midleware;
-using DispatcherApp.API.Services;
-using DispatcherApp.BLL.Interfaces;
 using DispatcherApp.BLL.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;

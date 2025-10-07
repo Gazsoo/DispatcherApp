@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
-using DispatcherApp.BLL.Configurations;
-using DispatcherApp.BLL.Interfaces;
+using DispatcherApp.BLL.Common.Configurations;
+using DispatcherApp.BLL.Common.Interfaces;
 using DispatcherApp.BLL.Model;
 using DispatcherApp.Models.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
-namespace DispatcherApp.BLL.Services;
+namespace DispatcherApp.BLL.Common.Services;
 public class LocalFileStorageService : IFileStorageService
 {
     private readonly string _basePath;

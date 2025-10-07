@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using AutoMapper;
-using DispatcherApp.BLL.Interfaces;
+using DispatcherApp.BLL.Common.Interfaces;
 using DispatcherApp.DAL.Data;
 using DispatcherApp.Models.Context;
 using DispatcherApp.Models.DTOs.Assignment;
@@ -13,7 +13,7 @@ using DispatcherApp.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace DispatcherApp.BLL.Services;
+namespace DispatcherApp.BLL.Common.Services;
 public class AssignmentService : IAssignmentService
 {
     public readonly IUserContextService _userContextService;

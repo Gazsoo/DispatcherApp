@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using DispatcherApp.BLL.Model;
 using Microsoft.AspNetCore.Identity;
 
-namespace DispatcherApp.BLL.Interfaces;
+namespace DispatcherApp.BLL.Common.Interfaces;
 public interface ITokenService
 {
     Task<TokenResult> GenerateAccessTokenAsync(IdentityUser user);

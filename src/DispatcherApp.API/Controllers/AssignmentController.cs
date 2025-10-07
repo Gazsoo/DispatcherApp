@@ -1,4 +1,4 @@
-﻿using DispatcherApp.BLL.Interfaces;
+﻿using DispatcherApp.BLL.Common.Interfaces;
 using DispatcherApp.Models.DTOs.Assignment;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

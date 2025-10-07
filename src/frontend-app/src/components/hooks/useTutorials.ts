@@ -55,13 +55,16 @@ export function useTutorialFile(tutorialId: number, fileId: number) {
     };
 }
 
-export function useTutorial(tutorialId: number) {
+export function useTutorial(tutorialId: number | undefined) {
     const { execute, error, isLoading } = useApiCall<TutorialResponse>();
     const [tutorial, setTutorial] = useState<TutorialResponse | null>(null);
 
     useEffect(() => {
         // Skip API call if ID is invalid
-        if (!tutorialId) return;
+        if (!tutorialId) {
+            setTutorial(null);
+            return;
+        }
 
         const fetchTutorial = async () => {
             const data = await execute(() => apiClient.tutorial_GetTutorial(tutorialId));
