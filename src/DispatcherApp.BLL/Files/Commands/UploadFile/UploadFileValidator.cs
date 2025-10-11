@@ -8,7 +8,7 @@ using DispatcherApp.BLL.Common.Configurations;
 using FluentValidation;
 using Microsoft.Extensions.Options;
 
-namespace DispatcherApp.BLL.Files.Commands;
+namespace DispatcherApp.BLL.Files.Commands.UpdateFile;
 public class UploadFileValidator : AbstractValidator<UploadFileCommand>
 {
     private readonly FileStorageSettings  _settings;

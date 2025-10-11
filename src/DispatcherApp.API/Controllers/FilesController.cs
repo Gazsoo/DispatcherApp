@@ -1,34 +1,39 @@
-﻿using DispatcherApp.BLL.Files.Commands;
+﻿using System.Runtime.InteropServices;
+using DispatcherApp.BLL.Files.Commands.DeleteFile;
+using DispatcherApp.BLL.Files.Commands.DeleteFiles;
+using DispatcherApp.BLL.Files.Commands.UpdateFile;
+using DispatcherApp.BLL.Files.Queries.DownloadFile;
+using DispatcherApp.BLL.Files.Queries.GetFile;
+using DispatcherApp.BLL.Files.Queries.GetFiles;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace DispatcherApp.API.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-public class FilesController (
-    IMediator mediator
-    ) : ControllerBase
+public class FilesController (IMediator mediator) : ControllerBase
 {
-    private readonly IFileService _fileService = fileService;
-    // GET: api/<FilesController>
     [HttpGet]
-    public async Task<ActionResult<List<FileMetadataResponse>>> GetFilesAsync()
+    public async Task<ActionResult<IEnumerable<FileMetadataResponse>>> GetFilesAsync()
     {
-        var result = await _fileService.GetFilesMetadataAsync();
+        var result = await mediator.Send(new GetFilesQuery());
         return Ok(result);
     }
 
-    // GET api/<FilesController>/5
     [HttpGet("{fileId}/download")]
-    public async Task<FileContentResult> Get(int fileId)
+    public async Task<FileContentResult> DownloadFile(int fileId)
     {
-        var result = await _fileService.GetFileAsync(fileId);
-        return File(result.FileContent, result.ContentType, result.FileName);
+        var result = await mediator.Send(new DownloadFileQuery(fileId));
+        return result;
     }
 
-    // POST api/<FilesController>
+    [HttpGet("{fileId}")]
+    public async Task<ActionResult<FileMetadataResponse>> GetFileMetadata(int fileId)
+    {
+        var result = await mediator.Send(new GetFileQuery(fileId));
+        return Ok(result);
+    }
+
     [HttpPost]
     public async Task<ActionResult<FileUploadResponse>> PostFileAsync([FromForm] UploadFileCommand uploadCommand)
     {
@@ -36,18 +41,17 @@ public class FilesController (
         return Ok(result);
     }
 
-
-    // DELETE api/<FilesController>/5
-    [HttpDelete("{id}")]
+    [HttpDelete("{fileId}")]
     public async Task<ActionResult> DeleteFile(int fileId)
     {
-        await _fileService.DeleteFileAsync(fileId);
-        return Ok();
+        var result = await mediator.Send(new DeleteFileCommand(fileId));
+        return Ok(result);
     }
-    [HttpDelete("/files")]
-    public async Task<ActionResult> DeleteMutipleFile([FromBody] List<int> fileIds)
+
+    [HttpDelete]
+    public async Task<ActionResult> DeleteMutipleFiles([FromBody] DeleteFilesCommand deleteCommand)
     {
-        await _fileService.DeleteMutipleFilesAsync(fileIds);
-        return Ok();
+        var result = await mediator.Send(deleteCommand);
+        return Ok(result);
     }
 }

@@ -1,6 +1,7 @@
 ﻿
 
 using DispatcherApp.Models.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using File = DispatcherApp.Models.Entities.File;
@@ -36,8 +37,11 @@ namespace DispatcherApp.DAL.Data
                 entity.HasKey(f => f.Id);
                 entity.Property(f => f.FileName).IsRequired().HasMaxLength(255);
                 entity.Property(f => f.StoragePath).IsRequired();
+                entity.HasOne<IdentityUser>(f => f.UploadedByUser)
+                    .WithMany()
+                    .HasForeignKey(f => f.UploadedByUserId)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
-
             modelBuilder.Entity<AssignmentUser>(entity =>
             {
                 entity.HasKey(au => new { au.AssignmentId, au.UserId });

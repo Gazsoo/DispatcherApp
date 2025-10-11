@@ -1,5 +1,9 @@
 ﻿using DispatcherApp.API.Configurations;
 using DispatcherApp.API.Midleware;
+using DispatcherApp.BLL.Common.Configurations;
+using DispatcherApp.BLL.Common.Extentions;
+using DispatcherApp.BLL.Common.Interfaces;
+using DispatcherApp.BLL.Common.Services;
 using DispatcherApp.BLL.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -13,6 +17,9 @@ namespace Microsoft.Extensions.DependencyInjection;
     {
         public static void AddApiServices(this IHostApplicationBuilder builder)
         {
+            builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
+            builder.Services.Configure<FileStorageSettings>(builder.Configuration.GetSection(FileStorageSettings.SectionName));
+
             var corsSettings = builder.Configuration.GetSection("CorsSettings").Get<CorsSettings>();
 
             builder.Services.AddCors(options =>
@@ -28,7 +35,9 @@ namespace Microsoft.Extensions.DependencyInjection;
             builder.Configuration.AddApiConfigurations();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddControllers();
-            
+
+            builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddScoped<IUserContextService, UserContextService>();
 
             builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
@@ -38,21 +47,29 @@ namespace Microsoft.Extensions.DependencyInjection;
 
             builder.Services.AddEndpointsApiExplorer();
             //builder.Services.AddIdentityApiEndpoints<IdentityUser>();
-            builder.Services.AddOpenApiDocument((configure, sp) =>
-            {
-                configure.Title = "DispatcherApp API";
-                configure.AddSecurity("Bearer", new OpenApiSecurityScheme
-                {
-                    Type = OpenApiSecuritySchemeType.Http,
-                    Scheme = "bearer",
-                    BearerFormat = "JWT",
-                    In = OpenApiSecurityApiKeyLocation.Header,
-                    Name = "Authorization",
-                    Description = "Enter JWT Bearer token"
-                });
-                configure.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("Bearer"));
 
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = null;
+                options.LogoutPath = null;
+                options.AccessDeniedPath = null;
             });
+            builder.Services.AddJwtAuthentication(builder.Configuration);
+            builder.Services.AddOpenApiDocument((configure, sp) =>
+                {
+                    configure.Title = "DispatcherApp API";
+                    configure.AddSecurity("Bearer", new OpenApiSecurityScheme
+                    {
+                        Type = OpenApiSecuritySchemeType.Http,
+                        Scheme = "bearer",
+                        BearerFormat = "JWT",
+                        In = OpenApiSecurityApiKeyLocation.Header,
+                        Name = "Authorization",
+                        Description = "Enter JWT Bearer token"
+                    });
+                    configure.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("Bearer"));
+                }
+            );
 
 
     }

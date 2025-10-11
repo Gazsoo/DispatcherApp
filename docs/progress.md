@@ -41,3 +41,7 @@ This is a known issue with the TypeScript + Axios template when using certain co
 - automapper,
 - fileok letöltése, feltöltése a tutoralhoz
 - tutorial crud
+
+
+- Introducing MediatR in ASP.NET Core setting up folder sturcture and 
+- simeple validation is handled by the router no validation.cs file need in a simple get request

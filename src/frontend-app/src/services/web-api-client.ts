@@ -866,25 +866,15 @@ export class Client extends ApiClientBase {
         return Promise.resolve<FileMetadataResponse[]>(null as any);
     }
 
-    files_PostFile(contentType?: string | null | undefined, contentDisposition?: string | null | undefined, headers?: any[] | null | undefined, length?: number | undefined, name?: string | null | undefined, fileName?: string | null | undefined, signal?: AbortSignal): Promise<FileUploadResponse> {
+    files_PostFile(file?: FileParameter | null | undefined, description?: string | null | undefined, signal?: AbortSignal): Promise<FileUploadResponse> {
         let url_ = this.baseUrl + "/api/Files";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = new FormData();
-        if (contentType !== null && contentType !== undefined)
-            content_.append("ContentType", contentType.toString());
-        if (contentDisposition !== null && contentDisposition !== undefined)
-            content_.append("ContentDisposition", contentDisposition.toString());
-        if (headers !== null && headers !== undefined)
-            headers.forEach(item_ => content_.append("Headers", item_.toString()));
-        if (length === null || length === undefined)
-            throw new globalThis.Error("The parameter 'length' cannot be null.");
-        else
-            content_.append("Length", length.toString());
-        if (name !== null && name !== undefined)
-            content_.append("Name", name.toString());
-        if (fileName !== null && fileName !== undefined)
-            content_.append("FileName", fileName.toString());
+        if (file !== null && file !== undefined)
+            content_.append("File", file.data, file.fileName ? file.fileName : "File");
+        if (description !== null && description !== undefined)
+            content_.append("Description", description.toString());
 
         let options_: AxiosRequestConfig = {
             data: content_,
@@ -931,18 +921,19 @@ export class Client extends ApiClientBase {
         return Promise.resolve<FileUploadResponse>(null as any);
     }
 
-    files_Get(fileId: number, signal?: AbortSignal): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/api/Files/{fileId}/download";
-        if (fileId === undefined || fileId === null)
-            throw new globalThis.Error("The parameter 'fileId' must be defined.");
-        url_ = url_.replace("{fileId}", encodeURIComponent("" + fileId));
+    files_DeleteMutipleFiles(deleteCommand: DeleteFilesCommand, signal?: AbortSignal): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/api/Files";
         url_ = url_.replace(/[?&]$/, "");
 
+        const content_ = JSON.stringify(deleteCommand);
+
         let options_: AxiosRequestConfig = {
+            data: content_,
             responseType: "blob",
-            method: "GET",
+            method: "DELETE",
             url: url_,
             headers: {
+                "Content-Type": "application/json",
                 "Accept": "application/octet-stream"
             },
             signal
@@ -955,11 +946,11 @@ export class Client extends ApiClientBase {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processFiles_Get(_response));
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processFiles_DeleteMutipleFiles(_response));
         });
     }
 
-    protected processFiles_Get(response: AxiosResponse): Promise<FileResponse> {
+    protected processFiles_DeleteMutipleFiles(response: AxiosResponse): Promise<FileResponse> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -987,15 +978,118 @@ export class Client extends ApiClientBase {
         return Promise.resolve<FileResponse>(null as any);
     }
 
-    files_DeleteFile(id: string, fileId?: number | undefined, signal?: AbortSignal): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/api/Files/{id}?";
-        if (id === undefined || id === null)
-            throw new globalThis.Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        if (fileId === null)
-            throw new globalThis.Error("The parameter 'fileId' cannot be null.");
-        else if (fileId !== undefined)
-            url_ += "fileId=" + encodeURIComponent("" + fileId) + "&";
+    files_DownloadFile(fileId: number, signal?: AbortSignal): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/api/Files/{fileId}/download";
+        if (fileId === undefined || fileId === null)
+            throw new globalThis.Error("The parameter 'fileId' must be defined.");
+        url_ = url_.replace("{fileId}", encodeURIComponent("" + fileId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            responseType: "blob",
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/octet-stream"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processFiles_DownloadFile(_response));
+        });
+    }
+
+    protected processFiles_DownloadFile(response: AxiosResponse): Promise<FileResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers["content-disposition"] : undefined;
+            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
+            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
+            if (fileName) {
+                fileName = decodeURIComponent(fileName);
+            } else {
+                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            }
+            return Promise.resolve({ fileName: fileName, status: status, data: new Blob([response.data], { type: response.headers["content-type"] }), headers: _headers });
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<FileResponse>(null as any);
+    }
+
+    files_GetFileMetadata(fileId: number, signal?: AbortSignal): Promise<FileMetadataResponse> {
+        let url_ = this.baseUrl + "/api/Files/{fileId}";
+        if (fileId === undefined || fileId === null)
+            throw new globalThis.Error("The parameter 'fileId' must be defined.");
+        url_ = url_.replace("{fileId}", encodeURIComponent("" + fileId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processFiles_GetFileMetadata(_response));
+        });
+    }
+
+    protected processFiles_GetFileMetadata(response: AxiosResponse): Promise<FileMetadataResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<FileMetadataResponse>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<FileMetadataResponse>(null as any);
+    }
+
+    files_DeleteFile(fileId: number, signal?: AbortSignal): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/api/Files/{fileId}";
+        if (fileId === undefined || fileId === null)
+            throw new globalThis.Error("The parameter 'fileId' must be defined.");
+        url_ = url_.replace("{fileId}", encodeURIComponent("" + fileId));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -1020,63 +1114,6 @@ export class Client extends ApiClientBase {
     }
 
     protected processFiles_DeleteFile(response: AxiosResponse): Promise<FileResponse> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers["content-disposition"] : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return Promise.resolve({ fileName: fileName, status: status, data: new Blob([response.data], { type: response.headers["content-type"] }), headers: _headers });
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<FileResponse>(null as any);
-    }
-
-    files_DeleteMutipleFile(fileIds: number[], signal?: AbortSignal): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/files";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(fileIds);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            responseType: "blob",
-            method: "DELETE",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/octet-stream"
-            },
-            signal
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processFiles_DeleteMutipleFile(_response));
-        });
-    }
-
-    protected processFiles_DeleteMutipleFile(response: AxiosResponse): Promise<FileResponse> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1555,12 +1592,19 @@ export interface FileMetadataResponse {
     id?: number;
     fileName?: string;
     contentType?: string;
+    description?: string;
+    createdByName?: string;
     fileSize?: number;
     uploadedAt?: Date;
     downloadUrl?: string;
 }
 
 export interface FileUploadResponse {
+    id?: number;
+}
+
+export interface DeleteFilesCommand {
+    ids?: number[];
 }
 
 export interface TutorialResponse {

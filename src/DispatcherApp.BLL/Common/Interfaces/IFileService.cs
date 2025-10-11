@@ -1,13 +1,22 @@
-﻿using DispatcherApp.BLL.Model;
+﻿using DispatcherApp.BLL.Files.Commands.DeleteFile;
+using DispatcherApp.BLL.Files.Commands.UpdateFile;
+using DispatcherApp.BLL.Model;
+using DispatcherApp.Models.Entities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using File = DispatcherApp.Models.Entities.File;
 
 namespace DispatcherApp.API.Controllers;
 
 public interface IFileService
 {
-    Task<List<FileMetadataResponse>> GetFilesMetadataAsync();
-    Task<FileResult> GetFileAsync(int id);
-    Task<FileUploadResponse> SaveFileAsync(Stream fileStream, string fileName, string contentType, CancellationToken cancellationToken);
+    Task<IEnumerable<File>> GetFilesMetadataAsync();
+    Task<File> GetFileMetadataAsync(int id);
+    Task<FileContentResult> GetFileAsync(int id);
+    Task<FileUploadResponse> SaveFileAsync(
+        FileUploadRequest fur,
+        CancellationToken cancellationToken);
     Task DeleteFileAsync(int id);
-    Task DeleteMutipleFilesAsync(List<int> ids);
+    Task<IEnumerable<string>> DeleteMutipleFilesAsync(IEnumerable<int> ids, CancellationToken ct);
 }

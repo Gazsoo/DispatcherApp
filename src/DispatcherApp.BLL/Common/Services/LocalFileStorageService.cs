@@ -10,6 +10,7 @@ using DispatcherApp.BLL.Model;
 using DispatcherApp.Models.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using File = System.IO.File;
 
 namespace DispatcherApp.BLL.Common.Services;
 public class LocalFileStorageService : IFileStorageService
@@ -32,6 +33,30 @@ public class LocalFileStorageService : IFileStorageService
         return Path.Combine(_basePath, relativePath, fileName);
     }
 
+    public async Task<SaveFileResult> SaveFileStreamAsync(
+        Stream fileStream,
+        string contentType,
+        string extention,
+        string name)
+    {
+        var fileName = $"{Guid.NewGuid()}{extention}";
+        var relativePathWith = Path.Combine("files", fileName);
+        var fullPath = Path.Combine(_basePath, relativePathWith);
+
+        Directory.CreateDirectory(Path.GetDirectoryName(fullPath) ??
+            throw new ArgumentException("no file path"));
+
+        using var stream = new FileStream(fullPath, FileMode.Create);
+        await fileStream.CopyToAsync(stream);
+
+        return new SaveFileResult
+        {
+            ContentType = contentType ?? "application/octet-stream",
+            FileName = fileName,
+            StoragePath = Path.Combine(relativePathWith)
+        };
+    }
+
     public async Task<SaveFileResult> SaveFileAsync(IFormFile file, string relativePathWithoutFileName)
     {
         var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
@@ -49,5 +74,21 @@ public class LocalFileStorageService : IFileStorageService
             FileName = fileName,
             StoragePath = Path.Combine(relativePathWithoutFileName, fileName)
         };
+    }
+
+    public async Task RemoveFileAsync(string relativePath)
+    {
+        var fullPath = GetFullPath(relativePath);
+        try
+        {
+            if (File.Exists(fullPath))
+                File.Delete(fullPath);
+        }
+        catch (IOException ex)
+        {
+            // Log warning or retry logic here
+            Console.WriteLine($"Error deleting file: {ex.Message}");
+        }
+        await Task.CompletedTask;
     }
 }

@@ -36,10 +36,9 @@
   <ItemGroup>
     <Folder Include="Extentions\" />
     <Folder Include="Interfaces\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 
-  
+
   <!-- NSwag code generation -->  
   <PropertyGroup>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
