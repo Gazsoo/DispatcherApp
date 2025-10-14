@@ -8,8 +8,8 @@ using Ardalis.GuardClauses;
 using AutoMapper;
 using DispatcherApp.BLL.Common.Configurations;
 using DispatcherApp.BLL.Common.Interfaces;
+using DispatcherApp.BLL.Common.Interfaces.Repository;
 using DispatcherApp.BLL.Model;
-using DispatcherApp.DAL.Data;
 using DispatcherApp.Models.DTOs.Tutorial;
 using DispatcherApp.Models.Entities;
 using DispatcherApp.Models.Exceptions;
@@ -20,12 +20,12 @@ using Microsoft.Extensions.Options;
 namespace DispatcherApp.BLL.Common.Services;
 public class TutorialService : ITutorialService
 {
-    private readonly AppDbContext _context;
+    private readonly ITutorialRepository _tutorialRepository;
     private readonly FileStorageSettings _fileStorageSettings;
     private readonly IFileStorageService _fileStorageService;
     private readonly IMapper _mapper;
 
-    public TutorialService(AppDbContext context,
+    public TutorialService(ITutorialRepository tutorialRepository,
         IOptions<FileStorageSettings> fileStorageSettings,
         IMapper mapper,
         IFileStorageService fileStorageService)
@@ -33,11 +33,11 @@ public class TutorialService : ITutorialService
         _fileStorageSettings = fileStorageSettings.Value;
         _fileStorageService = fileStorageService;
         _mapper = mapper;
-        _context = context;
+        _tutorialRepository = tutorialRepository;
     }
     public async Task<int> AddTutorialFileAsync(IFormFile file, int tutorialId)
     {
-        var tutorial = _context.Tutorials.FirstOrDefault(t => t.Id == tutorialId);
+        var tutorial = await _tutorialRepository.GetByIdAsync(tutorialId);
         Guard.Against.NotFound(tutorialId, tutorial);
 
         var maxFileSize = Guard.Against.Null(_fileStorageSettings.MaxFileSize, nameof(_fileStorageSettings.MaxFileSize));
@@ -57,8 +57,8 @@ public class TutorialService : ITutorialService
             Tutorials = new List<Tutorial> { tutorial }
         };
 
-        _context.Files.Add(tutorialFile);
-        await _context.SaveChangesAsync();
+        //_tutorialRepository.Files.Add(tutorialFile);
+        await _tutorialRepository.SaveChangesAsync();
         return tutorialFile.Id;
     }
     private string GetTutorialRelativePath(int tutorialId) =>
@@ -66,37 +66,34 @@ public class TutorialService : ITutorialService
 
     public async Task<FileResult> GetTutorialFileAsync(int fileId, int tutorialId)
     {
-        var tutorial = _context.Tutorials.FirstOrDefault(t => t.Id == tutorialId);
+        var tutorial = await _tutorialRepository.GetByIdAsync(tutorialId);
         Guard.Against.NotFound(tutorialId, tutorial);
 
-        var file = _context.Files.FirstOrDefault(t => t.Id == fileId);
-        Guard.Against.NotFound(fileId, file);
+        //var file = _tutorialRepository.Files.FirstOrDefault(t => t.Id == fileId);
+        //Guard.Against.NotFound(fileId, file);
 
-        var content = await _fileStorageService.LoadFileAsync(
-            Path.Combine(GetTutorialRelativePath(tutorialId) , file.FileName)
-            );
-        Guard.Against.NullOrEmpty(content, nameof(content), null, () => new ValidationException("File content is empty"));
+        //var content = await _fileStorageService.LoadFileAsync(
+        //    Path.Combine(GetTutorialRelativePath(tutorialId), file.FileName)
+        //    );
+        //Guard.Against.NullOrEmpty(content, nameof(content), null, () => new ValidationException("File content is empty"));
 
-        return new FileResult { 
-            ContentType = file.ContentType,
-            FileContent = content,
-            FileName = file.OriginalFileName
+        return new FileResult
+        {
+            //ContentType = file.ContentType,
+            //FileContent = content,
+            //FileName = file.OriginalFileName
         };
     }
 
     public async Task<TutorialResponse> GetTutorialAsync(int tutorialId)
     {
-        var tutorial = await _context.Tutorials
-            .Include(t => t.Files)
-            .FirstOrDefaultAsync(t => t.Id == tutorialId);
+        var tutorial = await _tutorialRepository.GetByIdAsync(tutorialId, includeFiles: true);
         return _mapper.Map<TutorialResponse>(tutorial);
     }
 
     public async Task<List<TutorialResponse>> GetTutorialListAsync()
     {
-        var tutorials = await _context.Tutorials
-            .Include(t => t.Files)
-            .ToListAsync();
+        var tutorials = await _tutorialRepository.GetAllAsync(includeFiles: true);
 
         return _mapper.Map<List<TutorialResponse>>(tutorials);
     }

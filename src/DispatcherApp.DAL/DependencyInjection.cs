@@ -1,8 +1,10 @@
 ﻿
 using System.Text;
 using Ardalis.GuardClauses;
+using DispatcherApp.BLL.Common.Interfaces.Repository;
 using DispatcherApp.BLL.Services;
 using DispatcherApp.DAL.Data;
+using DispatcherApp.DAL.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
@@ -56,6 +58,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
             builder.Services.AddScoped<DatabaseSeedingService>();
 
+            builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
+            builder.Services.AddScoped<IFileRepository, FileRepository>();
+            builder.Services.AddScoped<ITutorialRepository, TutorialRepository>();
             //builder.Services
             //    .AddDefaultIdentity<ApplicationUser>()
             //    .AddRoles<IdentityRole>()

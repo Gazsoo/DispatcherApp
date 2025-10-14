@@ -30,7 +30,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DispatcherApp.BLL\DispatcherApp.BLL.csproj" />
     <ProjectReference Include="..\DispatcherApp.DAL\DispatcherApp.DAL.csproj" />
-    <ProjectReference Include="..\DispatcherApp.Models\DispatcherApp.Models.csproj" />
+    <ProjectReference Include="..\DispatcherApp.Models\DispatcherApp.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

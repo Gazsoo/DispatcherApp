@@ -20,7 +20,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DispatcherApp.DAL", "src\Di
 		{1A4CC302-0CF4-4746-B74A-125FC706F7F6} = {1A4CC302-0CF4-4746-B74A-125FC706F7F6}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DispatcherApp.Models", "src\DispatcherApp.Models\DispatcherApp.Models.csproj", "{1A4CC302-0CF4-4746-B74A-125FC706F7F6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DispatcherApp.Common", "src\DispatcherApp.Models\DispatcherApp.Common.csproj", "{1A4CC302-0CF4-4746-B74A-125FC706F7F6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{0C88DD14-F956-CE84-757C-A364CCF449FC}"
 EndProject

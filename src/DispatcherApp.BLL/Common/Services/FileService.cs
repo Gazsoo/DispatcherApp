@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using DispatcherApp.API.Controllers;
 using DispatcherApp.BLL.Common.Interfaces;
+using DispatcherApp.BLL.Common.Interfaces.Repository;
 using DispatcherApp.BLL.Files.Commands.UpdateFile;
 using DispatcherApp.BLL.Model;
-using DispatcherApp.DAL.Data;
 using DispatcherApp.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
@@ -19,12 +19,12 @@ using FileMetadata = DispatcherApp.Models.Entities.File;
 namespace DispatcherApp.BLL.Common.Services;
 internal class FileService(
     IFileStorageService fileStorageService,
-    AppDbContext db,
+    IFileRepository fileRepository,
     IUserContextService userContextService
     ) : IFileService
 {
     private readonly IFileStorageService _fileStorageService = fileStorageService;
-    private readonly AppDbContext _db = db;
+    private readonly IFileRepository _fileRepository = fileRepository;
     private readonly IUserContextService _userContextService = userContextService;
 
     public async Task DeleteFileAsync(int id)
@@ -33,20 +33,20 @@ internal class FileService(
         var fileMeta = await GetFileMetadataAsync(id);
         await _fileStorageService.RemoveFileAsync(fileMeta.StoragePath);
 
-        _db.Files.Remove(fileMeta);
-        await _db.SaveChangesAsync();
+        _fileRepository.Remove(fileMeta);
+        await _fileRepository.SaveChangesAsync();
     }
 
     public async Task<IEnumerable<string>> DeleteMutipleFilesAsync(IEnumerable<int> ids, CancellationToken ct)
     {
-        var metadatas = await GetDbFileMetadatasByIds(ids).ToListAsync(ct);
+        var metadatas = await _fileRepository.GetByIdsAsync(ids);
 
         foreach(var file in metadatas)
         {
             await _fileStorageService.RemoveFileAsync(file.StoragePath);
         }
-        _db.Files.RemoveRange(metadatas);
-        await _db.SaveChangesAsync(ct);
+        _fileRepository.RemoveRange(metadatas);
+        await _fileRepository.SaveChangesAsync(ct);
 
         return metadatas.Select(f => f.OriginalFileName);
     }
@@ -63,18 +63,14 @@ internal class FileService(
 
     public async Task<FileMetadata> GetFileMetadataAsync(int id)
     {
-        var file = await _db.Files
-            .AsNoTracking()
-            .SingleOrDefaultAsync(f => f.Id == id);
+        var file = await _fileRepository.GetByIdAsync(id);
         Guard.Against.NotFound(id, file);
         return file;
     }
 
     public async Task<IEnumerable<FileMetadata>> GetFilesMetadataAsync()
     {
-        var files = await _db.Files
-            .AsNoTracking().
-            ToListAsync();
+        var files = await _fileRepository.GetAllAsync();
         return files;
     }
 
@@ -90,7 +86,7 @@ internal class FileService(
             );
         Guard.Against.Null(fileResult, nameof(fileResult));
         
-        var uploadResult = _db.Files.Add(new FileMetadata
+        var file = _fileRepository.AddAsync(new FileMetadata
         {
             FileName = fileResult.FileName,
             OriginalFileName = fur.OriginalFileName,
@@ -101,20 +97,13 @@ internal class FileService(
             UploadedByUserId = _userContextService.UserId,
             UploadedAt = DateTime.UtcNow
         });
-        await _db.SaveChangesAsync(cancellationToken);
+        await _fileRepository.SaveChangesAsync(cancellationToken);
 
         return new FileUploadResponse
         {
-            Id = uploadResult.Entity.Id,
+            Id = file.Id,
         };
 
-    }
-    private IQueryable<FileMetadata> GetDbFileMetadatasByIds(IEnumerable<int> ids)
-    {
-        var files = _db.Files
-            .Where(f => ids.Contains(f.Id))
-            .AsNoTracking();
-        return files;
     }
 
 }

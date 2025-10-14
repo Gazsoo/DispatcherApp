@@ -22,7 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DispatcherApp.Models\DispatcherApp.Models.csproj" />
+    <ProjectReference Include="..\DispatcherApp.Models\DispatcherApp.Common.csproj" />
+    <ProjectReference Include="..\DispatcherApp.BLL\DispatcherApp.BLL.csproj" />
   </ItemGroup>
 
 </Project>
