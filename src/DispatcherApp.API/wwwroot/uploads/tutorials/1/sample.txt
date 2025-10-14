@@ -1,6 +1,0 @@
-﻿namespace DispatcherApp.API.wwwroot.uploads.tutorials._1
-{
-    public class sample
-    {
-    }
-}

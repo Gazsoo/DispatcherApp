@@ -1,27 +1,94 @@
-import { Link, Outlet, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ErrorDisplay } from "../../ui/ErrorDisplay";
 import { LoadingSpinner } from "../../ui/LoadingSpinner";
+import { useFiles } from "../../hooks/useFiles";
+
+import React, { useRef } from "react";
+import { useApiMutation } from "../../hooks/useApiClient";
+import type { FileParameter, FileUploadResponse } from "../../../services/web-api-client";
+import { apiClient } from "../../../api/client";
+import downloadFileById from "../../../services/file-downloader";
 
 export default function Files() {
-    const { fileId } = useParams();
+    const { mutate, reset } = useApiMutation<FileParameter, FileUploadResponse>();
+    const { files, isLoading, error, refetch } = useFiles();
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // const { files, isLoading, error } = useFiles();
+    if (isLoading) return <LoadingSpinner />;
+    if (error) return <ErrorDisplay error={error} />;
 
-    // if (isLoading) return <LoadingSpinner />;
-    // if (error) return <ErrorDisplay error={error} />;
+    const handleUploadClick = () => {
+        if (fileInputRef.current) {
+            fileInputRef.current.click(); // open file picker
+        }
+    };
 
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        const fileParam: FileParameter = {
+            fileName: file.name,
+            data: file,
+        };
+        reset();
+
+        try {
+            const call = await mutate((input: FileParameter) =>
+                apiClient.files_PostFile(input)
+            );
+            const response = await call(fileParam);
+
+            if (!response) throw new Error("Upload failed");
+
+            alert("File uploaded successfully!");
+            refetch(); // Refresh file list
+        } catch (err) {
+            alert(`Error uploading file: ${err instanceof Error ? err.message : String(err)}`);
+        } finally {
+            event.target.value = ""; // reset input
+        }
+    };
+
+    const handleDownload = async (e: React.MouseEvent, fileId?: number, defaultName?: string) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (fileId === undefined || fileId === null) {
+            alert("Invalid file id");
+            return;
+        }
+
+        try {
+            const result = await downloadFileById(fileId, defaultName);
+            if (!result.success) {
+                alert(`Download failed: ${result.reason}`);
+            }
+        } catch (err) {
+            alert(`Error downloading file: ${err instanceof Error ? err.message : String(err)}`);
+        }
+    };
     // Otherwise show the files list
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold">Files</h1>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <button
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    onClick={handleUploadClick}
+                >
                     Upload File
                 </button>
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    onChange={handleFileChange}
+                />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* {files.map((file) => (
+                {files.map((file) => (
                     <Link
                         key={file.id}
                         to={`/dashboard/files/${file.id}`}
@@ -30,14 +97,23 @@ export default function Files() {
                         <div className="flex items-start justify-between">
                             <div className="flex-1 min-w-0">
                                 <h3 className="text-lg font-semibold truncate">{file.fileName}</h3>
-                                <p className="text-sm text-gray-500 mt-1">{file.contentType}</p>
+                                {/* <p className="text-sm text-gray-500 mt-1">{file.contentType}</p> */}
                             </div>
-                            <svg className="w-5 h-5 text-gray-400 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
+                            <div className="flex items-center ml-2 space-x-2">
+                                <button
+                                    className="p-2 rounded hover:bg-gray-100 text-gray-600"
+                                    title="Download"
+                                    onClick={(e) => handleDownload(e, file.id, file.fileName)}
+                                    aria-label={`Download ${file.fileName}`}
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v6a1 1 0 11-2 0V5H5v10h4a1 1 0 110 2H4a1 1 0 01-1-1V3zm9.293 6.293a1 1 0 011.414 1.414L11 15.414V9a1 1 0 112 0v6.414l2.707-4.707a1 1 0 111.586 1.172l-4 7a1 1 0 01-1.686 0l-4-7a1 1 0 011.586-1.172L12.293 9.293z" clipRule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </Link>
-                ))} */}
+                ))}
             </div>
         </div>
     );

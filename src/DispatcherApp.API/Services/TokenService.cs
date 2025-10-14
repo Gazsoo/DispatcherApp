@@ -17,18 +17,15 @@ using Microsoft.IdentityModel.Tokens;
 namespace DispatcherApp.BLL.Common.Services;
 public class TokenService : ITokenService
 {
-    private readonly IConfiguration _configuration;
     private readonly UserManager<IdentityUser> _userManager;
     private readonly JwtSettings _jwtSettings;
 
     public  TokenService(
-        IConfiguration configuration, 
         UserManager<IdentityUser> userManager,
         IOptions<JwtSettings> jwtSettings
         )
     {
         _jwtSettings = jwtSettings.Value;
-        _configuration = configuration;
         _userManager = userManager;
     }
     public async Task<TokenResult>  GenerateAccessTokenAsync(IdentityUser user)

@@ -9,7 +9,7 @@ export function useTutorials() {
 
     useEffect(() => {
         const fetchTutorials = async () => {
-            const data = await execute(() => apiClient.tutorial_GetTutorialAll());
+            const data = await execute(() => apiClient.tutorial_GetTutorials());
             if (data) {
                 setTutorials(data);
             }
@@ -18,7 +18,7 @@ export function useTutorials() {
     }, [execute]);
 
     const refetch = async () => {
-        const data = await execute(() => apiClient.tutorial_GetTutorialAll());
+        const data = await execute(() => apiClient.tutorial_GetTutorials());
         if (data) {
             setTutorials(data);
         }
@@ -40,7 +40,7 @@ export function useTutorialFile(tutorialId: number, fileId: number) {
         if (!tutorialId || !fileId) return;
 
         const fetchFile = async () => {
-            const data = await execute(() => apiClient.tutorial_GetFile(tutorialId, fileId));
+            const data = await execute(() => apiClient.tutorial_GetTutorialFile(tutorialId, fileId));
             if (data) {
                 setFile(data);
             }

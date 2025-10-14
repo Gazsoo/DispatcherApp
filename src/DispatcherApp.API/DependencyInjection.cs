@@ -20,13 +20,14 @@ namespace Microsoft.Extensions.DependencyInjection;
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
             builder.Services.Configure<FileStorageSettings>(builder.Configuration.GetSection(FileStorageSettings.SectionName));
 
-            var corsSettings = builder.Configuration.GetSection("CorsSettings").Get<CorsSettings>();
+            var corsSettings = builder.Configuration.GetSection(CorsSettings.SectionName).Get<CorsSettings>() 
+                ?? throw new ArgumentException();
 
             builder.Services.AddCors(options =>
                 {
-                    options.AddPolicy("DefaultPolicy", policy =>
+                    options.AddPolicy(corsSettings.PolicyName, policy =>
                     {
-                        policy.WithOrigins(corsSettings?.AllowedOrigins ?? new CorsSettings().AllowedOrigins)
+                        policy.WithOrigins(corsSettings.AllowedOrigins)
                               .AllowAnyHeader()
                               .AllowAnyMethod()
                               .AllowCredentials();
