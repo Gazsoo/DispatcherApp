@@ -1,7 +1,5 @@
-﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using DispatcherApp.Models.Entities;
 
@@ -11,5 +9,6 @@ public interface ITutorialRepository
     Task<Tutorial?> GetByIdAsync(int id, bool includeFiles = false, CancellationToken ct = default);
     Task<List<Tutorial>> GetAllAsync(bool includeFiles = false, CancellationToken ct = default);
     Task AddAsync(Tutorial tutorial, CancellationToken ct = default);
+    Task RemoveAsync(Tutorial tutorial, CancellationToken ct = default);
     Task SaveChangesAsync(CancellationToken ct = default);
 }

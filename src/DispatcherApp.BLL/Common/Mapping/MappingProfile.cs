@@ -1,8 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AutoMapper;
 using DispatcherApp.API.Controllers;
 using DispatcherApp.Models.DTOs.Assignment;
@@ -22,6 +17,7 @@ public class MappingProfile : Profile
             i => i.MapFrom(src => src.OriginalFileName));
 
         CreateMap<Tutorial, TutorialResponse>();
+        CreateMap<Tutorial, CreateTutorialResponse>();
         CreateMap<CreateTutorialRequest, Tutorial>();
         CreateMap<Assignment, AssignmentResponse>();
         CreateMap<Assignment, AssignmentWithUsersResponse>();

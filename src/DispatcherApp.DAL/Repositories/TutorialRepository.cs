@@ -1,7 +1,6 @@
-﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using DispatcherApp.BLL.Common.Interfaces.Repository;
 using DispatcherApp.DAL.Data;
@@ -41,8 +40,12 @@ public class TutorialRepository : ITutorialRepository
         await _context.Tutorials.AddAsync(tutorial, ct);
     }
 
-    public async Task SaveChangesAsync(CancellationToken ct = default)
+    public Task RemoveAsync(Tutorial tutorial, CancellationToken ct = default)
     {
-        await _context.SaveChangesAsync(ct);
+        _context.Tutorials.Remove(tutorial);
+        return Task.CompletedTask;
     }
+
+    public Task SaveChangesAsync(CancellationToken ct = default) =>
+        _context.SaveChangesAsync(ct);
 }

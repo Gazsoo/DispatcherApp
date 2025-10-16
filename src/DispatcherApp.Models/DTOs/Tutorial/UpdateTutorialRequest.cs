@@ -1,14 +1,12 @@
-using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace DispatcherApp.Models.DTOs.Tutorial;
 
-public class CreateTutorialResponse
+public class UpdateTutorialRequest
 {
-    public int Id { get; set; }
+    [Required]
     public string Title { get; set; } = string.Empty;
     public string? Description { get; set; }
     public string? Url { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
     public string? ContentType { get; set; }
 }

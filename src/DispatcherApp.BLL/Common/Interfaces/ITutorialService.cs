@@ -1,13 +1,16 @@
-﻿using DispatcherApp.BLL.Model;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using DispatcherApp.Models.DTOs.Tutorial;
-using Microsoft.AspNetCore.Http;
+using DispatcherApp.Models.Entities;
 
 namespace DispatcherApp.BLL.Common.Interfaces;
+
 public interface ITutorialService
 {
-    Task<int> AddTutorialFileAsync(IFormFile file, int tutorialId);
-    Task<FileResult> GetTutorialFileAsync(int fileId, int tutorialId);
-    Task<TutorialResponse> GetTutorialAsync(int tutorialId);
-    Task<List<TutorialResponse>> GetTutorialListAsync();
-    Task<CreateTutorialResponse> CreateTutorial(CreateTutorialRequest request);
+    Task<Tutorial> GetTutorialAsync(int tutorialId, CancellationToken ct = default);
+    Task<List<Tutorial>> GetTutorialListAsync(CancellationToken ct = default);
+    Task<Tutorial> CreateTutorial(CreateTutorialRequest request, CancellationToken ct = default);
+    Task<Tutorial> UpdateTutorialAsync(int tutorialId, UpdateTutorialRequest request, CancellationToken ct = default);
+    Task DeleteTutorialAsync(int tutorialId, CancellationToken ct = default);
 }

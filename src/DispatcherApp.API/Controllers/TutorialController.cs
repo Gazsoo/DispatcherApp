@@ -1,55 +1,73 @@
-﻿using DispatcherApp.BLL.Common.Interfaces;
-using DispatcherApp.BLL.Services;
+using System.Collections.Generic;
+using System.Threading;
+using Ardalis.GuardClauses;
+using DispatcherApp.BLL.Tutorials.Commands.CreateTutorial;
+using DispatcherApp.BLL.Tutorials.Commands.DeleteTutorial;
+using DispatcherApp.BLL.Tutorials.Commands.UpdateTutorial;
+using DispatcherApp.BLL.Tutorials.Queries.GetTutorial;
+using DispatcherApp.BLL.Tutorials.Queries.GetTutorialList;
 using DispatcherApp.Models.DTOs.Tutorial;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DispatcherApp.API.Controllers;
+
 [Route("api/[controller]")]
 [ApiController]
-public class TutorialController (ITutorialService tutorialService): ControllerBase
+public class TutorialController(IMediator mediator) : ControllerBase
 {
-    private readonly ITutorialService _tutorialService = tutorialService;
-
-    [HttpPost("{tutorialId}/files")]
-    public async Task<ActionResult<int>> UploadTutorialFile(int tutorialId, IFormFile file)
-    {
-        var result = await _tutorialService.AddTutorialFileAsync(file, tutorialId);
-        return Ok(result);
-    }
-
-    [HttpGet("{tutorialId}/files/{fileId}")]
-    public async Task<FileContentResult> GetTutorialFile(int tutorialId, int fileId)
-    {
-        var result = await _tutorialService.GetTutorialFileAsync(fileId, tutorialId);
-        return File(result.FileContent, result.ContentType);
-    }
+    private readonly IMediator _mediator = mediator;
 
     [HttpGet("{tutorialId}")]
-    public async Task<ActionResult<TutorialResponse>> GetTutorial(int tutorialId)
+    [ProducesResponseType(typeof(TutorialResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<TutorialResponse>> GetTutorial(int tutorialId, CancellationToken cancellationToken)
     {
-        var result = await _tutorialService.GetTutorialAsync(tutorialId);
-        return Ok(result);
+        try
+        {
+            var result = await _mediator.Send(new GetTutorialQuery(tutorialId), cancellationToken);
+            return Ok(result);
+        }
+        catch (NotFoundException)
+        {
+            return NotFound();
+        }
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<TutorialResponse>>> GetTutorials()
+    [ProducesResponseType(typeof(List<TutorialResponse>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<TutorialResponse>>> GetTutorials(CancellationToken cancellationToken)
     {
-        var result = await _tutorialService.GetTutorialListAsync();
+        var result = await _mediator.Send(new GetTutorialListQuery(), cancellationToken);
         return Ok(result);
     }
 
-    [HttpPut]
-    public async Task<ActionResult<CreateTutorialResponse>> CreateTutorial([FromBody]CreateTutorialRequest request)
+    [HttpPost]
+    [ProducesResponseType(typeof(CreateTutorialResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<CreateTutorialResponse>> CreateTutorial([FromBody] CreateTutorialRequest request, CancellationToken cancellationToken)
     {
-        var result = await _tutorialService.CreateTutorial(request);
+        var result = await _mediator.Send(new CreateTutorialCommand(request), cancellationToken);
+        return CreatedAtAction(nameof(GetTutorial), new { tutorialId = result.Id }, result);
+    }
+
+    [HttpPut("{tutorialId}")]
+    [ProducesResponseType(typeof(TutorialResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<TutorialResponse>> UpdateTutorial(int tutorialId, [FromBody] UpdateTutorialRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new UpdateTutorialCommand(tutorialId, request), cancellationToken);
         return Ok(result);
     }
 
-    //[HttpPost]
-    //public async Task<ActionResult<CreateTutorialResponse>> CreateTutorial([FromBody] CreateTutorialRequest request)
-    //{
-    //    var result = await _tutorialService.CreateTutorial(request);
-    //    return Ok(result);
-    //}
+    [HttpDelete("{tutorialId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteTutorial(int tutorialId, CancellationToken cancellationToken)
+    {
+        await _mediator.Send(new DeleteTutorialCommand(tutorialId), cancellationToken);
+        return NoContent();
+    }
 }
