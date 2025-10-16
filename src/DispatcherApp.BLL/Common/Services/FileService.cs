@@ -75,7 +75,7 @@ internal class FileService(
     }
 
     public async Task<FileUploadResponse> SaveFileAsync(
-        FileUploadRequest fur,
+        FileUploadData fur,
         CancellationToken cancellationToken)
     {
         var fileResult = await _fileStorageService.SaveFileStreamAsync(

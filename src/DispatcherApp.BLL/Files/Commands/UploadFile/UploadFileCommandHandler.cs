@@ -24,7 +24,7 @@ public class UploadFileCommandHandler : IRequestHandler<UploadFileCommand, FileU
 
         var fileEntity = await _fileService
             .SaveFileAsync( 
-                new FileUploadRequest(
+                new FileUploadData(
                     stream,
                     request.File.FileName,
                     request.File.ContentType,

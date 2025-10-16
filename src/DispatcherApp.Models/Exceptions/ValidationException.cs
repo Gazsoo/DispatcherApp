@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FluentValidation.Results;
 
 namespace DispatcherApp.Models.Exceptions;
 public class ValidationException: Exception
@@ -10,9 +11,12 @@ public class ValidationException: Exception
     public ValidationException(string message) : base(message) {
         Errors = new Dictionary<string, string[]>();
             }
-    public ValidationException(string message, Dictionary<string, string[]> errors) : base(message)
+    public ValidationException(IEnumerable<ValidationFailure> failures)
+        : this("Errors")
     {
-        Errors = errors;
+        Errors = failures
+            .GroupBy(e => e.PropertyName, e => e.ErrorMessage)
+            .ToDictionary(failureGroup => failureGroup.Key, failureGroup => failureGroup.ToArray());
     }
     public Dictionary<string, string[]> Errors { get; set; } = new();
 }

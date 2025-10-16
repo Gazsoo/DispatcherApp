@@ -15,7 +15,7 @@ public interface IFileService
     Task<File> GetFileMetadataAsync(int id);
     Task<FileContentResult> GetFileAsync(int id);
     Task<FileUploadResponse> SaveFileAsync(
-        FileUploadRequest fur,
+        FileUploadData fur,
         CancellationToken cancellationToken);
     Task DeleteFileAsync(int id);
     Task<IEnumerable<string>> DeleteMutipleFilesAsync(IEnumerable<int> ids, CancellationToken ct);

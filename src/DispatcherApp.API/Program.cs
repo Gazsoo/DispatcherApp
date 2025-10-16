@@ -31,6 +31,7 @@ if (app.Environment.IsDevelopment())
         settings.DocumentPath = "/api/specification.json";
     });
 }
+app.UseExceptionHandler(options => {});
 app.MapHealthChecks("/health");
 app.MapControllers();
 

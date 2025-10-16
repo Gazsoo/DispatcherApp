@@ -32,7 +32,7 @@ namespace Microsoft.Extensions.DependencyInjection
             //builder.Services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
             //builder.Services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
 
-            builder.Services.AddSingleton(TimeProvider.System);
+            //builder.Services.AddSingleton(TimeProvider.System);
             builder.Services.AddDbContext<AppDbContext>((sp, options) =>
             {
                 //options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
@@ -66,7 +66,7 @@ namespace Microsoft.Extensions.DependencyInjection
             //    .AddRoles<IdentityRole>()
             //    .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            //builder.Services.AddSingleton(TimeProvider.System);
+            builder.Services.AddSingleton(TimeProvider.System);
             //builder.Services.AddTransient<IIdentityService, IdentityService>();
 
             //builder.Services.AddAuthorization(options =>

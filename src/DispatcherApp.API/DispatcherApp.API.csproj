@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Ardalis.GuardClauses" Version="5.0.0" />
+    <PackageReference Include="FluentValidation" Version="12.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9" />
@@ -39,7 +40,9 @@
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
-
+  <PropertyGroup Condition="'$(Configuration)' == 'SkipNswag'">
+    <SkipNSwagGen>True</SkipNSwagGen>
+  </PropertyGroup>
   <!-- NSwag code generation -->  
   <PropertyGroup>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace DispatcherApp.BLL.Files.Commands.UpdateFile;
-public record FileUploadRequest(
+public record FileUploadData(
     Stream FileStream,
     string OriginalFileName,
     string ContentType,

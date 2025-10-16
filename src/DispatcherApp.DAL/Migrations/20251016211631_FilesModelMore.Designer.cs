@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DispatcherApp.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251011184440_FilesModelMore")]
+    [Migration("20251016211631_FilesModelMore")]
     partial class FilesModelMore
     {
         /// <inheritdoc />
