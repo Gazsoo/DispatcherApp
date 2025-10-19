@@ -1,5 +1,5 @@
 import { useParams } from "react-router";
-import { useTutorial, useTutorialFile } from "../../hooks/useTutorials";
+import { useTutorial } from "../../hooks/useTutorials";
 import { LoadingSpinner } from "../../ui/LoadingSpinner";
 import { ErrorDisplay } from "../../ui/ErrorDisplay";
 

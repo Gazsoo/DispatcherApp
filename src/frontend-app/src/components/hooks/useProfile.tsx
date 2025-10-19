@@ -1,9 +1,10 @@
 import { useUser } from "../context/userContext";
 
 export function useProfile() {
-    const { user } = useUser();
+    const { user, isLoading } = useUser();
 
-    return (<>
-        div
-    </>)
+    return {
+        user,
+        isLoading,
+    };
 }

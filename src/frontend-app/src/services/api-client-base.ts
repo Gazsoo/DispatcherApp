@@ -13,6 +13,7 @@ export abstract class ApiClientBase {
         response: AxiosResponse,
         processor: (response: AxiosResponse) => Promise<any>
     ): Promise<any> {
+        void url;
         // Only stringify JSON responses. Do NOT stringify binary responses (Blob) because
         // that corrupts the data (e.g. file downloads which use responseType: 'blob').
         try {

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { type FileResponse, type TutorialResponse } from '../../services/web-api-client';
+import { useEffect, useState } from 'react';
+import { type TutorialResponse } from '../../services/web-api-client';
 import { useApiCall } from './useApiClient';
 import { apiClient } from '../../api/client';
 
@@ -28,30 +28,7 @@ export function useTutorials() {
         tutorials,
         isLoading,
         error,
-        refetch
-    };
-}
-export function useTutorialFile(tutorialId: number, fileId: number) {
-    const { execute, error, isLoading } = useApiCall<FileResponse>();
-    const [file, setFile] = useState<FileResponse | null>(null);
-
-    useEffect(() => {
-        // Skip API call if IDs are invalid
-        if (!tutorialId || !fileId) return;
-
-        const fetchFile = async () => {
-            const data = await execute(() => apiClient.tutorial_GetTutorialFile(tutorialId, fileId));
-            if (data) {
-                setFile(data);
-            }
-        };
-        fetchFile();
-    }, [execute, tutorialId, fileId]);
-
-    return {
-        file,
-        isLoading,
-        error
+        refetch,
     };
 }
 

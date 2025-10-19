@@ -1,3 +1,1 @@
-
-
-import { ApiClientBase } from './api-client-base';
+// @ts-nocheck

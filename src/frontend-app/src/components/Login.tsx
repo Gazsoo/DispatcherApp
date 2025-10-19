@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ThemeToggle from './ThemeToggle';
-import goggle from '/src/assets/goggle.png';
-import goggleLight from '/src/assets/gogglewhite.png';
 import { Input, Button, Card } from './ui';
 import { useAuth } from "./hooks/useAuth";
 import { useUser } from "./context/userContext";
