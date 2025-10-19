@@ -13,8 +13,10 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 
 app.UseHttpsRedirection();
-app.UseCors("DefaultPolicy");
+app.UseDefaultFiles();
+app.UseStaticFiles();
 app.UseRouting();
+app.UseCors("DefaultPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseCustomMiddleware();
@@ -33,6 +35,7 @@ if (app.Environment.IsDevelopment())
 }
 app.UseExceptionHandler(options => {});
 app.MapHealthChecks("/health");
+app.MapFallbackToFile("index.html");
 app.MapControllers();
 
 app.Run();

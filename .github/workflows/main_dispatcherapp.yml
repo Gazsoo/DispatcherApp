@@ -34,7 +34,7 @@ jobs:
         working-directory: ./src/frontend-app
         run: |
           npm ci
-          npm run build
+          npm run build -- --mode production
 
       # --- Copy frontend build into API project ---
       - name: Copy frontend build into wwwroot
