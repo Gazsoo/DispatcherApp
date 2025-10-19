@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DispatcherApp.BLL.Common.Configurations;
+﻿
+using DispatcherApp.Common.Configurations;
 using FluentValidation;
 using Microsoft.Extensions.Options;
+
 
 namespace DispatcherApp.BLL.Files.Commands.UpdateFile;
 public class UploadFileValidator : AbstractValidator<UploadFileCommand>

@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 using Ardalis.GuardClauses;
-using DispatcherApp.BLL.Common.Configurations;
-using DispatcherApp.BLL.Common.Interfaces;
-using DispatcherApp.BLL.Model;
-using DispatcherApp.Models.Entities;
+using DispatcherApp.Common.Abstractions.Storage;
+using DispatcherApp.Common.Configurations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using File = System.IO.File;
 
-namespace DispatcherApp.BLL.Common.Services;
+namespace DispatcherApp.DAL.Services;
 public class LocalFileStorageService : IFileStorageService
 {
     private readonly string _basePath;

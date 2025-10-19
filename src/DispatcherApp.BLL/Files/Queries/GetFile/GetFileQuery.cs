@@ -1,4 +1,4 @@
-﻿using DispatcherApp.API.Controllers;
+﻿using DispatcherApp.Common.DTOs.Files;
 using MediatR;
 
 namespace DispatcherApp.BLL.Files.Queries.GetFile;

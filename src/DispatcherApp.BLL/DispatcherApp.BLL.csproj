@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DispatcherApp.Models\DispatcherApp.Common.csproj" />
+    <ProjectReference Include="..\DispatcherApp.Common\DispatcherApp.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

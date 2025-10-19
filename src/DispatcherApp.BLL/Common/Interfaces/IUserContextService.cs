@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DispatcherApp.Models.Context;
+using DispatcherApp.Common.Context;
 
 namespace DispatcherApp.BLL.Common.Interfaces;
 public interface IUserContextService

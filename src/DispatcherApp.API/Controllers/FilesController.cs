@@ -5,6 +5,7 @@ using DispatcherApp.BLL.Files.Commands.UpdateFile;
 using DispatcherApp.BLL.Files.Queries.DownloadFile;
 using DispatcherApp.BLL.Files.Queries.GetFile;
 using DispatcherApp.BLL.Files.Queries.GetFiles;
+using DispatcherApp.Common.DTOs.Files;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

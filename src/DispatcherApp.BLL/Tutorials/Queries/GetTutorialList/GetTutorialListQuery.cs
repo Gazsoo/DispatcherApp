@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using DispatcherApp.Models.DTOs.Tutorial;
+using DispatcherApp.Common.DTOs.Tutorial;
 using MediatR;
 
 namespace DispatcherApp.BLL.Tutorials.Queries.GetTutorialList;

@@ -1,17 +1,17 @@
 using AutoMapper;
-using DispatcherApp.API.Controllers;
-using DispatcherApp.Models.DTOs.Assignment;
-using DispatcherApp.Models.DTOs.Tutorial;
-using DispatcherApp.Models.Entities;
+using DispatcherApp.Common.DTOs.Assignment;
+using DispatcherApp.Common.DTOs.Files;
+using DispatcherApp.Common.DTOs.Tutorial;
+using DispatcherApp.Common.Entities;
 using Microsoft.AspNetCore.Identity;
-using File = DispatcherApp.Models.Entities.File;
+using File = DispatcherApp.Common.Entities.File;
 
 namespace DispatcherApp.BLL.Common.Mapping;
 public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<Models.Entities.File, FileResponse>()
+        CreateMap<File, FileResponse>()
             .ForMember(
             x => x.FileName, 
             i => i.MapFrom(src => src.OriginalFileName));

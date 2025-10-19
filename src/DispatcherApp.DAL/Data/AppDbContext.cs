@@ -1,10 +1,10 @@
 ﻿
 
-using DispatcherApp.Models.Entities;
+using DispatcherApp.Common.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using File = DispatcherApp.Models.Entities.File;
+using File = DispatcherApp.Common.Entities.File;
 
 namespace DispatcherApp.DAL.Data
 {

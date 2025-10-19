@@ -1,13 +1,9 @@
-﻿using DispatcherApp.BLL.Files.Commands.DeleteFile;
-using DispatcherApp.BLL.Files.Commands.UpdateFile;
-using DispatcherApp.BLL.Model;
-using DispatcherApp.Models.Entities;
-using Microsoft.AspNetCore.Http;
+﻿using DispatcherApp.BLL.Files.Commands.UpdateFile;
+using DispatcherApp.Common.DTOs.Files;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using File = DispatcherApp.Models.Entities.File;
+using File = DispatcherApp.Common.Entities.File;
 
-namespace DispatcherApp.API.Controllers;
+namespace DispatcherApp.BLL.Common.Interfaces;
 
 public interface IFileService
 {

@@ -10,11 +10,10 @@ using DispatcherApp.BLL.Common.Configurations;
 using DispatcherApp.BLL.Common.Interfaces;
 using DispatcherApp.BLL.Model;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace DispatcherApp.BLL.Common.Services;
+namespace DispatcherApp.API.Services;
 public class TokenService : ITokenService
 {
     private readonly UserManager<IdentityUser> _userManager;

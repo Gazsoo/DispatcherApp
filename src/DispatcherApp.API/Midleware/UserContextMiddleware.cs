@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using DispatcherApp.Models.Context;
+using DispatcherApp.Common.Context;
 
 namespace DispatcherApp.API.Midleware;
 

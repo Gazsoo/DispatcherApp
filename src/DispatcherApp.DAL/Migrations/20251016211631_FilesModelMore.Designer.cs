@@ -25,7 +25,7 @@ namespace DispatcherApp.DAL.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("DispatcherApp.Models.Entities.Assignment", b =>
+            modelBuilder.Entity("DispatcherApp.Common.Entities.Assignment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -58,7 +58,7 @@ namespace DispatcherApp.DAL.Migrations
                     b.ToTable("Assignments");
                 });
 
-            modelBuilder.Entity("DispatcherApp.Models.Entities.AssignmentUser", b =>
+            modelBuilder.Entity("DispatcherApp.Common.Entities.AssignmentUser", b =>
                 {
                     b.Property<int>("AssignmentId")
                         .HasColumnType("int");
@@ -78,7 +78,7 @@ namespace DispatcherApp.DAL.Migrations
                     b.ToTable("AssignmentUsers");
                 });
 
-            modelBuilder.Entity("DispatcherApp.Models.Entities.File", b =>
+            modelBuilder.Entity("DispatcherApp.Common.Entities.File", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -123,7 +123,7 @@ namespace DispatcherApp.DAL.Migrations
                     b.ToTable("Files");
                 });
 
-            modelBuilder.Entity("DispatcherApp.Models.Entities.Tutorial", b =>
+            modelBuilder.Entity("DispatcherApp.Common.Entities.Tutorial", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -376,9 +376,9 @@ namespace DispatcherApp.DAL.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("DispatcherApp.Models.Entities.AssignmentUser", b =>
+            modelBuilder.Entity("DispatcherApp.Common.Entities.AssignmentUser", b =>
                 {
-                    b.HasOne("DispatcherApp.Models.Entities.Assignment", "Assignment")
+                    b.HasOne("DispatcherApp.Common.Entities.Assignment", "Assignment")
                         .WithMany("AssignmentUsers")
                         .HasForeignKey("AssignmentId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -387,7 +387,7 @@ namespace DispatcherApp.DAL.Migrations
                     b.Navigation("Assignment");
                 });
 
-            modelBuilder.Entity("DispatcherApp.Models.Entities.File", b =>
+            modelBuilder.Entity("DispatcherApp.Common.Entities.File", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "UploadedByUser")
                         .WithMany()
@@ -399,13 +399,13 @@ namespace DispatcherApp.DAL.Migrations
 
             modelBuilder.Entity("FileTutorial", b =>
                 {
-                    b.HasOne("DispatcherApp.Models.Entities.File", null)
+                    b.HasOne("DispatcherApp.Common.Entities.File", null)
                         .WithMany()
                         .HasForeignKey("FilesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DispatcherApp.Models.Entities.Tutorial", null)
+                    b.HasOne("DispatcherApp.Common.Entities.Tutorial", null)
                         .WithMany()
                         .HasForeignKey("TutorialsId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -463,7 +463,7 @@ namespace DispatcherApp.DAL.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("DispatcherApp.Models.Entities.Assignment", b =>
+            modelBuilder.Entity("DispatcherApp.Common.Entities.Assignment", b =>
                 {
                     b.Navigation("AssignmentUsers");
                 });

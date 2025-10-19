@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using DispatcherApp.BLL.Common.Interfaces;
-using DispatcherApp.Models.DTOs.Tutorial;
+using DispatcherApp.Common.DTOs.Tutorial;
 using MediatR;
 using AutoMapper;
 

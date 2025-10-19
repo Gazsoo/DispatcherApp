@@ -4,17 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
-using DispatcherApp.API.Controllers;
 using DispatcherApp.BLL.Common.Interfaces;
-using DispatcherApp.BLL.Common.Interfaces.Repository;
 using DispatcherApp.BLL.Files.Commands.UpdateFile;
 using DispatcherApp.BLL.Model;
-using DispatcherApp.Models.Entities;
+using DispatcherApp.Common.Entities;
+using DispatcherApp.Common.DTOs.Files;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using FileMetadata = DispatcherApp.Models.Entities.File;
+using FileMetadata = DispatcherApp.Common.Entities.File;
+using DispatcherApp.Common.Abstractions.Storage;
+using DispatcherApp.Common.Abstractions.Repository;
 
 namespace DispatcherApp.BLL.Common.Services;
 internal class FileService(
@@ -86,7 +87,7 @@ internal class FileService(
             );
         Guard.Against.Null(fileResult, nameof(fileResult));
         
-        var file = _fileRepository.AddAsync(new FileMetadata
+        var file = await _fileRepository.AddAsync(new FileMetadata
         {
             FileName = fileResult.FileName,
             OriginalFileName = fur.OriginalFileName,

@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DispatcherApp.BLL.Common.Interfaces;
-using DispatcherApp.Models.Context;
+using DispatcherApp.Common.Context;
 using Microsoft.AspNetCore.Http;
 
-namespace DispatcherApp.BLL.Common.Services;
+namespace DispatcherApp.API.Services;
 public class UserContextService : IUserContextService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;

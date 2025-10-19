@@ -1,5 +1,5 @@
-using DispatcherApp.Models.CommonConfigurations;
-using DispatcherApp.BLL.Services;
+using DispatcherApp.DAL.Seed;
+using DispatcherApp.Common.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 

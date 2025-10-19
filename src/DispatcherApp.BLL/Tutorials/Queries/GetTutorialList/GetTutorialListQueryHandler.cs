@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using DispatcherApp.BLL.Common.Interfaces;
-using DispatcherApp.Models.DTOs.Tutorial;
+using DispatcherApp.Common.DTOs.Tutorial;
 using MediatR;
 
 namespace DispatcherApp.BLL.Tutorials.Queries.GetTutorialList;

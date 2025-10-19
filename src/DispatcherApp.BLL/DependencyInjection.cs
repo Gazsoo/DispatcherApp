@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using DispatcherApp.API.Controllers;
 using DispatcherApp.BLL.Common.Behaviors;
 using DispatcherApp.BLL.Common.Configurations;
 using DispatcherApp.BLL.Common.Extentions;
@@ -36,7 +35,6 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.AddSingleton<IEmailSender, DummyEmailSender>();
             builder.Services.AddScoped<IAssignmentService, AssignmentService>();
             builder.Services.AddScoped<ITutorialService, TutorialService>();
-            builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
             builder.Services.AddScoped<IFileService, FileService>();
 
         }

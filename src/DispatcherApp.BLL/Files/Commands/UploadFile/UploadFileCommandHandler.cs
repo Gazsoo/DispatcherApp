@@ -1,6 +1,8 @@
 ﻿
 using Ardalis.GuardClauses;
-using DispatcherApp.API.Controllers;
+using DispatcherApp.BLL.Common.Interfaces;
+using DispatcherApp.Common.DTOs.Files;
+using DispatcherApp.Common.Exceptions;
 using MediatR;
 
 namespace DispatcherApp.BLL.Files.Commands.UpdateFile;
@@ -20,7 +22,7 @@ public class UploadFileCommandHandler : IRequestHandler<UploadFileCommand, FileU
     {
         using var stream = request.File.OpenReadStream();
         var extension = Path.GetExtension(request.File.FileName);
-        Guard.Against.NullOrEmpty(extension, nameof(extension), null, () => new Models.Exceptions.ValidationException("File extension is missing"));
+        Guard.Against.NullOrEmpty(extension, nameof(extension), null, () => new ValidationException("File extension is missing"));
 
         var fileEntity = await _fileService
             .SaveFileAsync( 

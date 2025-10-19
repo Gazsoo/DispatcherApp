@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DispatcherApp.Models.Exceptions;
+using DispatcherApp.Common.Exceptions;
 using FluentValidation;
 using MediatR;
 
@@ -33,7 +33,7 @@ public sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<
 
             if (failures.Count != 0)
             {
-                throw new Models.Exceptions.ValidationException(failures);
+                throw new DispatcherApp.Common.Exceptions.ValidationException(failures);
             }
         }
 

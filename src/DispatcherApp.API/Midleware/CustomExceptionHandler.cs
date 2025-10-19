@@ -1,5 +1,5 @@
 ﻿using Ardalis.GuardClauses;
-using DispatcherApp.Models.Exceptions;
+using DispatcherApp.Common.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 

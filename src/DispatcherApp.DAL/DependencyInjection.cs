@@ -1,19 +1,26 @@
 ﻿
 using System.Text;
 using Ardalis.GuardClauses;
-using DispatcherApp.BLL.Common.Interfaces.Repository;
-using DispatcherApp.BLL.Services;
+using Azure.Core;
+using Azure.Identity;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
+using DispatcherApp.BLL.Common.Services;
+using DispatcherApp.Common.Abstractions.Repository;
+using DispatcherApp.Common.Abstractions.Storage;
+using DispatcherApp.DAL.Configurations;
 using DispatcherApp.DAL.Data;
 using DispatcherApp.DAL.Repositories;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Diagnostics;
+using DispatcherApp.DAL.Seed;
+using DispatcherApp.DAL.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -24,6 +31,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var connectionString = builder.Configuration.GetConnectionString("DispatcherDb");
             Guard.Against.Null(connectionString, message: "Connection string 'DispatcherDb' not found.");
 
+            builder.Services.Configure<FileStorageSettings>(builder.Configuration.GetSection(FileStorageSettings.SectionName));
 
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
             builder.Services.AddHealthChecks()
@@ -57,7 +65,8 @@ namespace Microsoft.Extensions.DependencyInjection
             //builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
             builder.Services.AddScoped<DatabaseSeedingService>();
-
+            //builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
+            builder.Services.AddScoped<IFileStorageService, AzureBlobStorageService>();
             builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
             builder.Services.AddScoped<IFileRepository, FileRepository>();
             builder.Services.AddScoped<ITutorialRepository, TutorialRepository>();
@@ -71,6 +80,22 @@ namespace Microsoft.Extensions.DependencyInjection
 
             //builder.Services.AddAuthorization(options =>
             //    options.AddPolicy(Policies.CanPurge, policy => policy.RequireRole(Roles.Administrator)));
+
+
+            var credential = new DefaultAzureCredential();
+            builder.Services.AddSingleton<TokenCredential>(credential);
+            // Register Azure clients
+            builder.Services.AddAzureClients(clientBuilder =>
+            {
+                clientBuilder.UseCredential(credential);
+
+                // Get the blob URI from configuration
+                var blobUri = builder.Configuration[$"{FileStorageSettings.SectionName}:BlobUri"];
+                if (!string.IsNullOrWhiteSpace(blobUri))
+                {
+                    clientBuilder.AddBlobServiceClient(new Uri(blobUri));
+                }
+            });
         }
     }
 }

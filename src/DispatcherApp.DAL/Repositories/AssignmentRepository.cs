@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DispatcherApp.BLL.Common.Interfaces.Repository;
 using DispatcherApp.DAL.Data;
-using DispatcherApp.Models.Entities;
+using DispatcherApp.Common.Entities;
 using Microsoft.EntityFrameworkCore;
+using DispatcherApp.Common.Abstractions.Repository;
 
 namespace DispatcherApp.DAL.Repositories;
 public class AssignmentRepository : IAssignmentRepository

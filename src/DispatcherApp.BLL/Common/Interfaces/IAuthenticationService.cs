@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DispatcherApp.BLL.Model;
-using DispatcherApp.Models.DTOs.Auth;
+using DispatcherApp.Common.DTOs.Auth;
 using Microsoft.AspNetCore.Identity;
-using LoginRequest = DispatcherApp.Models.DTOs.Auth.LoginRequest;
-using RefreshRequest = DispatcherApp.Models.DTOs.Auth.RefreshRequest;
-using RegisterRequest = DispatcherApp.Models.DTOs.Auth.RegisterRequest;
-using ResetPasswordRequest = DispatcherApp.Models.DTOs.Auth.ResetPasswordRequest;
+using LoginRequest = DispatcherApp.Common.DTOs.Auth.LoginRequest;
+using RefreshRequest = DispatcherApp.Common.DTOs.Auth.RefreshRequest;
+using RegisterRequest = DispatcherApp.Common.DTOs.Auth.RegisterRequest;
+using ResetPasswordRequest = DispatcherApp.Common.DTOs.Auth.ResetPasswordRequest;
 
 namespace DispatcherApp.BLL.Common.Interfaces;
 public interface IAuthenticationService

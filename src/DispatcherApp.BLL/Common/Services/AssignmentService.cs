@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using AutoMapper;
 using DispatcherApp.BLL.Common.Interfaces;
-using DispatcherApp.BLL.Common.Interfaces.Repository;
-using DispatcherApp.Models.Context;
-using DispatcherApp.Models.DTOs.Assignment;
-using DispatcherApp.Models.Entities;
+using DispatcherApp.Common.Abstractions.Repository;
+using DispatcherApp.Common.Context;
+using DispatcherApp.Common.DTOs.Assignment;
+using DispatcherApp.Common.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

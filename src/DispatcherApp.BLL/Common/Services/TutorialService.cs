@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using AutoMapper;
 using DispatcherApp.BLL.Common.Interfaces;
-using DispatcherApp.BLL.Common.Interfaces.Repository;
-using DispatcherApp.Models.DTOs.Tutorial;
-using DispatcherApp.Models.Entities;
+using DispatcherApp.Common.Abstractions.Repository;
+using DispatcherApp.Common.DTOs.Tutorial;
+using DispatcherApp.Common.Entities;
 
 namespace DispatcherApp.BLL.Common.Services;
 

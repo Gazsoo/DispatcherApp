@@ -1,4 +1,4 @@
-﻿using DispatcherApp.API.Controllers;
+﻿using DispatcherApp.BLL.Common.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

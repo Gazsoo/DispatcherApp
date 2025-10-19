@@ -6,17 +6,17 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using DispatcherApp.DAL.Data;
-using DispatcherApp.Models.Constants;
-using DispatcherApp.Models.Entities;
+using DispatcherApp.Common.Constants;
+using DispatcherApp.Common.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using File = DispatcherApp.Models.Entities.File;
+using File = DispatcherApp.Common.Entities.File;
 
-namespace DispatcherApp.BLL.Services;
+namespace DispatcherApp.DAL.Seed;
 
 public static class RoleSeederExtention
 {

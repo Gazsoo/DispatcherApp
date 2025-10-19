@@ -6,7 +6,7 @@ using DispatcherApp.BLL.Tutorials.Commands.DeleteTutorial;
 using DispatcherApp.BLL.Tutorials.Commands.UpdateTutorial;
 using DispatcherApp.BLL.Tutorials.Queries.GetTutorial;
 using DispatcherApp.BLL.Tutorials.Queries.GetTutorialList;
-using DispatcherApp.Models.DTOs.Tutorial;
+using DispatcherApp.Common.DTOs.Tutorial;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

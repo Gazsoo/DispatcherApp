@@ -1,5 +1,5 @@
-﻿using DispatcherApp.Models.Context;
-using DispatcherApp.Models.DTOs.Assignment;
+﻿using DispatcherApp.Common.Context;
+using DispatcherApp.Common.DTOs.Assignment;
 
 namespace DispatcherApp.BLL.Common.Interfaces;
 public interface IAssignmentService

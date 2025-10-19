@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DispatcherApp.API.Controllers;
+﻿using DispatcherApp.Common.DTOs.Files;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 

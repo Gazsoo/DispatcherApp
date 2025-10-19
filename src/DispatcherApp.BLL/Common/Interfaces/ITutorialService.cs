@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using DispatcherApp.Models.DTOs.Tutorial;
-using DispatcherApp.Models.Entities;
+using DispatcherApp.Common.DTOs.Tutorial;
+using DispatcherApp.Common.Entities;
 
 namespace DispatcherApp.BLL.Common.Interfaces;
 

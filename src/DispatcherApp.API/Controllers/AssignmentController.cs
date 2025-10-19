@@ -1,5 +1,5 @@
 ﻿using DispatcherApp.BLL.Common.Interfaces;
-using DispatcherApp.Models.DTOs.Assignment;
+using DispatcherApp.Common.DTOs.Assignment;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
