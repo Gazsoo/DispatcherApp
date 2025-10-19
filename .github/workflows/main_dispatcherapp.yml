@@ -23,11 +23,30 @@ jobs:
         with:
           dotnet-version: '9.x'
 
+      # --- Setup Node (for frontend build) ---
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # --- Build frontend ---
+      - name: Install and build frontend
+        working-directory: ./src/frontend-app
+        run: |
+          npm ci
+          npm run build
+
+      # --- Copy frontend build into API project ---
+      - name: Copy frontend build into wwwroot
+        run: |
+          mkdir -p ./src/DispatcherApp.API/wwwroot
+          cp -r ./src/frontend-app/dist/* ./src/DispatcherApp.API/wwwroot/
+
       - name: Build with dotnet
         run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish ./src/DispatcherApp.API/DispatcherApp.API.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
