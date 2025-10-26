@@ -34,13 +34,29 @@ namespace DispatcherApp.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Log")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("PlannedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -73,6 +89,52 @@ namespace DispatcherApp.DAL.Migrations
                     b.HasKey("AssignmentId", "UserId");
 
                     b.ToTable("AssignmentUsers");
+                });
+
+            modelBuilder.Entity("DispatcherApp.Common.Entities.DispatcherSession", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AssignmentId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("EndTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("OwnerId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssignmentId");
+
+                    b.ToTable("DispatcherSessions");
                 });
 
             modelBuilder.Entity("DispatcherApp.Common.Entities.File", b =>
@@ -120,6 +182,22 @@ namespace DispatcherApp.DAL.Migrations
                     b.ToTable("Files");
                 });
 
+            modelBuilder.Entity("DispatcherApp.Common.Entities.SessionParticipant", b =>
+                {
+                    b.Property<int>("SessionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.HasKey("SessionId", "UserId");
+
+                    b.ToTable("SessionParticipant");
+                });
+
             modelBuilder.Entity("DispatcherApp.Common.Entities.Tutorial", b =>
                 {
                     b.Property<int>("Id")
@@ -128,10 +206,6 @@ namespace DispatcherApp.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ContentType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -139,6 +213,9 @@ namespace DispatcherApp.DAL.Migrations
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int?>("PictureId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -156,6 +233,8 @@ namespace DispatcherApp.DAL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedAt");
+
+                    b.HasIndex("PictureId");
 
                     b.ToTable("Tutorials");
                 });
@@ -384,6 +463,16 @@ namespace DispatcherApp.DAL.Migrations
                     b.Navigation("Assignment");
                 });
 
+            modelBuilder.Entity("DispatcherApp.Common.Entities.DispatcherSession", b =>
+                {
+                    b.HasOne("DispatcherApp.Common.Entities.Assignment", "Assignment")
+                        .WithMany()
+                        .HasForeignKey("AssignmentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Assignment");
+                });
+
             modelBuilder.Entity("DispatcherApp.Common.Entities.File", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "UploadedByUser")
@@ -392,6 +481,27 @@ namespace DispatcherApp.DAL.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("UploadedByUser");
+                });
+
+            modelBuilder.Entity("DispatcherApp.Common.Entities.SessionParticipant", b =>
+                {
+                    b.HasOne("DispatcherApp.Common.Entities.DispatcherSession", "Session")
+                        .WithMany("Participants")
+                        .HasForeignKey("SessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Session");
+                });
+
+            modelBuilder.Entity("DispatcherApp.Common.Entities.Tutorial", b =>
+                {
+                    b.HasOne("DispatcherApp.Common.Entities.File", "Picture")
+                        .WithMany()
+                        .HasForeignKey("PictureId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Picture");
                 });
 
             modelBuilder.Entity("FileTutorial", b =>
@@ -463,6 +573,11 @@ namespace DispatcherApp.DAL.Migrations
             modelBuilder.Entity("DispatcherApp.Common.Entities.Assignment", b =>
                 {
                     b.Navigation("AssignmentUsers");
+                });
+
+            modelBuilder.Entity("DispatcherApp.Common.Entities.DispatcherSession", b =>
+                {
+                    b.Navigation("Participants");
                 });
 #pragma warning restore 612, 618
         }

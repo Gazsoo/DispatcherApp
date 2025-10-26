@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
-namespace DispatcherApp.BLL.Files.Commands.UpdateFile;
+namespace DispatcherApp.BLL.Files.Commands.UploadFile;
 public record FileUploadData(
     Stream FileStream,
     string OriginalFileName,
     string ContentType,
     string Extension,
     string? Description)
-{}
+{ }

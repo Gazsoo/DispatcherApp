@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Assignments\" />
     <Folder Include="Tutorials\" />
   </ItemGroup>
 

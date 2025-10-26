@@ -1,4 +1,4 @@
-﻿using DispatcherApp.BLL.Files.Commands.UpdateFile;
+﻿using DispatcherApp.BLL.Files.Commands.UploadFile;
 using DispatcherApp.Common.DTOs.Files;
 using Microsoft.AspNetCore.Mvc;
 using File = DispatcherApp.Common.Entities.File;

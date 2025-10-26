@@ -19,7 +19,7 @@ public class File
     public string ContentType { get; set; } = string.Empty;
     public long FileSize { get; set; }
     public string StoragePath { get; set; } = string.Empty; // Relative path or blob name
-    public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
+    public DateTime UploadedAt { get; set; }
 
     public ICollection<Tutorial> Tutorials { get; set; } = new List<Tutorial>();
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DispatcherApp.Common.DTOs.Auth;
+namespace DispatcherApp.Common.DTOs.User;
 public record UserInfoResponse
 {
     public string Email { get; set; } = string.Empty;

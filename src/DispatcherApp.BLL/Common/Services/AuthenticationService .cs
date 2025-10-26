@@ -5,6 +5,7 @@ using Ardalis.GuardClauses;
 using DispatcherApp.BLL.Common.Interfaces;
 using DispatcherApp.Common.Configurations;
 using DispatcherApp.Common.DTOs.Auth;
+using DispatcherApp.Common.DTOs.User;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -214,44 +215,38 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<bool> RegisterAsync(RegisterRequest request, string confirmationBaseUrl)
     {
-        try
+
+        var existingUser = await _userManager.FindByEmailAsync(request.Email);
+        if (existingUser != null)
         {
-            var existingUser = await _userManager.FindByEmailAsync(request.Email);
-            if (existingUser != null)
-            {
-                _logger.LogWarning("Registration attempt for existing user: {Email}", request.Email);
-                return false;
-            }
-
-            var user = new IdentityUser
-            {
-                UserName = request.Email,
-                Email = request.Email,
-                EmailConfirmed = false
-            };
-
-            var createResult = await _userManager.CreateAsync(user, request.Password);
-            if (!createResult.Succeeded)
-            {
-                _logger.LogWarning("User creation failed for: {Email}. Errors: {Errors}",
-                    request.Email, string.Join(", ", createResult.Errors.Select(e => e.Description)));
-                return false;
-            }
-
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var confirmationUrl = $"{confirmationBaseUrl}?userId={user.Id}&token={WebUtility.UrlEncode(token)}";
-
-            await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
-                $"Please confirm your email by clicking <a href='{confirmationUrl}'>here</a>");
-
-            _logger.LogInformation("User registered successfully: {Email}", request.Email);
-            return true;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error during registration for user: {Email}", request.Email);
+            _logger.LogWarning("Registration attempt for existing user: {Email}", request.Email);
             return false;
         }
+
+        var user = new IdentityUser
+        {
+            UserName = request.Email,
+            Email = request.Email,
+            EmailConfirmed = false
+        };
+
+        var createResult = await _userManager.CreateAsync(user, request.Password);
+        if (!createResult.Succeeded)
+        {
+            _logger.LogWarning("User creation failed for: {Email}. Errors: {Errors}",
+                request.Email, string.Join(", ", createResult.Errors.Select(e => e.Description)));
+            return false;
+        }
+
+        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        var confirmationUrl = $"{confirmationBaseUrl}?userId={user.Id}&token={WebUtility.UrlEncode(token)}";
+
+        await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
+            $"Please confirm your email by clicking <a href='{confirmationUrl}'>here</a>");
+
+        _logger.LogInformation("User registered successfully: {Email}", request.Email);
+        return true;
+        
     }
 
     public async Task<bool> ResendConfirmationEmailAsync(string email, string confirmationBaseUrl)

@@ -5,8 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using DispatcherApp.BLL.Common.Interfaces;
-using DispatcherApp.BLL.Files.Commands.UpdateFile;
-using DispatcherApp.BLL.Model;
+using DispatcherApp.BLL.Files.Commands.UploadFile;
 using DispatcherApp.Common.Entities;
 using DispatcherApp.Common.DTOs.Files;
 using Microsoft.AspNetCore.Mvc;
@@ -21,12 +20,14 @@ namespace DispatcherApp.BLL.Common.Services;
 internal class FileService(
     IFileStorageService fileStorageService,
     IFileRepository fileRepository,
-    IUserContextService userContextService
+    IUserContextService userContextService,
+    TimeProvider timeProvider
     ) : IFileService
 {
     private readonly IFileStorageService _fileStorageService = fileStorageService;
     private readonly IFileRepository _fileRepository = fileRepository;
     private readonly IUserContextService _userContextService = userContextService;
+    private readonly TimeProvider _timeProvider = timeProvider;
 
     public async Task DeleteFileAsync(int id)
     {
@@ -96,7 +97,7 @@ internal class FileService(
             StoragePath = fileResult.StoragePath,
             Description = fur.Description ?? "",
             UploadedByUserId = _userContextService.UserId,
-            UploadedAt = DateTime.UtcNow
+            UploadedAt = _timeProvider.GetUtcNow().UtcDateTime
         });
         await _fileRepository.SaveChangesAsync(cancellationToken);
 

@@ -1,5 +1,6 @@
-using DispatcherApp.DAL.Seed;
+using DispatcherApp.API.Controllers;
 using DispatcherApp.Common.Configurations;
+using DispatcherApp.DAL.Seed;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,5 +38,6 @@ app.UseExceptionHandler(options => {});
 app.MapHealthChecks("/health");
 app.MapFallbackToFile("index.html");
 app.MapControllers();
+app.MapHub<SessionHub>("/ws/sessions");
 
 app.Run();

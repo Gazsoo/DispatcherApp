@@ -15,11 +15,13 @@ public class TutorialService : ITutorialService
 {
     private readonly ITutorialRepository _tutorialRepository;
     private readonly IMapper _mapper;
+    private readonly TimeProvider _timeProvider;
 
-    public TutorialService(ITutorialRepository tutorialRepository, IMapper mapper)
+    public TutorialService(ITutorialRepository tutorialRepository, IMapper mapper, TimeProvider timeProvider)
     {
         _tutorialRepository = tutorialRepository;
         _mapper = mapper;
+        _timeProvider = timeProvider;
     }
 
     public async Task<Tutorial> GetTutorialAsync(int tutorialId, CancellationToken ct = default)
@@ -34,8 +36,9 @@ public class TutorialService : ITutorialService
     public async Task<Tutorial> CreateTutorial(CreateTutorialRequest request, CancellationToken ct = default)
     {
         var tutorial = _mapper.Map<Tutorial>(request);
-        tutorial.CreatedAt = DateTime.UtcNow;
-        tutorial.UpdatedAt = tutorial.CreatedAt;
+        var now = _timeProvider.GetUtcNow().UtcDateTime;
+        tutorial.CreatedAt = now;
+        tutorial.UpdatedAt = now;
 
         await _tutorialRepository.AddAsync(tutorial, ct);
         await _tutorialRepository.SaveChangesAsync(ct);
@@ -51,8 +54,7 @@ public class TutorialService : ITutorialService
         tutorial.Title = request.Title;
         tutorial.Description = request.Description ?? tutorial.Description;
         tutorial.Url = request.Url ?? tutorial.Url;
-        tutorial.ContentType = request.ContentType ?? tutorial.ContentType;
-        tutorial.UpdatedAt = DateTime.UtcNow;
+        tutorial.UpdatedAt = _timeProvider.GetUtcNow().UtcDateTime;
 
         await _tutorialRepository.SaveChangesAsync(ct);
 

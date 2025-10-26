@@ -1,0 +1,20 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 64 64"
+  width="64"
+  height="64"
+>
+  <!-- Background circle -->
+  <circle cx="32" cy="32" r="30" fill="#A3B18A"/>
+
+  <!-- VR headset outline -->
+  <rect x="14" y="24" width="36" height="16" rx="6" fill="none" stroke="#ffffff" stroke-width="3"/>
+  <circle cx="24" cy="32" r="4" fill="#ffffff"/>
+  <circle cx="40" cy="32" r="4" fill="#ffffff"/>
+
+  <!-- Little “sage leaf” sprout -->
+  <path
+    d="M45 17c2 0 5 2 5 5 0 2-2 4-5 4-1 0-2 0-3-1 0-3 1-6 3-8z"
+    fill="#ffffff"
+  />
+</svg>

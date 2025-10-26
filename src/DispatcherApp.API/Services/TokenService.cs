@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DispatcherApp.BLL.Common.Configurations;
 using DispatcherApp.BLL.Common.Interfaces;
-using DispatcherApp.BLL.Model;
+using DispatcherApp.BLL.Common.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -18,19 +18,24 @@ public class TokenService : ITokenService
 {
     private readonly UserManager<IdentityUser> _userManager;
     private readonly JwtSettings _jwtSettings;
+    private readonly TimeProvider _timeProvider;
 
     public  TokenService(
         UserManager<IdentityUser> userManager,
-        IOptions<JwtSettings> jwtSettings
+        IOptions<JwtSettings> jwtSettings,
+        TimeProvider timeProvider
         )
     {
         _jwtSettings = jwtSettings.Value;
         _userManager = userManager;
+        _timeProvider = timeProvider;
     }
     public async Task<TokenResult>  GenerateAccessTokenAsync(IdentityUser user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
+
+        var now = _timeProvider.GetUtcNow();
 
         var claims = new List<Claim>
         {
@@ -38,7 +43,7 @@ public class TokenService : ITokenService
             new(ClaimTypes.Name, user.UserName!),
             new(ClaimTypes.Email, user.Email!),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
+            new(JwtRegisteredClaimNames.Iat, now.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
         };
 
         var roles = await _userManager.GetRolesAsync(user);
@@ -47,7 +52,7 @@ public class TokenService : ITokenService
             claims.Add(new Claim(ClaimTypes.Role, role));
         }
 
-        var expiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes);
+        var expiresAt = now.AddMinutes(_jwtSettings.ExpiryMinutes).UtcDateTime;
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
@@ -62,7 +67,8 @@ public class TokenService : ITokenService
         return new TokenResult
         {
             AccessToken = tokenHandler.WriteToken(token),
-            ExpiresAt = expiresAt
+            ExpiresAt = expiresAt,
+            TimeProvider = _timeProvider
         };
     }
 

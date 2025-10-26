@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
+using DispatcherApp.Common.Abstractions;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -35,8 +36,10 @@ namespace Microsoft.Extensions.DependencyInjection;
             builder.Configuration.AddApiConfigurations();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddControllers();
+            builder.Services.AddSignalR(o => o.EnableDetailedErrors = true);
 
             builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddScoped<ISessionNotifier, SignalRSessionNotifier>();
             builder.Services.AddScoped<IUserContextService, UserContextService>();
 
             builder.Services.AddExceptionHandler<CustomExceptionHandler>();

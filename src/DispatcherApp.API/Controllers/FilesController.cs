@@ -1,16 +1,18 @@
 ﻿using System.Runtime.InteropServices;
 using DispatcherApp.BLL.Files.Commands.DeleteFile;
 using DispatcherApp.BLL.Files.Commands.DeleteFiles;
-using DispatcherApp.BLL.Files.Commands.UpdateFile;
+using DispatcherApp.BLL.Files.Commands.UploadFile;
 using DispatcherApp.BLL.Files.Queries.DownloadFile;
 using DispatcherApp.BLL.Files.Queries.GetFile;
 using DispatcherApp.BLL.Files.Queries.GetFiles;
 using DispatcherApp.Common.DTOs.Files;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DispatcherApp.API.Controllers;
 [Route("api/[controller]")]
+[Authorize]
 [ApiController]
 public class FilesController (IMediator mediator) : ControllerBase
 {

@@ -1,20 +1,26 @@
 ﻿using System.Net;
+using System.Net.Mail;
+using Ardalis.GuardClauses;
+using DispatcherApp.Common.Abstractions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Logging;
 
-namespace DispatcherApp.BLL.Common.Services;
+namespace DispatcherApp.DAL.Services;
 
 public class DummyEmailSender: IEmailSender<IdentityUser> , IEmailSender
 {
     private readonly ILogger<DummyEmailSender> _logger;
 
-    public DummyEmailSender(ILogger<DummyEmailSender> logger)
+    public DummyEmailSender(
+        ILogger<DummyEmailSender> logger
+        )
     {
         _logger = logger;
     }
     public Task SendConfirmationLinkAsync(IdentityUser user, string email, string confirmationLink)
     {
+        var emailAddress = Guard.Against.NullOrEmpty(user.Email, nameof(user.Email));
         var decoded = WebUtility.HtmlDecode(confirmationLink);
         // Use structured logging instead of Console.WriteLine
         _logger.LogInformation("Email would be sent to {Email} with link {decoded}",
@@ -30,7 +36,7 @@ public class DummyEmailSender: IEmailSender<IdentityUser> , IEmailSender
         _logger.LogInformation("Email would be sent to {Email} with link {decoded}",
             email, decoded);
 
-        return Task.CompletedTask;
+        return Task.CompletedTask; ;
     }
 
     public Task SendPasswordResetCodeAsync(IdentityUser user, string email, string resetCode)
