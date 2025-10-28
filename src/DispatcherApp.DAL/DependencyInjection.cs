@@ -73,6 +73,7 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.AddScoped<IFileRepository, FileRepository>();
             builder.Services.AddScoped<ITutorialRepository, TutorialRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<ISessionRepository, SessionRepository>();
             //builder.Services
             //    .AddDefaultIdentity<ApplicationUser>()
             //    .AddRoles<IdentityRole>()

@@ -13,9 +13,10 @@ public class DispatcherSession
 { 
     public int Id { get; set; }
     public string? OwnerId { get; set; }
+    public string? GroupId { get; set; }
     public ICollection<SessionParticipant> Participants { get; set; } = new List<SessionParticipant>();
-    public DateTime StartTime { get; set; }
-    public DateTime? EndTime { get; set; }
+    public DateTimeOffset StartTime { get; set; }
+    public DateTimeOffset? EndTime { get; set; }
     public int? AssignmentId { get; set; }
     public Assignment Assignment { get; set; } = null!;
     public DispatcherSessionType Type { get; set; }

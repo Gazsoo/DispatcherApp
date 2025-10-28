@@ -5,3 +5,6 @@ interface AppEnv {
 
     // Add other env vars as needed
 }
+interface ImportMeta {
+    readonly env: ImportMetaEnv;
+}

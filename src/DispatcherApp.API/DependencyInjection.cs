@@ -1,15 +1,16 @@
-﻿using Azure.Identity;
+﻿using System.Text.Json.Serialization;
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
+using Azure.Identity;
 using DispatcherApp.API.Configurations;
 using DispatcherApp.API.Midleware;
 using DispatcherApp.API.Services;
 using DispatcherApp.BLL.Common.Configurations;
 using DispatcherApp.BLL.Common.Extentions;
 using DispatcherApp.BLL.Common.Interfaces;
+using DispatcherApp.Common.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using NSwag;
 using NSwag.Generation.Processors.Security;
-using Azure.Extensions.AspNetCore.Configuration.Secrets;
-using DispatcherApp.Common.Abstractions;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -35,8 +36,18 @@ namespace Microsoft.Extensions.DependencyInjection;
                 });
             builder.Configuration.AddApiConfigurations();
             builder.Services.AddHttpContextAccessor();
-            builder.Services.AddControllers();
-            builder.Services.AddSignalR(o => o.EnableDetailedErrors = true);
+            builder.Services
+                .AddControllers()
+                .AddJsonOptions(opts =>
+                {
+                    opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
+            builder.Services
+                .AddSignalR(o => o.EnableDetailedErrors = true)
+                .AddJsonProtocol(opts =>
+                {
+                    opts.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                }); ;
 
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<ISessionNotifier, SignalRSessionNotifier>();

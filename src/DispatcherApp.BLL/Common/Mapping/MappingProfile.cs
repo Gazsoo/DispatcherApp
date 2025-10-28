@@ -35,6 +35,9 @@ public class MappingProfile : Profile
             f => f.FileName,
             x => x.MapFrom(src => src.OriginalFileName));
 
-        CreateMap<DispatcherSession, SessionResponse>();
+        CreateMap<DispatcherSession, SessionResponse>()
+            .ForMember(
+            x => x.ParticipantIds, 
+            i => i.MapFrom(src => src.Participants.Select(p => p.UserId)));
     }
 }

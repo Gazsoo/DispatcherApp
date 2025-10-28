@@ -50,7 +50,7 @@
 
 
 
-  <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' != 'true'">
+  <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' == 'true'">
     <SkipNSwagGen>True</SkipNSwagGen>
   </PropertyGroup>
   <!-- NSwag code generation -->  

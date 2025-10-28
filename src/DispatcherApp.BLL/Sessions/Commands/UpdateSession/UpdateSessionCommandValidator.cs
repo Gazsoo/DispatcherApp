@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace DispatcherApp.BLL.Sessions.Commands;
+namespace DispatcherApp.BLL.Sessions.Commands.UpdateSession;
 public class UpdateSessionCommandValidator : AbstractValidator<UpdateSessionCommand>
 {
     public UpdateSessionCommandValidator()

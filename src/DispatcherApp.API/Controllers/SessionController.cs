@@ -1,5 +1,11 @@
 ﻿using DispatcherApp.BLL.Sessions.Commands;
+using DispatcherApp.BLL.Sessions.Commands.UpdateSession;
+using DispatcherApp.BLL.Sessions.Commands.UpdateSessionState;
 using DispatcherApp.BLL.Sessions.Queries;
+using DispatcherApp.BLL.Sessions.Queries.GetActiveSessions;
+using DispatcherApp.BLL.Sessions.Queries.GetAllSessions;
+using DispatcherApp.BLL.Sessions.Queries.GetSession;
+using DispatcherApp.Common.Constants;
 using DispatcherApp.Common.DTOs.Session;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -15,30 +21,30 @@ public class SessionController (IMediator mediator) : ControllerBase
 {
     private readonly IMediator _mediator = mediator;
 
-    [HttpPost("{id}/_simulate-update")]
-    #if DEBUG
-        public async Task<IActionResult> SimulateUpdate(string id, [FromBody] UpdateSessionRequest body, CancellationToken ct)
-        {
-            var dto = await _mediator.Send(new UpdateSessionCommand(id, body.IfMatchVersion, body.Data.ToString()), ct);
-            return Ok(dto);
-        }
-    #else
-    public IActionResult SimulateUpdate() => NotFound();
-    #endif
     // GET: api/<SessionController>
-    //[HttpGet]
-    //public async Task<ActionResult<IEnumerable<SessionResponse>>> Get()
-    //{
-    //   return await _mediator.Send(new GetSessionQuery);
-    //}
+    [HttpGet()]
+    public async Task<ActionResult<IEnumerable<SessionResponse>>> Get()
+    {
+        return Ok(await _mediator.Send(new GetAllSessionsQuery()));
+    }
+    // GET: api/<SessionController>
+    [HttpGet("active")]
+    public async Task<ActionResult<IEnumerable<SessionResponse>>> GetActive()
+    {
+        return Ok( await _mediator.Send(new GetActiveSessionsQuery()));
+    }
 
     // GET api/<SessionController>/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<SessionResponse>> Get(string sessionId)
+    public async Task<ActionResult<SessionResponse>> Get(int id)
     {
-        return await _mediator.Send(new GetSessionQuery(sessionId));
+        return Ok(await _mediator.Send(new GetSessionQuery(id)));
     }
-
+    [HttpPatch("{id}/{status}")]
+    public async Task<ActionResult<SessionResponse>> UpdateStatus(string sessionId, DispatcherSessionStatus dss)
+    {
+        return Ok(await _mediator.Send(new UpdateSessionStateCommand(sessionId, dss)));
+    }
     // POST api/<SessionController>
     //[HttpPost]
     //public void Post([FromBody] SessionCreateRequest request)
@@ -51,7 +57,7 @@ public class SessionController (IMediator mediator) : ControllerBase
 
     // PUT api/<SessionController>/5
     [HttpPut("{sessionId}")]
-    public async Task<IActionResult> UpdateSession(int id, [FromBody] UpdateSessionRequest req, CancellationToken ct)
+    public async Task<IActionResult> UpdateSession(string id, [FromBody] UpdateSessionRequest req, CancellationToken ct)
     {
         var result = await _mediator.Send(new UpdateSessionCommand(
             id,

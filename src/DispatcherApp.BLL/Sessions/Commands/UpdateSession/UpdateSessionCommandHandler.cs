@@ -6,7 +6,7 @@ using DispatcherApp.Common.DTOs.Session;
 using DispatcherApp.Common.Exceptions;
 using MediatR;
 
-namespace DispatcherApp.BLL.Sessions.Commands;
+namespace DispatcherApp.BLL.Sessions.Commands.UpdateSession;
 internal sealed class UpdateSessionCommandHandler(
     ISessionService sessionService
 ) : IRequestHandler<UpdateSessionCommand, SessionResponse>

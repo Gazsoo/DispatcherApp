@@ -4,6 +4,7 @@ using DispatcherApp.DAL.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DispatcherApp.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251028154358_Sessions4")]
+    partial class Sessions4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -102,8 +105,8 @@ namespace DispatcherApp.DAL.Migrations
                     b.Property<int?>("AssignmentId")
                         .HasColumnType("int");
 
-                    b.Property<DateTimeOffset?>("EndTime")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateTime?>("EndTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("GroupId")
                         .HasColumnType("nvarchar(max)");
@@ -117,8 +120,8 @@ namespace DispatcherApp.DAL.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
 
-                    b.Property<DateTimeOffset>("StartTime")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");

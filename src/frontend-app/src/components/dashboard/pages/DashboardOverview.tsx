@@ -1,33 +1,44 @@
 ﻿import React, { useEffect, useMemo, useRef, useState } from "react";
 import * as signalR from "@microsoft/signalr";
+import { apiClient } from "../../../api/client";
+import { JWTManager } from "../../../auth/jwt/jwt-manager";
 
 export default function DashboardOverview({
     hubUrl = "/ws/sessions",
-    token,                      // optional JWT string
-    defaultSessionId = "S-123"  // change as you like
+    token,
+    defaultSessionId = "S-123"
+}: {
+    hubUrl?: string;
+    token?: string;
+    defaultSessionId?: string;
 }) {
     const [status, setStatus] = useState("disconnected");
-    const [connectionId, setConnectionId] = useState(null);
-    const [log, setLog] = useState([]);
-    const [sessionId, setSessionId] = useState(defaultSessionId);
-    const connRef = useRef(null);
+    const [connectionId, setConnectionId] = useState<string | null>(null);
+    const [log, setLog] = useState<string[]>([]);
+    const [sessionId, setSessionId] = useState<string>(defaultSessionId);
+    const connRef = useRef<signalR.HubConnection | null>(null);
+    token = JWTManager.getAccessToken() ?? "";;
 
-    const append = (line) => setLog((x) => [...x, `[${new Date().toISOString()}] ${line}`]);
+
+    const append = (line: string) => setLog((x) => [...x, `[${new Date().toISOString()}] ${line}`]);
 
     // Build connection lazily
     const buildConnection = useMemo(() => {
         return () => {
+            const url = import.meta.env.VITE_API_BASE_URL + hubUrl;
+            const options = token ? { accessTokenFactory: () => token } : {};
             const builder = new signalR.HubConnectionBuilder()
-                .withUrl(import.meta.env.VITE_API_BASE_URL + hubUrl, token ? { accessTokenFactory: () => token } : undefined)
+                .withUrl(url, options)
                 .withAutomaticReconnect();
-
             const conn = builder.build();
 
             // inbound events
             conn.on("SessionUpdated", (msg) => {
                 append(`SessionUpdated: ${JSON.stringify(msg)}`);
             });
-
+            conn.on("SessionJoined", (msg) => {
+                append(`SessionJoined: ${JSON.stringify(msg)}`);
+            });
             // lifecycle noise
             conn.onreconnecting((err) => {
                 setStatus("reconnecting");
@@ -66,8 +77,10 @@ export default function DashboardOverview({
             setConnectionId(connRef.current.connectionId ?? null);
             append("Connected.");
         } catch (e) {
-            setStatus("error");
-            append(`Connect failed: ${e.message}`);
+            if (e instanceof Error) {
+                setStatus("error");
+                append(`Connect failed: ${e.message}`);
+            }
         }
     };
 
@@ -79,7 +92,7 @@ export default function DashboardOverview({
         append("Disconnected.");
     };
 
-    const invoke = async (method, ...args) => {
+    const invoke = async (method: string, ...args: any[]) => {
         if (!connRef.current || connRef.current.state !== signalR.HubConnectionState.Connected) {
             append("Not connected.");
             return;
@@ -89,12 +102,18 @@ export default function DashboardOverview({
             append(`${method} → ${JSON.stringify(res)}`);
             return res;
         } catch (e) {
-            append(`${method} failed: ${e.message}`);
+            if (e instanceof Error) {
+                append(`${method} failed: ${e.message}`);
+            }
         }
     };
 
     const joinSession = async () => {
-        await invoke("JoinSession", sessionId);
+        const id = await invoke("JoinSession", sessionId);
+        setSessionId(id);
+    };
+    const leaveSession = async () => {
+        const id = await invoke("LeaveSession", sessionId);
     };
 
     const ping = async () => {
@@ -134,6 +153,7 @@ export default function DashboardOverview({
                 <button onClick={ping} className="px-3 py-2 rounded border">Ping</button>
                 <button onClick={whoAmI} className="px-3 py-2 rounded border">WhoAmI</button>
                 <button onClick={joinSession} className="px-3 py-2 rounded border">Join Session</button>
+                <button onClick={leaveSession} className="px-3 py-2 rounded border">Leave Session</button>
                 <button onClick={sendTestUpdate} className="px-3 py-2 rounded border">Send Test Update</button>
             </div>
 
@@ -143,7 +163,7 @@ export default function DashboardOverview({
                     className="w-full border rounded px-3 py-2"
                     value={sessionId}
                     onChange={(e) => setSessionId(e.target.value)}
-                    placeholder="S-123"
+                    placeholder={sessionId}
                 />
             </div>
 

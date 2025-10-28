@@ -2,7 +2,7 @@
 using DispatcherApp.Common.DTOs.Session;
 using MediatR;
 
-namespace DispatcherApp.BLL.Sessions.Queries;
+namespace DispatcherApp.BLL.Sessions.Queries.GetSession;
 internal sealed class GetSessionQueryHandler(ISessionService sessionServie) : IRequestHandler<GetSessionQuery, SessionResponse>
 {
     private readonly ISessionService _sessionService = sessionServie;

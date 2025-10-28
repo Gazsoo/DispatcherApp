@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <Folder Include="Assignments\" />
+    <Folder Include="Assignments\Commands\CreateAssignment\" />
     <Folder Include="Tutorials\" />
   </ItemGroup>
 

@@ -1,5 +1,4 @@
 ﻿using DispatcherApp.BLL.Assignments.Commands.AddAssignmentAssignees;
-using DispatcherApp.BLL.Assignments.Commands.CreateAssignment;
 using DispatcherApp.BLL.Assignments.Commands.DeleteAssignment;
 using DispatcherApp.BLL.Assignments.Commands.RemoveAssignmentAssignee;
 using DispatcherApp.BLL.Assignments.Commands.UpdateAssignment;
@@ -11,6 +10,7 @@ using DispatcherApp.Common.DTOs.Assignment;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
+using DispatcherApp.BLL.Assignments.Commands.CreateAssignment;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 

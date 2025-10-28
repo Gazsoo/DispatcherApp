@@ -1375,23 +1375,15 @@ export class Client extends ApiClientBase {
         return Promise.resolve<FileResponse>(null as any);
     }
 
-    session_SimulateUpdate(id: string, body: UpdateSessionRequest, signal?: AbortSignal): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/api/Session/{id}/_simulate-update";
-        if (id === undefined || id === null)
-            throw new globalThis.Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+    session_GetAll(signal?: AbortSignal): Promise<SessionResponse[]> {
+        let url_ = this.baseUrl + "/api/Session";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(body);
-
         let options_: AxiosRequestConfig = {
-            data: content_,
-            responseType: "blob",
-            method: "POST",
+            method: "GET",
             url: url_,
             headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/octet-stream"
+                "Accept": "application/json"
             },
             signal
         };
@@ -1403,11 +1395,11 @@ export class Client extends ApiClientBase {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processSession_SimulateUpdate(_response));
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processSession_GetAll(_response));
         });
     }
 
-    protected processSession_SimulateUpdate(response: AxiosResponse): Promise<FileResponse> {
+    protected processSession_GetAll(response: AxiosResponse): Promise<SessionResponse[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1417,22 +1409,66 @@ export class Client extends ApiClientBase {
                 }
             }
         }
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers["content-disposition"] : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return Promise.resolve({ fileName: fileName, status: status, data: new Blob([response.data], { type: response.headers["content-type"] }), headers: _headers });
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<SessionResponse[]>(result200);
+
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<FileResponse>(null as any);
+        return Promise.resolve<SessionResponse[]>(null as any);
+    }
+
+    session_GetActive(signal?: AbortSignal): Promise<SessionResponse[]> {
+        let url_ = this.baseUrl + "/api/Session/active";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processSession_GetActive(_response));
+        });
+    }
+
+    protected processSession_GetActive(response: AxiosResponse): Promise<SessionResponse[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<SessionResponse[]>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<SessionResponse[]>(null as any);
     }
 
     session_Get(id: string, sessionId?: string | undefined, signal?: AbortSignal): Promise<SessionResponse> {
@@ -1490,57 +1526,6 @@ export class Client extends ApiClientBase {
         return Promise.resolve<SessionResponse>(null as any);
     }
 
-    session_Put(id: number, value: string, signal?: AbortSignal): Promise<void> {
-        let url_ = this.baseUrl + "/api/Session/{id}";
-        if (id === undefined || id === null)
-            throw new globalThis.Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(value);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "PUT",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-            },
-            signal
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processSession_Put(_response));
-        });
-    }
-
-    protected processSession_Put(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
-    }
-
     session_Delete(id: number, signal?: AbortSignal): Promise<void> {
         let url_ = this.baseUrl + "/api/Session/{id}";
         if (id === undefined || id === null)
@@ -1586,6 +1571,132 @@ export class Client extends ApiClientBase {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<void>(null as any);
+    }
+
+    session_UpdateStatus(id: string, status: string, sessionId?: string | undefined, dss?: DispatcherSessionStatus | undefined, signal?: AbortSignal): Promise<SessionResponse> {
+        let url_ = this.baseUrl + "/api/Session/{id}/{status}?";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (status === undefined || status === null)
+            throw new globalThis.Error("The parameter 'status' must be defined.");
+        url_ = url_.replace("{status}", encodeURIComponent("" + status));
+        if (sessionId === null)
+            throw new globalThis.Error("The parameter 'sessionId' cannot be null.");
+        else if (sessionId !== undefined)
+            url_ += "sessionId=" + encodeURIComponent("" + sessionId) + "&";
+        if (dss === null)
+            throw new globalThis.Error("The parameter 'dss' cannot be null.");
+        else if (dss !== undefined)
+            url_ += "dss=" + encodeURIComponent("" + dss) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "PATCH",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processSession_UpdateStatus(_response));
+        });
+    }
+
+    protected processSession_UpdateStatus(response: AxiosResponse): Promise<SessionResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<SessionResponse>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<SessionResponse>(null as any);
+    }
+
+    session_UpdateSession(req: UpdateSessionRequest, sessionId: string, id?: string | undefined, signal?: AbortSignal): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/api/Session/{sessionId}?";
+        if (sessionId === undefined || sessionId === null)
+            throw new globalThis.Error("The parameter 'sessionId' must be defined.");
+        url_ = url_.replace("{sessionId}", encodeURIComponent("" + sessionId));
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(req);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            responseType: "blob",
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/octet-stream"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processSession_UpdateSession(_response));
+        });
+    }
+
+    protected processSession_UpdateSession(response: AxiosResponse): Promise<FileResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers["content-disposition"] : undefined;
+            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
+            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
+            if (fileName) {
+                fileName = decodeURIComponent(fileName);
+            } else {
+                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            }
+            return Promise.resolve({ fileName: fileName, status: status, data: new Blob([response.data], { type: response.headers["content-type"] }), headers: _headers });
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<FileResponse>(null as any);
     }
 
     tutorial_GetTutorial(tutorialId: number, signal?: AbortSignal): Promise<TutorialResponse> {
@@ -2222,15 +2333,30 @@ export interface DeleteFilesCommand {
     ids?: number[];
 }
 
-export interface UpdateSessionRequest {
-    ifMatchVersion?: number;
-    data: any;
-}
-
 export interface SessionResponse {
+    groupId?: string;
     assignmentId?: number;
     ownerId?: string;
     participantIds?: string[];
+    userId?: string;
+}
+
+export type DispatcherSessionStatus = 0 | 1 | 2 | 3 | 4 | 5;
+
+export interface UpdateSessionRequest {
+    ownerId?: string | undefined;
+    startTime?: Date;
+    endTime?: Date | undefined;
+    assignmentId?: number | undefined;
+    type?: DispatcherSessionType;
+    status?: DispatcherSessionStatus;
+    participants?: ParticipantDto[];
+    ifMatchVersion?: number;
+}
+
+export type DispatcherSessionType = 0 | 1 | 2;
+
+export interface ParticipantDto {
     userId?: string;
 }
 
