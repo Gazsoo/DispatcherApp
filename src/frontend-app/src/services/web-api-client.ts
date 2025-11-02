@@ -1471,15 +1471,11 @@ export class Client extends ApiClientBase {
         return Promise.resolve<SessionResponse[]>(null as any);
     }
 
-    session_Get(id: string, sessionId?: string | undefined, signal?: AbortSignal): Promise<SessionResponse> {
-        let url_ = this.baseUrl + "/api/Session/{id}?";
+    session_Get(id: number, signal?: AbortSignal): Promise<SessionResponse> {
+        let url_ = this.baseUrl + "/api/Session/{id}";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        if (sessionId === null)
-            throw new globalThis.Error("The parameter 'sessionId' cannot be null.");
-        else if (sessionId !== undefined)
-            url_ += "sessionId=" + encodeURIComponent("" + sessionId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -1573,22 +1569,14 @@ export class Client extends ApiClientBase {
         return Promise.resolve<void>(null as any);
     }
 
-    session_UpdateStatus(id: string, status: string, sessionId?: string | undefined, dss?: DispatcherSessionStatus | undefined, signal?: AbortSignal): Promise<SessionResponse> {
-        let url_ = this.baseUrl + "/api/Session/{id}/{status}?";
+    session_UpdateStatus(id: string, status: DispatcherSessionStatus, signal?: AbortSignal): Promise<SessionResponse> {
+        let url_ = this.baseUrl + "/api/Session/{id}/{status}";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
         if (status === undefined || status === null)
             throw new globalThis.Error("The parameter 'status' must be defined.");
         url_ = url_.replace("{status}", encodeURIComponent("" + status));
-        if (sessionId === null)
-            throw new globalThis.Error("The parameter 'sessionId' cannot be null.");
-        else if (sessionId !== undefined)
-            url_ += "sessionId=" + encodeURIComponent("" + sessionId) + "&";
-        if (dss === null)
-            throw new globalThis.Error("The parameter 'dss' cannot be null.");
-        else if (dss !== undefined)
-            url_ += "dss=" + encodeURIComponent("" + dss) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -1987,16 +1975,15 @@ export class Client extends ApiClientBase {
         return Promise.resolve<CreateTutorialResponse>(null as any);
     }
 
-    user_GetProfile(signal?: AbortSignal): Promise<FileResponse> {
+    user_GetProfile(signal?: AbortSignal): Promise<UserInfoResponse> {
         let url_ = this.baseUrl + "/api/User/profile";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
-            responseType: "blob",
             method: "GET",
             url: url_,
             headers: {
-                "Accept": "application/octet-stream"
+                "Accept": "application/json"
             },
             signal
         };
@@ -2012,7 +1999,7 @@ export class Client extends ApiClientBase {
         });
     }
 
-    protected processUser_GetProfile(response: AxiosResponse): Promise<FileResponse> {
+    protected processUser_GetProfile(response: AxiosResponse): Promise<UserInfoResponse> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -2022,30 +2009,25 @@ export class Client extends ApiClientBase {
                 }
             }
         }
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers["content-disposition"] : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return Promise.resolve({ fileName: fileName, status: status, data: new Blob([response.data], { type: response.headers["content-type"] }), headers: _headers });
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<UserInfoResponse>(result200);
+
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<FileResponse>(null as any);
+        return Promise.resolve<UserInfoResponse>(null as any);
     }
 
-    user_GetUser(id?: string | undefined, signal?: AbortSignal): Promise<UserInfoResponse> {
-        let url_ = this.baseUrl + "/api/User/User?";
-        if (id === null)
-            throw new globalThis.Error("The parameter 'id' cannot be null.");
-        else if (id !== undefined)
-            url_ += "id=" + encodeURIComponent("" + id) + "&";
+    user_GetUser(id: string, signal?: AbortSignal): Promise<UserInfoResponse> {
+        let url_ = this.baseUrl + "/api/User/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -2092,8 +2074,56 @@ export class Client extends ApiClientBase {
         return Promise.resolve<UserInfoResponse>(null as any);
     }
 
+    user_GetAllUsers(signal?: AbortSignal): Promise<GetAllUsersResponse> {
+        let url_ = this.baseUrl + "/api/User/AllUser";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processUser_GetAllUsers(_response));
+        });
+    }
+
+    protected processUser_GetAllUsers(response: AxiosResponse): Promise<GetAllUsersResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<GetAllUsersResponse>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<GetAllUsersResponse>(null as any);
+    }
+
     user_CreateUser(request: CreateUserRequest, signal?: AbortSignal): Promise<UserInfoResponse> {
-        let url_ = this.baseUrl + "/api/User/User";
+        let url_ = this.baseUrl + "/api/User";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(request);
@@ -2143,58 +2173,6 @@ export class Client extends ApiClientBase {
         }
         return Promise.resolve<UserInfoResponse>(null as any);
     }
-
-    user_GetAllUsers(id?: string | undefined, signal?: AbortSignal): Promise<GetAllUsersResponse> {
-        let url_ = this.baseUrl + "/api/User/AllUser?";
-        if (id === null)
-            throw new globalThis.Error("The parameter 'id' cannot be null.");
-        else if (id !== undefined)
-            url_ += "id=" + encodeURIComponent("" + id) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            signal
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processUser_GetAllUsers(_response));
-        });
-    }
-
-    protected processUser_GetAllUsers(response: AxiosResponse): Promise<GetAllUsersResponse> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = JSON.parse(resultData200);
-            return Promise.resolve<GetAllUsersResponse>(result200);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<GetAllUsersResponse>(null as any);
-    }
 }
 
 export interface AssignmentResponse {
@@ -2230,7 +2208,7 @@ export interface AssignmentCreateRequest {
     assigneeIds?: string[];
 }
 
-export type AssignmentStatus = 0 | 1 | 2 | 3;
+export type AssignmentStatus = "Pending" | "InProgress" | "Completed" | "Cancelled";
 
 export interface AssignmentUpdateRequest {
     name?: string | undefined;
@@ -2274,6 +2252,7 @@ export interface RegisterRequest {
     email: string;
     password: string;
     firstName?: string;
+    role?: string;
     lastName?: string;
 }
 
@@ -2289,6 +2268,7 @@ export interface ResetPasswordRequest {
 
 export interface UserInfoResponse {
     email?: string;
+    role?: string;
     emailConfirmed?: boolean;
     firstName?: string;
     lastName?: string;
@@ -2337,11 +2317,12 @@ export interface SessionResponse {
     groupId?: string;
     assignmentId?: number;
     ownerId?: string;
+    status?: DispatcherSessionStatus;
     participantIds?: string[];
     userId?: string;
 }
 
-export type DispatcherSessionStatus = 0 | 1 | 2 | 3 | 4 | 5;
+export type DispatcherSessionStatus = "Scheduled" | "Started" | "InProgress" | "Postponed" | "Canceled" | "Finished";
 
 export interface UpdateSessionRequest {
     ownerId?: string | undefined;
@@ -2354,7 +2335,7 @@ export interface UpdateSessionRequest {
     ifMatchVersion?: number;
 }
 
-export type DispatcherSessionType = 0 | 1 | 2;
+export type DispatcherSessionType = "Web" | "Mobile" | "VR";
 
 export interface ParticipantDto {
     userId?: string;

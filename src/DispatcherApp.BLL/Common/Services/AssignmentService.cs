@@ -53,7 +53,8 @@ public class AssignmentService : IAssignmentService
 
     public async Task<IEnumerable<AssignmentResponse>> GetUserAssignmentAsync(CancellationToken ct = default)
     {
-        var userId = Guard.Against.NullOrEmpty(GetCurrentUserId()?.UserId, nameof(GetCurrentUserId));
+        var user = _userContextService.GetCurrentUser();
+        var userId = Guard.Against.NullOrEmpty(user?.UserId, nameof(user.UserId));
         var assignments = await _repository.GetUserAssignments(userId);
         return _mapper.Map<IEnumerable<AssignmentResponse>>(assignments);
     }
@@ -170,12 +171,6 @@ public class AssignmentService : IAssignmentService
         var assignment = await GetTrackedAssignmentAsync(assignmentId);
         _repository.Remove(assignment);
         await _repository.SaveChangesAsync();
-    }
-
-    public UserContext GetCurrentUserId()
-    {
-        return _userContextService.GetCurrentUser()
-               ?? throw new UnauthorizedAccessException("No user context.");
     }
 
     private async Task<Assignment> GetTrackedAssignmentAsync(int assignmentId)

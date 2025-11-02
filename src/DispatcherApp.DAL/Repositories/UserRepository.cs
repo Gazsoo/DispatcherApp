@@ -57,4 +57,9 @@ public class UserRepository: IUserRepository
         if (!result.Succeeded)
             throw new NotFoundException(user.Id, (nameof(user)));
     }
+
+    public async Task<IEnumerable<string>> GetRoleAsync(IdentityUser user, CancellationToken ct)
+    {
+        return await _userManager.GetRolesAsync(user);
+    }
 }

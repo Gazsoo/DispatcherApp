@@ -18,4 +18,5 @@ public interface ISessionRepository
     Task AddAsync(DispatcherSession session, CancellationToken ct = default);
     void Remove(DispatcherSession session);
     Task<int> SaveChangesAsync(CancellationToken ct = default);
+    Task<IEnumerable<DispatcherSession>> GetSessionsByUserIdAsync(string userId, CancellationToken ct = default);
 }

@@ -8,6 +8,9 @@ internal sealed class GetActiveSessionsQueryHandler (ISessionService sessionServ
     private readonly ISessionService _sessionService = sessionService;
     public async Task<IEnumerable<SessionResponse>> Handle(GetActiveSessionsQuery request, CancellationToken cancellationToken)
     {
-       return await _sessionService.ListActiveSessionsAsync(cancellationToken);
+        var activeSessions = await _sessionService.ListActiveSessionsAsync(cancellationToken);
+        //await _sessionService.SendOutSessionsAcitvityAsync(cancellationToken);
+        return activeSessions;
+
     }
 }

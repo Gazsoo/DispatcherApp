@@ -9,7 +9,6 @@ namespace DispatcherApp.BLL.Common.Interfaces;
 
 public interface IAssignmentService
 {
-    UserContext? GetCurrentUserId();
     Task<IEnumerable<AssignmentResponse>> GetAssignmentListAsync(CancellationToken ct = default);
     Task<AssignmentWithUsersResponse> GetAssignmentAsync(int id, CancellationToken ct = default);
     Task<IEnumerable<AssignmentResponse>> GetUserAssignmentAsync(CancellationToken ct = default);

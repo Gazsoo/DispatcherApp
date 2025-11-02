@@ -61,6 +61,13 @@ public class UserService : IUserService
         return _mapper.Map<List<UserInfoResponse>>(users);
     }
 
+    public async Task<string> GetUserRoleByIdAsync(string id, CancellationToken ct)
+    {
+        var user = await _repository.GetByIdAsync(id, ct);
+        var role = await _repository.GetRoleAsync(user, ct);
+        return role.FirstOrDefault() ?? string.Empty;
+
+    }
     public async Task<UserInfoResponse> GetByIdAsync(string id, CancellationToken ct)
     {
         var user = await _repository.GetByIdAsync(id, ct);

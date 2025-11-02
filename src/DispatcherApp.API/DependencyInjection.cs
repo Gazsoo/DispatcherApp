@@ -11,6 +11,7 @@ using DispatcherApp.Common.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using NSwag;
 using NSwag.Generation.Processors.Security;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -84,7 +85,29 @@ namespace Microsoft.Extensions.DependencyInjection;
                     configure.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("Bearer"));
                 }
             );
-
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.MapType<Microsoft.AspNetCore.Mvc.ValidationProblemDetails>(() =>
+                    new Microsoft.OpenApi.Models.OpenApiSchema
+                    {
+                        Type = "object",
+                        Properties = {
+                            ["type"] = new() { Type = "string" },
+                            ["title"] = new() { Type = "string" },
+                            ["status"] = new() { Type = "integer" },
+                            ["errors"] = new()
+                            {
+                                Type = "object",
+                                AdditionalProperties = new Microsoft.OpenApi.Models.OpenApiSchema
+                                {
+                                    Type = "array",
+                                    Items = new() { Type = "string" }
+                                }
+                            }
+                        }
+                    }
+                );
+            });
 
     }
 

@@ -13,6 +13,7 @@ public interface IUserRepository
     Task<IdentityUser> CreateAsync(IdentityUser user, string password, CancellationToken ct);
     Task UpdateAsync(IdentityUser user, CancellationToken ct);
     Task UpdateEmailAsync(IdentityUser user, string newEmail, CancellationToken ct);
+    Task<IEnumerable<string>> GetRoleAsync(IdentityUser user, CancellationToken ct);
     Task SetRoleAsync(IdentityUser user, string role, CancellationToken ct);
     Task DeleteAsync(IdentityUser user, CancellationToken ct);
 }

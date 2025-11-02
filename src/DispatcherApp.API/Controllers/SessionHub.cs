@@ -1,8 +1,11 @@
 ﻿using DispatcherApp.BLL.Sessions.Commands;
 using DispatcherApp.BLL.Sessions.Commands.CreateSession;
+using DispatcherApp.BLL.Sessions.Commands.LeaveAllUserSessions;
 using DispatcherApp.BLL.Sessions.Commands.LeaveSession;
 using DispatcherApp.BLL.Sessions.Commands.UpdateSession;
 using DispatcherApp.BLL.Sessions.Queries;
+using DispatcherApp.BLL.Sessions.Queries.GetActiveSessions;
+using DispatcherApp.BLL.Sessions.Queries.GetAllSessions;
 using DispatcherApp.BLL.Sessions.Queries.GetSession;
 using DispatcherApp.Common.DTOs.Session;
 using MediatR;
@@ -28,7 +31,7 @@ public class SessionHub : Hub
     public Task<SessionResponse> GetSession(int sessionId)
         => _mediator.Send(new GetSessionQuery(sessionId), Context.ConnectionAborted);
 
-    public async Task<string> JoinSession(string sessionId)
+    public async Task JoinSession(string sessionId)
     {
         // Try to get or create the session through MediatR
         var session = await _mediator.Send(new JoinGetOrCreateSessionCommand(sessionId), Context.ConnectionAborted);
@@ -37,16 +40,27 @@ public class SessionHub : Hub
         await Groups.AddToGroupAsync(Context.ConnectionId, $"sess:{session.GroupId}");
 
         // Optionally tell the caller what happened
-        await Clients.Caller.SendAsync("SessionJoined", new { id = session.GroupId });
-        return session.GroupId;
+        //await Clients.Caller.SendAsync("SessionJoined", new { id = session.GroupId });
+        //return await _mediator.Send(new GetAllSessionsQuery());
     }
+    public async Task<IEnumerable<SessionResponse>> JoinActivityGroup()
+    {
+        await Groups.AddToGroupAsync(Context.ConnectionId, $"activity");
 
+        // Optionally tell the caller what happened
+        await Clients.Caller.SendAsync("SessionJoined", new { id = "ACITIVE" });
+        return await _mediator.Send(new GetActiveSessionsQuery());
+    }
     public async Task LeaveSession(string sessionId)
     {
         await _mediator.Send(new LeaveSessionCommand(sessionId), Context.ConnectionAborted);
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"sess:{sessionId}");
     }
-
+    public override async Task OnDisconnectedAsync(Exception? exception)
+    {
+        await _mediator.Send(new LeaveAllUserSessionsCommand());
+        await base.OnDisconnectedAsync(exception);
+    }
     //// Optional WS write path (instead of HTTP PUT)
     //public Task<SessionResponse> UpdateSession(string sessionId, long ifMatchVersion, string dataJson)
     //    => _mediator.Send(

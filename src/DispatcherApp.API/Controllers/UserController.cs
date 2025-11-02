@@ -1,6 +1,7 @@
 ﻿using DispatcherApp.BLL.Common.Interfaces;
 using DispatcherApp.BLL.User.Commands.CreateUser;
 using DispatcherApp.BLL.User.Queries.GetAllUsers;
+using DispatcherApp.BLL.User.Queries.GetProfile;
 using DispatcherApp.BLL.User.Queries.GetUser;
 using DispatcherApp.Common.DTOs.User;
 using MediatR;
@@ -24,25 +25,24 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("profile")]
-    public IActionResult GetProfile()
+    public async Task<ActionResult<UserInfoResponse>> GetProfile()
     {
-        var a = _assignmentService.GetCurrentUserId();
-        return Ok(new { username = "sampleuser", email = a?.Roles });
+        return await _mediator.Send(new GetProfileQuery());
     }
 
-    [HttpGet("User")]
+    [HttpGet("{id}")]
     public async Task<ActionResult<UserInfoResponse>> GetUser(string id)
     {
         return await _mediator.Send(new GetUserQuery(id));
     }
 
     [HttpGet("AllUser")]
-    public async Task<ActionResult<GetAllUsersResponse>> GetAllUsers(string id)
+    public async Task<ActionResult<GetAllUsersResponse>> GetAllUsers()
     {
         return await _mediator.Send(new GetAllUsersQuery());
     }
 
-    [HttpPost("User")]
+    [HttpPost]
     public async Task<ActionResult<UserInfoResponse>> CreateUser([FromBody]CreateUserRequest request)
     {
         return await _mediator.Send(new CreateUserCommand(request));

@@ -41,9 +41,9 @@ public class SessionController (IMediator mediator) : ControllerBase
         return Ok(await _mediator.Send(new GetSessionQuery(id)));
     }
     [HttpPatch("{id}/{status}")]
-    public async Task<ActionResult<SessionResponse>> UpdateStatus(string sessionId, DispatcherSessionStatus dss)
+    public async Task<ActionResult<SessionResponse>> UpdateStatus(string id, DispatcherSessionStatus status)
     {
-        return Ok(await _mediator.Send(new UpdateSessionStateCommand(sessionId, dss)));
+        return Ok(await _mediator.Send(new UpdateSessionStateCommand(id, status)));
     }
     // POST api/<SessionController>
     //[HttpPost]

@@ -15,6 +15,7 @@ internal sealed class LeaveSessionCommandHandler (
         var userId = _userContextService.UserId;
         Guard.Against.NullOrEmpty(userId, nameof(userId));
         await _sessionService.LeaveSessionAsync(request.SessionId, userId, cancellationToken);
+        await _sessionService.SendOutSessionsAcitvityAsync(cancellationToken);
         return Unit.Value;
     }
 }

@@ -4,12 +4,13 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DispatcherApp.Common.Abstractions.Repository;
 using DispatcherApp.Common.Constants;
 using Microsoft.AspNetCore.Identity;
 
 namespace DispatcherApp.Common.Entities;
 
-public class DispatcherSession
+public class DispatcherSession : IVersionedEntity
 { 
     public int Id { get; set; }
     public string? OwnerId { get; set; }

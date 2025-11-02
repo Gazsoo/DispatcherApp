@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ardalis.GuardClauses;
+﻿using Ardalis.GuardClauses;
 using DispatcherApp.Common.Abstractions.Repository;
 using DispatcherApp.Common.Entities;
 using DispatcherApp.DAL.Data;
@@ -25,6 +20,7 @@ public class SessionRepository : ISessionRepository
     public async Task<DispatcherSession> AddParticipant(SessionParticipant user, string sessionId, CancellationToken ct = default)
     {
         var session =  await _context.DispatcherSessions
+            .Include(s => s.Participants)
             .Where(s => s.GroupId == sessionId)
             .FirstOrDefaultAsync();
         Guard.Against.NotFound(sessionId, session);
@@ -63,6 +59,14 @@ public class SessionRepository : ISessionRepository
             //.AsNoTracking()
             .Include(a => a.Participants)
             .FirstOrDefaultAsync(a => a.GroupId == id);
+    }
+
+    public async Task<IEnumerable<DispatcherSession>> GetSessionsByUserIdAsync(string userId, CancellationToken ct = default)
+    {
+        return await _context.DispatcherSessions
+            .Include(s => s.Participants)
+            .Where(s => s.Participants.Any(p => p.UserId == userId))
+            .ToListAsync();
     }
 
     public void Remove(DispatcherSession session)

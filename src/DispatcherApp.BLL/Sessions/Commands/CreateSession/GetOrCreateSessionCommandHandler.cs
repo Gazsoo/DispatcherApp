@@ -30,6 +30,9 @@ internal sealed class GetOrCreateSessionCommandHandler : IRequestHandler<JoinGet
     {
         var userId = _userContextService.UserId;
         Guard.Against.NullOrEmpty(userId, nameof(userId));
-        return await _sessionService.JoinOrCreateAsync(request.SessionId , userId, cancellationToken);
+        var session = await _sessionService.JoinOrCreateAsync(request.SessionId, userId, cancellationToken);
+        await _sessionService.SendOutSessionsAcitvityAsync(cancellationToken);
+
+        return session;
     }
 }

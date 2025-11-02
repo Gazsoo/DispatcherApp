@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Threading;
 using Ardalis.GuardClauses;
 using DispatcherApp.BLL.Common.Interfaces;
 using DispatcherApp.Common.Abstractions.Repository;
@@ -13,8 +14,11 @@ internal sealed class UpdateSessionCommandHandler(
 {
     private readonly ISessionService _sessionService = sessionService;
     public async Task<SessionResponse> Handle(UpdateSessionCommand request, CancellationToken ct)
+
     {
-        return await _sessionService.UpdateSessionDataAsync(request, ct);
+        var  updated = await _sessionService.UpdateSessionDataAsync(request, ct);
+        await _sessionService.SendOutSessionsAcitvityAsync(ct);
+        return updated;
 
     }
 }

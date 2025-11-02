@@ -1,5 +1,5 @@
-import goggle from '/src/assets/goggle.png'
-import goggleLight from '/src/assets/gogglewhite.png'
+import goggle from './assets/goggle.png?url'
+import goggleLight from './assets/gogglewhite.png?url'
 import { useNavigate } from "react-router-dom";
 import ThemeToggle from './components/ThemeToggle';
 import { Button, Card } from './components/ui';
@@ -15,6 +15,9 @@ function App() {
     } else {
       navigate('/login');
     }
+  };
+  const handleRegisterClick = () => {
+    navigate('/register');
   };
 
   return (
@@ -45,7 +48,7 @@ function App() {
           <Button variant="primary" onClick={handleLoginClick} className="mb-4">
             Login
           </Button>
-          <Button variant="secondary">Help</Button>
+          <Button variant="secondary" onClick={handleRegisterClick}>Register</Button>
         </Card>
 
       </div>
