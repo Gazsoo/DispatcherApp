@@ -2181,6 +2181,20 @@ export interface AssignmentResponse {
     description?: string | undefined;
     type?: string | undefined;
     value?: string | undefined;
+    createdAt?: Date;
+    plannedTime?: Date;
+    completedAt?: Date | undefined;
+    log?: string;
+    status?: AssignmentStatus;
+    assignees?: UserResponse[];
+}
+
+export type AssignmentStatus = "Pending" | "InProgress" | "Completed" | "Cancelled";
+
+export interface UserResponse {
+    id?: string;
+    userName?: string;
+    email?: string;
 }
 
 export interface AssignmentWithUsersResponse {
@@ -2192,12 +2206,6 @@ export interface AssignmentWithUsersResponse {
     assignees?: UserResponse[];
 }
 
-export interface UserResponse {
-    id?: string;
-    userName?: string;
-    email?: string;
-}
-
 export interface AssignmentCreateRequest {
     name?: string;
     description?: string | undefined;
@@ -2207,8 +2215,6 @@ export interface AssignmentCreateRequest {
     value?: string | undefined;
     assigneeIds?: string[];
 }
-
-export type AssignmentStatus = "Pending" | "InProgress" | "Completed" | "Cancelled";
 
 export interface AssignmentUpdateRequest {
     name?: string | undefined;
@@ -2373,7 +2379,7 @@ export interface CreateTutorialRequest {
     title?: string;
     description?: string | undefined;
     categoryIds?: number[];
-    createdById?: number;
+    createdById?: string;
     filesId?: number[];
 }
 

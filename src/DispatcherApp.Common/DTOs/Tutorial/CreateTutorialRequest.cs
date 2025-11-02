@@ -7,6 +7,6 @@ public class CreateTutorialRequest
     public string Title { get; set; } = string.Empty;
     public string? Description { get; set; }
     public List<int> CategoryIds { get; set; } = new();
-    public int CreatedById { get; set; }
+    public string CreatedById { get; set; } = string.Empty;
     public List<int> FilesId { get; set; } = new();
 }

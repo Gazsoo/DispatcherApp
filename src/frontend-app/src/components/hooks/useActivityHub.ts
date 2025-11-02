@@ -64,7 +64,7 @@ export function useActivityHub(options: UseActivityHubOptions = {}) {
                         append('[activity] Joined activity group');
                     } catch (err) {
                         append(
-                            `[activity] JoinActivityGroup failed (maybe not implemented on server): ${(err as Error).message}`
+                            `[activity] JoinActivityGroup failed: ${(err as Error).message}`
                         );
                     }
                 }
@@ -81,7 +81,6 @@ export function useActivityHub(options: UseActivityHubOptions = {}) {
             const c = activityConnRef.current;
             if (c) {
                 c.stop().catch(() => {
-                    /* ignore */
                 });
                 activityConnRef.current = null;
             }

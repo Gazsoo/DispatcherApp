@@ -3,9 +3,11 @@ import { AppProviders } from "./components/context/AppProvider";
 import { DashboardLayout } from "./components/dashboard/DashboardLayout";
 import Login from "./components/Login";
 import Register from "./components/Register";
-import { createBrowserRouter, Outlet } from "react-router-dom";
+import { createBrowserRouter, Outlet } from "react-router";
 import DashboardOverview from "./components/dashboard/pages/DashboardOverview";
 import Tutorials from "./components/dashboard/pages/Tutorials";
+import CreateTutorial from "./components/dashboard/pages/CreateTutorial.tsx";
+import CreateAssignment from "./components/dashboard/pages/CreateAssignment.tsx";
 import TutorialDetails from "./components/dashboard/pages/TutorialDetails";
 import Files from "./components/dashboard/pages/Files";
 import FileDetails from "./components/dashboard/pages/FileDetails";
@@ -47,6 +49,10 @@ export const router = createBrowserRouter([
             element: <Tutorials />,
           },
           {
+            path: "tutorials/create",
+            element: <CreateTutorial />,
+          },
+          {
             path: "tutorials/:tutorialId",
             element: <TutorialDetails />,
           },
@@ -63,6 +69,7 @@ export const router = createBrowserRouter([
 
           // Simple routes without nesting
           { path: "assignments", element: <Assignments /> },
+          { path: "assignments/create", element: <CreateAssignment /> },
           { path: "sessions", element: <Sessions /> },
           { path: "sessions/:sessionId", element: <SessionDetails /> },
           // { path: "settings", element: <Settings /> },

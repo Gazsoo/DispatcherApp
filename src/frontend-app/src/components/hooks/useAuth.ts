@@ -18,7 +18,7 @@ export function useAuth() {
             await AuthService.login(email, password);
             const userInfo = await AuthService.getUserInfo();
             setUser(userInfo);
-            // compute from token (JWTManager reads current access token)
+
             setUserRoles?.(JWTManager.getPrimaryRole());
             navigate('/dashboard');
         } catch (error) {

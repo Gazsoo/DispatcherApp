@@ -2,7 +2,8 @@ import { LoadingSpinner } from "../../ui/LoadingSpinner";
 import { ErrorDisplay } from "../../ui/ErrorDisplay";
 import { useTutorials } from "../../hooks/useTutorials";
 import { Outlet, useParams } from "react-router-dom";
-import { Card } from "../../ui";
+import { Card, Button } from "../../ui";
+import { Link } from "react-router-dom";
 import { TutorialCard } from "./TutorialCard";
 
 export default function Tutorials() {
@@ -18,7 +19,12 @@ export default function Tutorials() {
 
     return (
         <div>
-            <h1 className="text-3xl font-bold mb-6">Tutorials</h1>
+            <div className="flex items-center justify-between mb-6">
+                <h1 className="text-3xl font-bold">Tutorials</h1>
+                <Link to="/dashboard/tutorials/create">
+                    <Button variant="primary">Create Tutorial</Button>
+                </Link>
+            </div>
 
             {tutorials.length === 0 ? (
                 <Card className="p-6 text-center text-gray-500">
