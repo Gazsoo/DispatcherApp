@@ -25,9 +25,9 @@ public static class RoleSeederExtention
         using var scope = serviceProvider.Services.CreateScope();
         var initialiser = scope.ServiceProvider.GetRequiredService<DatabaseSeedingService>();
 
-        await initialiser.InitialiseAsync();
-        await initialiser.SeedAsync();
-
+        //await initialiser.InitialiseAsync();
+        //await initialiser.SeedAsync();
+        await Task.CompletedTask;
         return serviceProvider;
     }
 }
@@ -38,18 +38,21 @@ public class DatabaseSeedingService
     private readonly UserManager<IdentityUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly ILogger<DatabaseSeedingService> _logger;
+    private readonly TimeProvider _timeProvider;
 
     public DatabaseSeedingService(
         AppDbContext context,
         ILogger<DatabaseSeedingService> logger,
         UserManager<IdentityUser> userManager,
-        RoleManager<IdentityRole> roleManager
+        RoleManager<IdentityRole> roleManager,
+        TimeProvider timeProvider
         )
     {
         _logger = logger;
         _context = context;
         _userManager = userManager;
         _roleManager = roleManager;
+        _timeProvider = timeProvider;
     }
     public async Task InitialiseAsync()
     {
@@ -112,13 +115,13 @@ public class DatabaseSeedingService
                 await _userManager.AddToRolesAsync(administrator, new[] { administratorRole.Name });
             }
         }
+        var now = _timeProvider.GetUtcNow().UtcDateTime;
         var tutorial = new Tutorial { 
-            ContentType = "text/markdown",
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = now,
             Description = "This is a sample tutorial",
             Title = "Sample Tutorial",
             Url = "https://example.com/sample-tutorial",
-            UpdatedAt = DateTime.UtcNow,
+            UpdatedAt = now,
             Files = new List<File>
             {
                 new File
@@ -128,7 +131,7 @@ public class DatabaseSeedingService
                     FileSize = 1024,
                     OriginalFileName = "sample_original.txt",
                     StoragePath = "files/sample.txt",
-                    UploadedAt = DateTime.UtcNow,
+                    UploadedAt = now,
                 }
             }
         };
@@ -149,7 +152,8 @@ public class DatabaseSeedingService
         var assignmentUser1 = new AssignmentUser
         {
             Assignment = assignment1,
-            UserId = administrator.Id
+            UserId = administrator.Id,
+            AssignedAt = now
         };
 
         _context.AssignmentUsers.Add(assignmentUser1);

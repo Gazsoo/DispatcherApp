@@ -4,7 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using DispatcherApp.BLL.Model;
+using DispatcherApp.BLL.Common.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace DispatcherApp.BLL.Common.Interfaces;

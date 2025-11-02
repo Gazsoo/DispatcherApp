@@ -11,9 +11,9 @@ public class Tutorial
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string Url { get; set; } = string.Empty;
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-    public string ContentType { get; set; } = string.Empty;
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
     public ICollection<File> Files { get; set; } = new List<File>();
-
+    public int? PictureId { get; set; }
+    public File Picture { get; set; } = null!;
 }

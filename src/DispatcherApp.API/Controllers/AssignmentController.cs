@@ -1,7 +1,16 @@
-﻿using DispatcherApp.BLL.Common.Interfaces;
+﻿using DispatcherApp.BLL.Assignments.Commands.AddAssignmentAssignees;
+using DispatcherApp.BLL.Assignments.Commands.DeleteAssignment;
+using DispatcherApp.BLL.Assignments.Commands.RemoveAssignmentAssignee;
+using DispatcherApp.BLL.Assignments.Commands.UpdateAssignment;
+using DispatcherApp.BLL.Assignments.Commands.UpdateAssignmentStatus;
+using DispatcherApp.BLL.Assignments.Queries.GetAssignment;
+using DispatcherApp.BLL.Assignments.Queries.GetAssignmentList;
+using DispatcherApp.BLL.Assignments.Queries.GetMyAssignments;
 using DispatcherApp.Common.DTOs.Assignment;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MediatR;
+using DispatcherApp.BLL.Assignments.Commands.CreateAssignment;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -10,45 +19,69 @@ namespace DispatcherApp.API.Controllers;
 [Authorize(Roles = "Dispatcher,Administrator")]
 [Route("api/[controller]")]
 [ApiController]
-public class AssignmentController (IAssignmentService assignmentService) : ControllerBase
+public class AssignmentController(IMediator mediator) : ControllerBase
 {
-    private readonly IAssignmentService _assignmentService = assignmentService;
+    private readonly IMediator _mediator = mediator;
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AssignmentResponse>>> GetAssignments()
     {
-        var result = await _assignmentService.GetAssignmentListAsync();
+        var result = await _mediator.Send(new GetAssignmentListQuery());
         return Ok(result);
     }
     [HttpGet("my")]
     public async Task<ActionResult<IEnumerable<AssignmentResponse>>> GetMyAssignments()
     {
-        var result = await _assignmentService.GetUserAssignmentAsync();
+        var result = await _mediator.Send(new GetMyAssignmentsQuery());
         return Ok(result);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<IEnumerable<AssignmentResponse>>> GetAssignment(int id)
+    public async Task<ActionResult<AssignmentWithUsersResponse>> GetAssignment(int id)
     {
-        var result = await _assignmentService.GetAssignmentAsync(id);
+        var result = await _mediator.Send(new GetAssignmentQuery(id));
         return Ok(result);
     }
 
-    // POST api/<AssignmentController>
     [HttpPost]
-    public void Post([FromBody] string value)
+    public async Task<ActionResult<AssignmentWithUsersResponse>> CreateAssignment([FromBody] AssignmentCreateRequest request)
     {
+        var result = await _mediator.Send(new CreateAssignmentCommand(request));
+        return CreatedAtAction(nameof(GetAssignment), new { id = result.Id }, result);
     }
 
-    // PUT api/<AssignmentController>/5
     [HttpPut("{id}")]
-    public void Put(int id, [FromBody] string value)
+    public async Task<ActionResult<AssignmentWithUsersResponse>> UpdateAssignment(int id, [FromBody] AssignmentUpdateRequest request)
     {
+        var result = await _mediator.Send(new UpdateAssignmentCommand(id, request));
+        return Ok(result);
     }
 
-    // DELETE api/<AssignmentController>/5
-    [HttpDelete("{id}")]
-    public void Delete(int id)
+    [HttpPost("{id}/status")]
+    public async Task<ActionResult<AssignmentWithUsersResponse>> UpdateAssignmentStatus(int id, [FromBody] AssignmentStatusUpdateRequest request)
     {
+        var result = await _mediator.Send(new UpdateAssignmentStatusCommand(id, request));
+        return Ok(result);
+    }
+
+    [HttpPost("{id}/assignees")]
+    public async Task<ActionResult<AssignmentWithUsersResponse>> AddAssignees(int id, [FromBody] AssignmentAssigneesRequest request)
+    {
+        var result = await _mediator.Send(new AddAssignmentAssigneesCommand(id, request));
+        return Ok(result);
+    }
+
+    [HttpDelete("{id}/assignees/{userId}")]
+    public async Task<ActionResult<AssignmentWithUsersResponse>> RemoveAssignee(int id, string userId)
+    {
+        var result = await _mediator.Send(new RemoveAssignmentAssigneeCommand(id, userId));
+        return Ok(result);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAssignment(int id)
+    {
+        await _mediator.Send(new DeleteAssignmentCommand(id));
+        return NoContent();
     }
 }

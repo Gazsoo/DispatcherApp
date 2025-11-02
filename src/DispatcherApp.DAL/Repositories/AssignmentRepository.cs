@@ -22,6 +22,14 @@ public class AssignmentRepository : IAssignmentRepository
     {
         return await _context.Assignments
             .AsNoTracking()
+            .Include(a => a.AssignmentUsers)
+            .FirstOrDefaultAsync(a => a.Id == id);
+    }
+
+    public async Task<Assignment?> GetByIdTrackedAsync(int id)
+    {
+        return await _context.Assignments
+            .Include(a => a.AssignmentUsers)
             .FirstOrDefaultAsync(a => a.Id == id);
     }
 
@@ -36,6 +44,11 @@ public class AssignmentRepository : IAssignmentRepository
     public async Task AddAsync(Assignment assignment)
     {
         await _context.Assignments.AddAsync(assignment);
+    }
+
+    public void Remove(Assignment assignment)
+    {
+        _context.Assignments.Remove(assignment);
     }
 
     public async Task SaveChangesAsync()

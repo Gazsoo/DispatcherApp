@@ -6,6 +6,7 @@ using Azure.Identity;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
+using DispatcherApp.Common.Abstractions;
 using DispatcherApp.Common.Abstractions.Repository;
 using DispatcherApp.Common.Abstractions.Storage;
 using DispatcherApp.DAL.Configurations;
@@ -14,6 +15,7 @@ using DispatcherApp.DAL.Repositories;
 using DispatcherApp.DAL.Seed;
 using DispatcherApp.DAL.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Azure;
@@ -31,6 +33,7 @@ namespace Microsoft.Extensions.DependencyInjection
             Guard.Against.Null(connectionString, message: "Connection string 'DispatcherDb' not found.");
 
             builder.Services.Configure<FileStorageSettings>(builder.Configuration.GetSection(FileStorageSettings.SectionName));
+            builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(EmailSettings.SectionName));
 
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
             builder.Services.AddHealthChecks()
@@ -69,6 +72,8 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
             builder.Services.AddScoped<IFileRepository, FileRepository>();
             builder.Services.AddScoped<ITutorialRepository, TutorialRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<ISessionRepository, SessionRepository>();
             //builder.Services
             //    .AddDefaultIdentity<ApplicationUser>()
             //    .AddRoles<IdentityRole>()
@@ -93,6 +98,18 @@ namespace Microsoft.Extensions.DependencyInjection
                 if (!string.IsNullOrWhiteSpace(blobUri))
                 {
                     clientBuilder.AddBlobServiceClient(new Uri(blobUri));
+                }
+                // Email
+                var emailEndpoint = builder.Configuration["EmailSettings:ConnectionString"];
+                if (!string.IsNullOrWhiteSpace(emailEndpoint))
+                {
+                    clientBuilder.AddEmailClient(emailEndpoint);
+                    builder.Services.AddSingleton<IEmailSender, AzureEmailService>();
+                    builder.Services.AddSingleton<IEmailSender<IdentityUser>, AzureEmailService>();
+                } else
+                {
+                    builder.Services.AddSingleton<IEmailSender<IdentityUser>, DummyEmailSender>();
+                    builder.Services.AddSingleton<IEmailSender, DummyEmailSender>();
                 }
             });
         }

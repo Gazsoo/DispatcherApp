@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ThemeToggle from './ThemeToggle';
 import { Input, Button, Card } from './ui';
 import { useAuth } from "./hooks/useAuth";
@@ -11,6 +11,8 @@ const Login = () => {
   const { login, isLoading, error } = useAuth();
   const { user, isLoading: isCheckingAuth } = useUser();
   const navigate = useNavigate();
+  const location = useLocation();
+  const notice = (location.state as any)?.notice as string | undefined;
 
   // Redirect if already logged in
   useEffect(() => {
@@ -38,6 +40,11 @@ const Login = () => {
         </h1>
 
         <Card>
+          {notice && (
+            <div className="mb-4 text-sm text-green-700 bg-green-100 border border-green-200 rounded px-3 py-2">
+              {notice}
+            </div>
+          )}
           <form onSubmit={handleLogin} className="space-y-6">
             <Input
               id="email"

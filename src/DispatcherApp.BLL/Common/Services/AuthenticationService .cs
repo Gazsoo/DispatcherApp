@@ -1,10 +1,14 @@
 ﻿using System.Data;
+using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using Ardalis.GuardClauses;
 using DispatcherApp.BLL.Common.Interfaces;
 using DispatcherApp.Common.Configurations;
 using DispatcherApp.Common.DTOs.Auth;
+using DispatcherApp.Common.DTOs.User;
+using DispatcherApp.Common.Exceptions;
+using DispatcherApp.Common.Constants;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -122,47 +126,39 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<AuthResponse?> LoginAsync(LoginRequest request)
     {
-        try
+        var user = await _userManager.FindByEmailAsync(request.Email);
+        if (user == null)
         {
-            var user = await _userManager.FindByEmailAsync(request.Email);
-            if (user == null)
-            {
-                _logger.LogWarning("Login attempt for non-existent user: {Email}", request.Email);
-                return null;
-            }
-
-            if (!await _userManager.IsEmailConfirmedAsync(user))
-            {
-                _logger.LogWarning("Login attempt for unconfirmed email: {Email}", request.Email);
-                return null;
-            }
-
-            var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: true);
-
-            if (!result.Succeeded)
-            {
-                _logger.LogWarning("Failed login attempt for user: {Email}", request.Email);
-                return null;
-            }
-
-            var accessToken = await _tokenService.GenerateAccessTokenAsync(user);
-            var refreshToken = await _tokenService.GenerateRefreshTokenAsync(user);
-
-            _logger.LogInformation("Successful login for user: {Email}", request.Email);
-
-            return new AuthResponse
-            {
-                AccessToken = accessToken.AccessToken,
-                RefreshToken = refreshToken,
-                TokenType = "Bearer",
-                ExpiresIn = accessToken.ExpiresIn
-            };
+            _logger.LogWarning("Login attempt for non-existent user: {Email}", request.Email);
+            throw new InvalidCredentialsException();
         }
-        catch (Exception ex)
+
+        if (!await _userManager.IsEmailConfirmedAsync(user))
         {
-            _logger.LogError(ex, "Error during login for user: {Email}", request.Email);
-            return null;
+            _logger.LogWarning("Login attempt for unconfirmed email: {Email}", request.Email);
+            throw new EmailNotConfirmedException();
         }
+
+        var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: true);
+
+        if (!result.Succeeded)
+        {
+            _logger.LogWarning("Failed login attempt for user: {Email}", request.Email);
+            throw new InvalidCredentialsException();
+        }
+
+        var accessToken = await _tokenService.GenerateAccessTokenAsync(user);
+        var refreshToken = await _tokenService.GenerateRefreshTokenAsync(user);
+
+        _logger.LogInformation("Successful login for user: {Email}", request.Email);
+
+        return new AuthResponse
+        {
+            AccessToken = accessToken.AccessToken,
+            RefreshToken = refreshToken,
+            TokenType = "Bearer",
+            ExpiresIn = accessToken.ExpiresIn
+        };
     }
 
     public async Task<AuthResponse?> RefreshTokenAsync(RefreshRequest request)
@@ -214,44 +210,48 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<bool> RegisterAsync(RegisterRequest request, string confirmationBaseUrl)
     {
-        try
+
+        var existingUser = await _userManager.FindByEmailAsync(request.Email);
+        if (existingUser != null)
         {
-            var existingUser = await _userManager.FindByEmailAsync(request.Email);
-            if (existingUser != null)
-            {
-                _logger.LogWarning("Registration attempt for existing user: {Email}", request.Email);
-                return false;
-            }
-
-            var user = new IdentityUser
-            {
-                UserName = request.Email,
-                Email = request.Email,
-                EmailConfirmed = false
-            };
-
-            var createResult = await _userManager.CreateAsync(user, request.Password);
-            if (!createResult.Succeeded)
-            {
-                _logger.LogWarning("User creation failed for: {Email}. Errors: {Errors}",
-                    request.Email, string.Join(", ", createResult.Errors.Select(e => e.Description)));
-                return false;
-            }
-
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var confirmationUrl = $"{confirmationBaseUrl}?userId={user.Id}&token={WebUtility.UrlEncode(token)}";
-
-            await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
-                $"Please confirm your email by clicking <a href='{confirmationUrl}'>here</a>");
-
-            _logger.LogInformation("User registered successfully: {Email}", request.Email);
-            return true;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error during registration for user: {Email}", request.Email);
+            _logger.LogWarning("Registration attempt for existing user: {Email}", request.Email);
             return false;
         }
+
+        var user = new IdentityUser
+        {
+            UserName = request.Email,
+            Email = request.Email,
+            EmailConfirmed = false
+        };
+
+
+        var createResult = await _userManager.CreateAsync(user, request.Password);
+        if (!createResult.Succeeded)
+        {
+            _logger.LogWarning("User creation failed for: {Email}. Errors: {Errors}",
+                request.Email, string.Join(", ", createResult.Errors.Select(e => e.Description)));
+            return false;
+        }
+
+        var roleToAssign = string.IsNullOrWhiteSpace(request.Role) ? Roles.User : request.Role;
+        var roleResult = await _userManager.AddToRoleAsync(user, roleToAssign);
+        if (!roleResult.Succeeded)
+        {
+            _logger.LogWarning("Failed to assign role {Role} to user: {Email}. Errors: {Errors}",
+                roleToAssign, request.Email, string.Join(", ", roleResult.Errors.Select(e => e.Description)));
+            return false;
+        }
+
+        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        var confirmationUrl = $"{confirmationBaseUrl}?userId={user.Id}&token={WebUtility.UrlEncode(token)}";
+
+        await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
+            $"Please confirm your email by clicking <a href='{confirmationUrl}'>here</a>");
+
+        _logger.LogInformation("User registered successfully: {Email}", request.Email);
+        return true;
+        
     }
 
     public async Task<bool> ResendConfirmationEmailAsync(string email, string confirmationBaseUrl)

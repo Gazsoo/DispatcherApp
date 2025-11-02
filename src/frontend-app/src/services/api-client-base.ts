@@ -1,7 +1,6 @@
 import type { AxiosResponse } from "axios";
 
 export abstract class ApiClientBase {
-    protected baseUrl: string | undefined;
 
     protected getBaseUrl(url: string): string {
         const baseUrl = import.meta.env.VITE_API_BASE_URL || '';

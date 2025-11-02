@@ -46,3 +46,6 @@ This is a known issue with the TypeScript + Axios template when using certain co
 - Introducing MediatR in ASP.NET Core setting up folder sturcture and 
 - simeple validation is handled by the router no validation.cs file need in a simple get request
 - validation with fluent validation, registering centrally
+
+- pipeline behavior for logging and validation, IAlreadyLogged interface to avoid duplicate logging
+- mediatr notifications for domain events

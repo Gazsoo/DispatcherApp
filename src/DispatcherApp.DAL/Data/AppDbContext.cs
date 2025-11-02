@@ -14,6 +14,7 @@ namespace DispatcherApp.DAL.Data
         public DbSet<AssignmentUser> AssignmentUsers { get; set; }
         public DbSet<Tutorial> Tutorials { get; set; }
         public DbSet<File> Files { get; set; }
+        public DbSet<DispatcherSession> DispatcherSessions { get; set; }
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
         {
@@ -21,17 +22,6 @@ namespace DispatcherApp.DAL.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Tutorial>(entity =>
-            {
-                entity.HasKey(t => t.Id);
-                entity.Property(t => t.Title).IsRequired().HasMaxLength(200);
-                entity.Property(t => t.Description).HasMaxLength(1000);
-                entity.Property(t => t.Url).HasMaxLength(500);
-                entity.HasIndex(t => t.CreatedAt);
-
-                entity.HasMany(t => t.Files)
-                    .WithMany(f => f.Tutorials);
-            });
             modelBuilder.Entity<File>(entity =>
             {
                 entity.HasKey(f => f.Id);
@@ -39,9 +29,39 @@ namespace DispatcherApp.DAL.Data
                 entity.Property(f => f.StoragePath).IsRequired();
                 entity.HasOne<IdentityUser>(f => f.UploadedByUser)
                     .WithMany()
-                    .HasForeignKey(f => f.UploadedByUserId)
                     .OnDelete(DeleteBehavior.SetNull);
             });
+
+            modelBuilder.Entity<Tutorial>(entity =>
+            {
+                entity.HasKey(t => t.Id);
+                entity.Property(t => t.Title).IsRequired().HasMaxLength(200);
+                entity.Property(t => t.Description).HasMaxLength(1000);
+                entity.Property(t => t.Url).HasMaxLength(500);
+                entity.HasIndex(t => t.CreatedAt);
+                entity.HasOne(t => t.Picture)
+                    .WithMany()
+                    .HasForeignKey(t => t.PictureId)
+                    .OnDelete(DeleteBehavior.SetNull);
+                entity.HasMany(t => t.Files)
+                    .WithMany(f => f.Tutorials);
+            });
+
+            var s = modelBuilder.Entity<DispatcherSession>();
+            s.HasKey(x => x.Id);
+            s.Property(x => x.RowVersion).IsRowVersion();
+            s.Property(x => x.Version).IsConcurrencyToken();
+            s.HasOne(x => x.Assignment)
+             .WithMany()
+             .HasForeignKey(x => x.AssignmentId)
+             .OnDelete(DeleteBehavior.Restrict);
+
+            var p = modelBuilder.Entity<SessionParticipant>();
+            p.HasKey(x => new { x.SessionId, x.UserId });
+            p.HasOne(x => x.Session)
+             .WithMany(x => x.Participants)
+             .HasForeignKey(x => x.SessionId);
+
             modelBuilder.Entity<AssignmentUser>(entity =>
             {
                 entity.HasKey(au => new { au.AssignmentId, au.UserId });

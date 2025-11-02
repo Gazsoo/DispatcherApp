@@ -10,9 +10,10 @@ namespace DispatcherApp.Common.Abstractions.Repository;
 public interface IAssignmentRepository
 {
     Task<Assignment?> GetByIdAsync(int id);
+    Task<Assignment?> GetByIdTrackedAsync(int id);
     Task<IEnumerable<Assignment>> GetAllAsync();
     Task AddAsync(Assignment assignment);
+    void Remove(Assignment assignment);
     Task SaveChangesAsync();
     Task<IEnumerable<Assignment>> GetUserAssignments(string userId);
 }
-

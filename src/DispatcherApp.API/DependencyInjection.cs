@@ -1,14 +1,17 @@
-﻿using Azure.Identity;
+﻿using System.Text.Json.Serialization;
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
+using Azure.Identity;
 using DispatcherApp.API.Configurations;
 using DispatcherApp.API.Midleware;
 using DispatcherApp.API.Services;
 using DispatcherApp.BLL.Common.Configurations;
 using DispatcherApp.BLL.Common.Extentions;
 using DispatcherApp.BLL.Common.Interfaces;
+using DispatcherApp.Common.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using NSwag;
 using NSwag.Generation.Processors.Security;
-using Azure.Extensions.AspNetCore.Configuration.Secrets;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -34,9 +37,21 @@ namespace Microsoft.Extensions.DependencyInjection;
                 });
             builder.Configuration.AddApiConfigurations();
             builder.Services.AddHttpContextAccessor();
-            builder.Services.AddControllers();
+            builder.Services
+                .AddControllers()
+                .AddJsonOptions(opts =>
+                {
+                    opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
+            builder.Services
+                .AddSignalR(o => o.EnableDetailedErrors = true)
+                .AddJsonProtocol(opts =>
+                {
+                    opts.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                }); ;
 
             builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddScoped<ISessionNotifier, SignalRSessionNotifier>();
             builder.Services.AddScoped<IUserContextService, UserContextService>();
 
             builder.Services.AddExceptionHandler<CustomExceptionHandler>();
@@ -70,7 +85,29 @@ namespace Microsoft.Extensions.DependencyInjection;
                     configure.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("Bearer"));
                 }
             );
-
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.MapType<Microsoft.AspNetCore.Mvc.ValidationProblemDetails>(() =>
+                    new Microsoft.OpenApi.Models.OpenApiSchema
+                    {
+                        Type = "object",
+                        Properties = {
+                            ["type"] = new() { Type = "string" },
+                            ["title"] = new() { Type = "string" },
+                            ["status"] = new() { Type = "integer" },
+                            ["errors"] = new()
+                            {
+                                Type = "object",
+                                AdditionalProperties = new Microsoft.OpenApi.Models.OpenApiSchema
+                                {
+                                    Type = "array",
+                                    Items = new() { Type = "string" }
+                                }
+                            }
+                        }
+                    }
+                );
+            });
 
     }
 

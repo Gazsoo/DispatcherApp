@@ -1,29 +1,34 @@
-﻿using System.Net;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Ardalis.GuardClauses;
-using DispatcherApp.BLL.Common.Interfaces;
-using DispatcherApp.BLL.Model;
+using DispatcherApp.BLL.Auth.Commands.Login;
+using DispatcherApp.BLL.Auth.Commands.Register;
+using DispatcherApp.BLL.Auth.Commands.ConfirmEmail;
+using DispatcherApp.BLL.Auth.Commands.ResendConfirmationEmail;
+using DispatcherApp.BLL.Auth.Commands.ForgotPassword;
+using DispatcherApp.BLL.Auth.Commands.ResetPassword;
+using DispatcherApp.BLL.Auth.Queries.GetUserInfo;
+using DispatcherApp.BLL.Auth.Commands.UpdateUserInfo;
+using DispatcherApp.BLL.Auth.Commands.Refresh;
 using DispatcherApp.Common.DTOs.Auth;
+using DispatcherApp.Common.DTOs.User;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using MediatR;
 
 namespace DispatcherApp.API.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 public class AuthController : ControllerBase
 {
-    private readonly IAuthenticationService _authService;
+    private readonly IMediator _mediator;
 
 
 
     public AuthController(
-        IAuthenticationService authService
+        IMediator mediator
         )
     {
-        _authService = authService;
+        _mediator = mediator;
     }
 
     [HttpPost("register")]
@@ -32,7 +37,9 @@ public class AuthController : ControllerBase
     {
         var confirmationBaseUrl = Url.Action("ConfirmEmail", "Auth", null, Request.Scheme);
         Guard.Against.Null(confirmationBaseUrl, nameof(confirmationBaseUrl));
-        var success = await _authService.RegisterAsync(request, confirmationBaseUrl);
+        var success = await _mediator.Send(new RegisterCommand(request, confirmationBaseUrl));
+        if (!success)
+            return BadRequest("Registration failed");
 
         return Ok(new { message = "Confirmation email sent if your account exists." });
     }
@@ -44,7 +51,7 @@ public class AuthController : ControllerBase
         if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
             return BadRequest("Invalid confirmation link");
 
-        var success = await _authService.ConfirmEmailAsync(userId, token);
+        var success = await _mediator.Send(new ConfirmEmailCommand(userId, token));
         if (!success)
             return BadRequest("Email confirmation failed");
 
@@ -56,7 +63,7 @@ public class AuthController : ControllerBase
     {
         var confirmationBaseUrl = Url.Action("ConfirmEmail", "Auth", null, Request.Scheme);
         Guard.Against.Null(confirmationBaseUrl, nameof(confirmationBaseUrl));
-        var success = await _authService.ResendConfirmationEmailAsync(request.Email, confirmationBaseUrl);
+        await _mediator.Send(new ResendConfirmationEmailCommand(request.Email, confirmationBaseUrl));
 
         return Ok(new { message = "Confirmation email sent if your account exists." });
     }
@@ -66,7 +73,7 @@ public class AuthController : ControllerBase
     {
         var resetBaseUrl = Url.Action("ResetPassword", "Auth", null, Request.Scheme);
         Guard.Against.Null(resetBaseUrl, nameof(resetBaseUrl));
-        var success = await _authService.ForgotPasswordAsync(request.Email, resetBaseUrl);
+        await _mediator.Send(new ForgotPasswordCommand(request.Email, resetBaseUrl));
 
         return Ok(new { message = "If your email exists, you'll receive a reset link." });
     }
@@ -74,7 +81,7 @@ public class AuthController : ControllerBase
     [HttpPost("resetPassword")]
     public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
     {
-        var success = await _authService.ResetPasswordAsync(request);
+        var success = await _mediator.Send(new ResetPasswordCommand(request));
         if (!success)
             return BadRequest("Password reset failed");
 
@@ -89,7 +96,7 @@ public class AuthController : ControllerBase
         if (string.IsNullOrEmpty(userId))
             return Unauthorized();
 
-        var userInfo = await _authService.GetUserInfoAsync(userId);
+        var userInfo = await _mediator.Send(new GetUserInfoQuery(userId));
         if (userInfo == null)
             return NotFound();
 
@@ -104,7 +111,7 @@ public class AuthController : ControllerBase
         if (string.IsNullOrEmpty(userId))
             return Unauthorized();
 
-        var success = await _authService.UpdateUserInfoAsync(userId, request);
+        var success = await _mediator.Send(new UpdateUserInfoCommand(userId, request));
         if (!success)
             return BadRequest("Failed to update user information");
 
@@ -118,7 +125,7 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request)
     {
 
-        var result = await _authService.LoginAsync(request);
+        var result = await _mediator.Send(new LoginCommand(request));
         if (result == null)
             return Unauthorized("Invalid credentials or unconfirmed email");
 
@@ -131,7 +138,7 @@ public class AuthController : ControllerBase
     [HttpPost("refresh")]
     public async Task<ActionResult<AuthResponse>> Refresh([FromBody] RefreshRequest request)
     {
-        var result = await _authService.RefreshTokenAsync(request);
+        var result = await _mediator.Send(new RefreshCommand(request));
         if (result == null)
             return BadRequest("Invalid token");
 

@@ -16,7 +16,9 @@ public class CustomExceptionHandler : IExceptionHandler
                 { typeof(Ardalis.GuardClauses.NotFoundException), HandleNotFoundException },
                 { typeof(ValidationException), HandleValidationException },
                 { typeof(UnauthorizedAccessException), HandleUnauthorizedAccessException },
+                { typeof(InvalidCredentialsException), HandleUnauthorizedAccessException },
                 { typeof(ForbiddenAccessException), HandleForbiddenAccessException },
+                { typeof(EmailNotConfirmedException), HandleForbiddenAccessException },
             };
     }
 
