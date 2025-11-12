@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ErrorDisplay } from "../../ui/ErrorDisplay";
 import { LoadingSpinner } from "../../ui/LoadingSpinner";
+import { Button } from "../../ui";
 import { useFiles } from "../../hooks/useFiles";
 
 import React, { useRef } from "react";
@@ -10,7 +11,8 @@ import { apiClient } from "../../../api/client";
 import downloadFileById from "../../../services/file-downloader";
 
 export default function Files() {
-    const { mutate, reset } = useApiMutation<FileParameter, FileUploadResponse>();
+    // Pass a lambda so `this` is preserved for the client method
+    const { mutate, reset } = useApiMutation<FileParameter, FileUploadResponse>((input) => apiClient.files_PostFile(input));
     const { files, isLoading, error, refetch } = useFiles();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -34,10 +36,7 @@ export default function Files() {
         reset();
 
         try {
-            const call = await mutate((input: FileParameter) =>
-                apiClient.files_PostFile(input)
-            );
-            const response = await call(fileParam);
+            const response = await mutate(fileParam);
 
             if (!response) throw new Error("Upload failed");
 
@@ -70,23 +69,21 @@ export default function Files() {
     };
     // Otherwise show the files list
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
+        <>
+
+            <div className="flex items-center justify-between mb-6">
                 <h1 className="text-3xl font-bold">Files</h1>
-                <button
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                    onClick={handleUploadClick}
-                >
-                    Upload File
-                </button>
+                <div>
+                    <Button variant="primary" className="w-auto" onClick={handleUploadClick}>
+                        Upload File
+                    </Button>
+                </div>
                 <input
                     type="file"
                     ref={fileInputRef}
                     className="hidden"
-                    onChange={handleFileChange}
-                />
+                    onChange={handleFileChange} />
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {files.map((file) => (
                     <Link
@@ -114,7 +111,6 @@ export default function Files() {
                         </div>
                     </Link>
                 ))}
-            </div>
-        </div>
+            </div></>
     );
 }

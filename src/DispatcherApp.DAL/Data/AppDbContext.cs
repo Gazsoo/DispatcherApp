@@ -58,6 +58,10 @@ namespace DispatcherApp.DAL.Data
 
             var p = modelBuilder.Entity<SessionParticipant>();
             p.HasKey(x => new { x.SessionId, x.UserId });
+            p.HasOne(x => x.User)
+             .WithMany()
+             .HasForeignKey(x => x.UserId)
+             .OnDelete(DeleteBehavior.Cascade);
             p.HasOne(x => x.Session)
              .WithMany(x => x.Participants)
              .HasForeignKey(x => x.SessionId);

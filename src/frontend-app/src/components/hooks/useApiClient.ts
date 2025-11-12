@@ -33,34 +33,29 @@ export function useApiCall<T>() {
  * Hook for mutations (create, update, delete operations)
  * Provides additional success state tracking
  */
-export function useApiMutation<TInput, TOutput>() {
+export function useApiMutation<TInput, TOutput>(apiCall: (input: TInput) => Promise<TOutput>) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
     const [isSuccess, setIsSuccess] = useState(false);
 
-    const mutate = useCallback(
-        async (apiCall: (input: TInput) => Promise<TOutput>): Promise<(input: TInput) => Promise<TOutput | null>> => {
-            return async (input: TInput) => {
-                setIsLoading(true);
-                setError(null);
-                setIsSuccess(false);
+    const mutate = useCallback(async (input: TInput): Promise<TOutput | null> => {
+        setIsLoading(true);
+        setError(null);
+        setIsSuccess(false);
 
-                try {
-                    const result = await apiCall(input);
-                    setIsSuccess(true);
-                    return result;
-                } catch (err) {
-                    const error = err instanceof Error ? err : new Error('An unknown error occurred');
-                    setError(error);
-                    console.error('API mutation failed:', error);
-                    return null;
-                } finally {
-                    setIsLoading(false);
-                }
-            };
-        },
-        []
-    );
+        try {
+            const result = await apiCall(input);
+            setIsSuccess(true);
+            return result;
+        } catch (err) {
+            const error = err instanceof Error ? err : new Error('An unknown error occurred');
+            setError(error);
+            console.error('API mutation failed:', error);
+            return null;
+        } finally {
+            setIsLoading(false);
+        }
+    }, [apiCall]);
 
     const reset = useCallback(() => {
         setError(null);

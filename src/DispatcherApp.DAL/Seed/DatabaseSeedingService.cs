@@ -25,8 +25,8 @@ public static class RoleSeederExtention
         using var scope = serviceProvider.Services.CreateScope();
         var initialiser = scope.ServiceProvider.GetRequiredService<DatabaseSeedingService>();
 
-        //await initialiser.InitialiseAsync();
-        //await initialiser.SeedAsync();
+        await initialiser.InitialiseAsync();
+        await initialiser.SeedAsync();
         await Task.CompletedTask;
         return serviceProvider;
     }

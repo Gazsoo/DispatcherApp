@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Card, Input } from "./ui";
+import { Button, Card, Input, Select } from "./ui";
 import { useAuth } from "./hooks/useAuth";
 import { useNavigate } from "react-router";
 
@@ -72,21 +72,18 @@ const Register = () => {
                         required
                         placeholder="Doe"
                     />
-                    <div>
-                        <label htmlFor="role" className="block text-sm font-medium mb-2">Role</label>
-                        <select
-                            id="role"
-                            name="role"
-                            value={role}
-                            onChange={(e) => setRole(e.target.value)}
-                            required
-                            className="w-full px-4 py-3 rounded-lg bg-surface-light dark:bg-surface-dark border border-surface-light-border dark:border-surface-dark-border focus:outline-none focus:ring-2 focus:ring-accent transition-all"
-                        >
-                            <option value="Administrator">Administrator</option>
-                            <option value="User">User</option>
-                            <option value="Dispatcher">Dispatcher</option>
-                        </select>
-                    </div>
+                    <Select
+                        id="role"
+                        name="role"
+                        label="Role"
+                        value={role}
+                        onChange={(e) => setRole(e.target.value)}
+                        required
+                    >
+                        <option value="Administrator">Administrator</option>
+                        <option value="User">User</option>
+                        <option value="Dispatcher">Dispatcher</option>
+                    </Select>
 
                     {error && (
                         <div className="text-red-500 text-sm text-center">

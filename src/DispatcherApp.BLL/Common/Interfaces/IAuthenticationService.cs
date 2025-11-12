@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DispatcherApp.Common.DTOs.Auth;
-using DispatcherApp.Common.DTOs.User;
-using Microsoft.AspNetCore.Identity;
 using LoginRequest = DispatcherApp.Common.DTOs.Auth.LoginRequest;
 using RefreshRequest = DispatcherApp.Common.DTOs.Auth.RefreshRequest;
 using RegisterRequest = DispatcherApp.Common.DTOs.Auth.RegisterRequest;
@@ -21,6 +19,4 @@ public interface IAuthenticationService
     Task<bool> ResendConfirmationEmailAsync(string email, string confirmationBaseUrl);
     Task<bool> ForgotPasswordAsync(string email, string resetUrl);
     Task<bool> ResetPasswordAsync(ResetPasswordRequest request);
-    Task<UserInfoResponse?> GetUserInfoAsync(string userId);
-    Task<bool> UpdateUserInfoAsync(string userId, UserInfoResponse userInfo);
 }

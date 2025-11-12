@@ -12,7 +12,7 @@ public class SessionResponse
     public int AssignmentId { get; set; }
     public string OwnerId { get; set; } = string.Empty;
     public DispatcherSessionStatus Status { get; set; }
-    public List<string> ParticipantIds { get; set; } = new List<string>();
+    public List<ParticipantDto> Participants { get; set; } = new();
     public string UserId { get; set; } = string.Empty;
 
 }

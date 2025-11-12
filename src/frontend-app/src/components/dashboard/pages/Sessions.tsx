@@ -21,7 +21,7 @@ export default function Sessions() {
                             key={s.groupId}
                             to={`/dashboard/sessions/${s.groupId}`}
                             role="button"
-                            tabIndex={s.participantIds?.length || 0}
+                            tabIndex={s.participants?.length || 0}
                             className="cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent rounded-xl"
                         >
                             <Card className="p-4 max-w-none hover:shadow-md transition-transform transform">
@@ -45,7 +45,7 @@ export default function Sessions() {
                                     <div><span className="font-semibold">Assignment:</span> {s.assignmentId ?? '—'}</div>
                                     <div><span className="font-semibold">Owner:</span> {s.ownerId ?? '—'}</div>
                                     <div><span className="font-semibold">User:</span> {s.ownerId ?? '—'}</div>
-                                    <div><span className="font-semibold">Participants:</span> {Array.isArray(s.participantIds) ? s.participantIds.join(', ') || '—' : String(s.participantIds)}</div>
+                                    <div><span className="font-semibold">Participants:</span> {Array.isArray(s.participants) ? s.participants.join(', ') || '—' : String(s.participants)}</div>
                                 </div>
                             </Card>
                         </Link>

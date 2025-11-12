@@ -58,6 +58,7 @@ public class SessionRepository : ISessionRepository
         return await _context.DispatcherSessions
             //.AsNoTracking()
             .Include(a => a.Participants)
+            .ThenInclude(a => a.User)
             .FirstOrDefaultAsync(a => a.GroupId == id);
     }
 

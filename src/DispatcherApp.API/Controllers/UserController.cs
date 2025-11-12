@@ -1,5 +1,6 @@
 ﻿using DispatcherApp.BLL.Common.Interfaces;
 using DispatcherApp.BLL.User.Commands.CreateUser;
+using DispatcherApp.BLL.User.Commands.DeleteUser;
 using DispatcherApp.BLL.User.Queries.GetAllUsers;
 using DispatcherApp.BLL.User.Queries.GetProfile;
 using DispatcherApp.BLL.User.Queries.GetUser;
@@ -12,15 +13,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DispatcherApp.API.Controllers;
 [Route("api/[controller]")]
-[Authorize(Roles = "Administrator")]
+[Authorize(Roles = "Administrator, Dispatcher")]
 [ApiController]
 public class UserController : ControllerBase
 {
     private readonly IMediator _mediator ;
-    private readonly IAssignmentService _assignmentService;
-    public UserController(IAssignmentService assignmentService, IMediator mediator)
+    public UserController(IMediator mediator)
     {
-        _assignmentService = assignmentService;
         _mediator = mediator;
     }
 
@@ -35,7 +34,12 @@ public class UserController : ControllerBase
     {
         return await _mediator.Send(new GetUserQuery(id));
     }
-
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteUser(string id)
+    {
+        await _mediator.Send(new DeleteUserCommand(id));
+        return Ok();
+    }
     [HttpGet("AllUser")]
     public async Task<ActionResult<GetAllUsersResponse>> GetAllUsers()
     {

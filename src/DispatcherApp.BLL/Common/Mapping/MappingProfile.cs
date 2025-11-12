@@ -1,3 +1,4 @@
+using System.Linq;
 using AutoMapper;
 using DispatcherApp.Common.DTOs.Assignment;
 using DispatcherApp.Common.DTOs.Files;
@@ -35,9 +36,15 @@ public class MappingProfile : Profile
             f => f.FileName,
             x => x.MapFrom(src => src.OriginalFileName));
 
+        CreateMap<SessionParticipant, ParticipantDto>()
+            .ConstructUsing(sp =>
+                new ParticipantDto(
+                    sp.UserId,
+                    sp.User != null ? sp.User.UserName ?? string.Empty : string.Empty));
+
         CreateMap<DispatcherSession, SessionResponse>()
             .ForMember(
-            x => x.ParticipantIds, 
-            i => i.MapFrom(src => src.Participants.Select(p => p.UserId)));
+                x => x.Participants,
+                i => i.MapFrom(src => src.Participants ?? Enumerable.Empty<SessionParticipant>()));
     }
 }

@@ -14,12 +14,18 @@ namespace DispatcherApp.BLL.Common.Services;
 public class TutorialService : ITutorialService
 {
     private readonly ITutorialRepository _tutorialRepository;
+    private readonly IFileRepository _fileRepository;
     private readonly IMapper _mapper;
     private readonly TimeProvider _timeProvider;
 
-    public TutorialService(ITutorialRepository tutorialRepository, IMapper mapper, TimeProvider timeProvider)
+    public TutorialService(
+        ITutorialRepository tutorialRepository, 
+        IFileRepository fileRepository,
+        IMapper mapper, 
+        TimeProvider timeProvider)
     {
         _tutorialRepository = tutorialRepository;
+        _fileRepository = fileRepository;
         _mapper = mapper;
         _timeProvider = timeProvider;
     }
@@ -36,6 +42,8 @@ public class TutorialService : ITutorialService
     public async Task<Tutorial> CreateTutorial(CreateTutorialRequest request, CancellationToken ct = default)
     {
         var tutorial = _mapper.Map<Tutorial>(request);
+        var files = await _fileRepository.GetByIdsAsync(request.FilesId);
+        tutorial.Files = files;
         var now = _timeProvider.GetUtcNow().UtcDateTime;
         tutorial.CreatedAt = now;
         tutorial.UpdatedAt = now;

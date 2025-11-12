@@ -6,7 +6,6 @@ using Ardalis.GuardClauses;
 using DispatcherApp.BLL.Common.Interfaces;
 using DispatcherApp.Common.Configurations;
 using DispatcherApp.Common.DTOs.Auth;
-using DispatcherApp.Common.DTOs.User;
 using DispatcherApp.Common.Exceptions;
 using DispatcherApp.Common.Constants;
 using Microsoft.AspNetCore.Http;
@@ -94,33 +93,6 @@ public class AuthenticationService : IAuthenticationService
         {
             _logger.LogError(ex, "Error during forgot password for: {Email}", email);
             return false;
-        }
-    }
-
-    public async Task<UserInfoResponse?> GetUserInfoAsync(string userId)
-    {
-        try
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                _logger.LogWarning("Get user info attempt for non-existent user: {UserId}", userId);
-                return null;
-            }
-
-            return new UserInfoResponse
-            {
-                Id = user.Id,
-                Phone = user.PhoneNumber,
-                Email = user.Email ?? string.Empty,
-                EmailConfirmed = user.EmailConfirmed,
-                TwoFactorEnabled = user.TwoFactorEnabled
-            };
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting user info for: {UserId}", userId);
-            return null;
         }
     }
 
@@ -315,41 +287,4 @@ public class AuthenticationService : IAuthenticationService
         }
     }
 
-    public async Task<bool> UpdateUserInfoAsync(string userId, UserInfoResponse userInfo)
-    {
-        try
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                _logger.LogWarning("Update user info attempt for non-existent user: {UserId}", userId);
-                return false;
-            }
-
-            // Update allowed fields
-            if (user.Email != userInfo.Email)
-            {
-                var changeEmailResult = await _userManager.SetEmailAsync(user, userInfo.Email);
-                if (!changeEmailResult.Succeeded)
-                {
-                    _logger.LogWarning("Failed to update email for user: {UserId}", userId);
-                    return false;
-                }
-            }
-
-            var updateResult = await _userManager.UpdateAsync(user);
-            if (updateResult.Succeeded)
-            {
-                _logger.LogInformation("User info updated for: {UserId}", userId);
-                return true;
-            }
-
-            return false;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating user info for: {UserId}", userId);
-            return false;
-        }
-    }
 }
