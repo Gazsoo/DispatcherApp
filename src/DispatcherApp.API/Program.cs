@@ -22,7 +22,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseCustomMiddleware();
 //if (app.Environment.IsDevelopment())
-{
+//{
     await app.RoleSeed();
     app.UseOpenApi(settings =>
     {
