@@ -21,7 +21,7 @@ app.UseCors("DefaultPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseCustomMiddleware();
-if (app.Environment.IsDevelopment())
+//if (app.Environment.IsDevelopment())
 {
     await app.RoleSeed();
     app.UseOpenApi(settings =>
@@ -33,7 +33,7 @@ if (app.Environment.IsDevelopment())
         settings.Path = "/api";
         settings.DocumentPath = "/api/specification.json";
     });
-}
+//}
 app.UseExceptionHandler(options => {});
 app.MapHealthChecks("/health");
 app.MapFallbackToFile("index.html");
