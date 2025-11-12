@@ -1,21 +1,22 @@
 using System.Threading;
 using System.Threading.Tasks;
 using DispatcherApp.BLL.Common.Interfaces;
+using DispatcherApp.Common.DTOs.User;
 using MediatR;
 
 namespace DispatcherApp.BLL.Auth.Commands.UpdateUserInfo;
 
-internal sealed class UpdateUserInfoCommandHandler : IRequestHandler<UpdateUserInfoCommand, bool>
+internal sealed class UpdateUserInfoCommandHandler : IRequestHandler<UpdateUserInfoCommand, UserInfoResponse>
 {
-    private readonly IAuthenticationService _authenticationService;
+    private readonly IUserProfileService _userProfileService;
 
-    public UpdateUserInfoCommandHandler(IAuthenticationService authenticationService)
+    public UpdateUserInfoCommandHandler(IUserProfileService userProfileService)
     {
-        _authenticationService = authenticationService;
+        _userProfileService = userProfileService;
     }
 
-    public async Task<bool> Handle(UpdateUserInfoCommand request, CancellationToken cancellationToken)
+    public async Task<UserInfoResponse> Handle(UpdateUserInfoCommand request, CancellationToken cancellationToken)
     {
-        return await _authenticationService.UpdateUserInfoAsync(request.UserId, request.UserInfo);
+        return await _userProfileService.UpdateAsync(request.UserId, request.UserInfo, cancellationToken);
     }
 }

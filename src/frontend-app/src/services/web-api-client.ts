@@ -824,7 +824,7 @@ export class Client extends ApiClientBase {
         return Promise.resolve<UserInfoResponse>(null as any);
     }
 
-    auth_UpdateUserInfo(request: UserInfoResponse, signal?: AbortSignal): Promise<FileResponse> {
+    auth_UpdateUserInfo(request: UserInfoResponse, signal?: AbortSignal): Promise<UserInfoResponse> {
         let url_ = this.baseUrl + "/api/Auth/manage/info";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -832,12 +832,11 @@ export class Client extends ApiClientBase {
 
         let options_: AxiosRequestConfig = {
             data: content_,
-            responseType: "blob",
             method: "POST",
             url: url_,
             headers: {
                 "Content-Type": "application/json",
-                "Accept": "application/octet-stream"
+                "Accept": "application/json"
             },
             signal
         };
@@ -853,7 +852,7 @@ export class Client extends ApiClientBase {
         });
     }
 
-    protected processAuth_UpdateUserInfo(response: AxiosResponse): Promise<FileResponse> {
+    protected processAuth_UpdateUserInfo(response: AxiosResponse): Promise<UserInfoResponse> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -863,22 +862,18 @@ export class Client extends ApiClientBase {
                 }
             }
         }
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers["content-disposition"] : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return Promise.resolve({ fileName: fileName, status: status, data: new Blob([response.data], { type: response.headers["content-type"] }), headers: _headers });
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<UserInfoResponse>(result200);
+
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<FileResponse>(null as any);
+        return Promise.resolve<UserInfoResponse>(null as any);
     }
 
     auth_Login(request: LoginRequest, signal?: AbortSignal): Promise<AuthResponse> {
@@ -2074,6 +2069,62 @@ export class Client extends ApiClientBase {
         return Promise.resolve<UserInfoResponse>(null as any);
     }
 
+    user_DeleteUser(id: string, signal?: AbortSignal): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/api/User/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            responseType: "blob",
+            method: "DELETE",
+            url: url_,
+            headers: {
+                "Accept": "application/octet-stream"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processUser_DeleteUser(_response));
+        });
+    }
+
+    protected processUser_DeleteUser(response: AxiosResponse): Promise<FileResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers["content-disposition"] : undefined;
+            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
+            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
+            if (fileName) {
+                fileName = decodeURIComponent(fileName);
+            } else {
+                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            }
+            return Promise.resolve({ fileName: fileName, status: status, data: new Blob([response.data], { type: response.headers["content-type"] }), headers: _headers });
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<FileResponse>(null as any);
+    }
+
     user_GetAllUsers(signal?: AbortSignal): Promise<GetAllUsersResponse> {
         let url_ = this.baseUrl + "/api/User/AllUser";
         url_ = url_.replace(/[?&]$/, "");
@@ -2324,11 +2375,16 @@ export interface SessionResponse {
     assignmentId?: number;
     ownerId?: string;
     status?: DispatcherSessionStatus;
-    participantIds?: string[];
+    participants?: ParticipantDto[];
     userId?: string;
 }
 
 export type DispatcherSessionStatus = "Scheduled" | "Started" | "InProgress" | "Postponed" | "Canceled" | "Finished";
+
+export interface ParticipantDto {
+    userId?: string;
+    name?: string;
+}
 
 export interface UpdateSessionRequest {
     ownerId?: string | undefined;
@@ -2342,10 +2398,6 @@ export interface UpdateSessionRequest {
 }
 
 export type DispatcherSessionType = "Web" | "Mobile" | "VR";
-
-export interface ParticipantDto {
-    userId?: string;
-}
 
 export interface TutorialResponse {
     id?: number;
@@ -2398,6 +2450,7 @@ export interface CreateUserRequest {
     email?: string;
     firstName?: string;
     lastName?: string;
+    role?: string;
     password?: string;
 }
 

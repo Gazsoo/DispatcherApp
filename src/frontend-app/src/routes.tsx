@@ -14,6 +14,8 @@ import FileDetails from "./components/dashboard/pages/FileDetails";
 import Assignments from "./components/dashboard/pages/Assignments";
 import Settings from "./components/dashboard/pages/Settings";
 import Administration from "./components/dashboard/pages/Administrations";
+import CreateUser from "./components/dashboard/pages/CreateUser";
+import EditUser from "./components/dashboard/pages/EditUser";
 import Profile from "./components/dashboard/pages/Profile";
 import RequireRole from "./components/auth/RequireRole";
 import Unauthorized from "./components/auth/Unauthorized";
@@ -74,6 +76,8 @@ export const router = createBrowserRouter([
           { path: "sessions/:sessionId", element: <SessionDetails /> },
           // { path: "settings", element: <Settings /> },
           { path: "administration", element: <RequireRole roles={["Administrator"]}><Administration /></RequireRole> },
+          { path: "administration/create", element: <RequireRole roles={["Administrator"]}><CreateUser /></RequireRole> },
+          { path: "administration/:userId", element: <RequireRole roles={["Administrator"]}><EditUser /></RequireRole> },
           { path: "unauthorized", element: <Unauthorized /> },
           { path: "profile", element: <Profile /> },
         ],

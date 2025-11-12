@@ -97,25 +97,19 @@ public class AuthController : ControllerBase
             return Unauthorized();
 
         var userInfo = await _mediator.Send(new GetUserInfoQuery(userId));
-        if (userInfo == null)
-            return NotFound();
-
         return Ok(userInfo);
     }
 
     [HttpPost("manage/info")]
     [Authorize]
-    public async Task<ActionResult> UpdateUserInfo([FromBody] UserInfoResponse request)
+    public async Task<ActionResult<UserInfoResponse>> UpdateUserInfo([FromBody] UserInfoResponse request)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId))
             return Unauthorized();
 
-        var success = await _mediator.Send(new UpdateUserInfoCommand(userId, request));
-        if (!success)
-            return BadRequest("Failed to update user information");
-
-        return Ok(new { message = "User information updated successfully" });
+        var updatedUser = await _mediator.Send(new UpdateUserInfoCommand(userId, request));
+        return Ok(updatedUser);
     }
 
     [HttpPost("login")]

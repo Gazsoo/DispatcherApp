@@ -37,6 +37,7 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.AddScoped<ITutorialService, TutorialService>();
             builder.Services.AddScoped<IFileService, FileService>();
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IUserProfileService, UserProfileService>();
             builder.Services.AddScoped<ISessionService, SessionService>();
 
         }

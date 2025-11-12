@@ -6,17 +6,17 @@ using MediatR;
 
 namespace DispatcherApp.BLL.Auth.Queries.GetUserInfo;
 
-internal sealed class GetUserInfoQueryHandler : IRequestHandler<GetUserInfoQuery, UserInfoResponse?>
+internal sealed class GetUserInfoQueryHandler : IRequestHandler<GetUserInfoQuery, UserInfoResponse>
 {
-    private readonly IAuthenticationService _authenticationService;
+    private readonly IUserProfileService _userProfileService;
 
-    public GetUserInfoQueryHandler(IAuthenticationService authenticationService)
+    public GetUserInfoQueryHandler(IUserProfileService userProfileService)
     {
-        _authenticationService = authenticationService;
+        _userProfileService = userProfileService;
     }
 
-    public async Task<UserInfoResponse?> Handle(GetUserInfoQuery request, CancellationToken cancellationToken)
+    public async Task<UserInfoResponse> Handle(GetUserInfoQuery request, CancellationToken cancellationToken)
     {
-        return await _authenticationService.GetUserInfoAsync(request.UserId);
+        return await _userProfileService.GetAsync(request.UserId, cancellationToken);
     }
 }

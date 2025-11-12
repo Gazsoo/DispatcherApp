@@ -84,10 +84,11 @@ public class UserService : IUserService
     public async Task<UserInfoResponse> CreateAsync(CreateUserRequest request, CancellationToken ct)
     {
         var user = await _repository.CreateAsync(new IdentityUser
-        {
+        {   EmailConfirmed = true,
+            UserName = request.Email,
             Email = request.Email
         }, request.Password, ct);
-        return _mapper.Map<UserInfoResponse>(user) ;
+        return await UpdateRoleAsync(user.Id, request.Role, ct);
     }
 
     public async Task DeleteAsync(string userId, CancellationToken ct)

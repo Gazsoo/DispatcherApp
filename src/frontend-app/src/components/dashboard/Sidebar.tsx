@@ -14,12 +14,12 @@ export default function Sidebar() {
         : (userRoles ? [userRoles] : []);
 
     return (
-        <aside className="w-64 bg-surface-light-border dark:bg-surface-dark-border border-r border-accent/20 flex flex-col">
+        <aside className="w-64 h-screen sticky top-0 bg-surface-light-border dark:bg-surface-dark-border border-r border-accent/20 flex flex-col flex-shrink-0">
             <div className="p-6">
                 <h2 className="text-xl font-bold text-accent">Dispatcher</h2>
             </div>
 
-            <nav className="px-4 space-y-2">
+            <nav className="px-4 space-y-2 flex-1 overflow-y-auto">
                 {dashboardNavigation
                     .filter(item => !item.requiredRoles || item.requiredRoles.some(r => rolesList.includes(r)))
                     .map((item) => (

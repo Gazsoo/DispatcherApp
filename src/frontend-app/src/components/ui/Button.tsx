@@ -1,23 +1,33 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary';
+  variant?: 'primary' | 'secondary' | 'danger' | 'dangerSubtle';
+  size?: 'sm' | 'md' | 'lg';
   children: ReactNode;
   isLoading?: boolean;
 }
 
 export const Button = ({
   variant = 'primary',
+  size = 'md',
   className = '',
   isLoading = false,
   children,
   ...props
 }: ButtonProps) => {
-  const baseStyles = "w-full font-semibold py-3 px-6 rounded-lg transition-all duration-300";
+  const sizeStyles: Record<NonNullable<ButtonProps['size']>, string> = {
+    sm: "py-1.5 px-3 text-xs",
+    md: "py-3 px-6 text-sm",
+    lg: "py-4 px-7 text-base"
+  };
 
-  const variants = {
+  const baseStyles = `w-full font-semibold rounded-lg transition-all duration-300 ${sizeStyles[size]}`;
+
+  const variants: Record<NonNullable<ButtonProps['variant']>, string> = {
     primary: "bg-gradient-to-r from-accent to-accent-dark hover:from-accent-dark hover:to-accent text-white shadow-lg hover:shadow-xl",
-    secondary: "bg-surface-light-border dark:bg-surface-dark-border hover:bg-accent/20 dark:hover:bg-accent/20 text-content-light dark:text-content-dark font-medium border-2 border-transparent hover:border-accent duration-200"
+    secondary: "bg-surface-light-border dark:bg-surface-dark-border hover:bg-accent/20 dark:hover:bg-accent/20 text-content-light dark:text-content-dark font-medium border-2 border-transparent hover:border-accent duration-200",
+    danger: "bg-red-600 hover:bg-red-700 text-white shadow-sm",
+    dangerSubtle: "bg-red-50 text-red-700 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-300 dark:hover:bg-red-900/30 border border-red-200/60 dark:border-red-900/40"
   };
 
   return (

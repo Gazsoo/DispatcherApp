@@ -34,10 +34,11 @@ public class SessionHub : Hub
     public async Task JoinSession(string sessionId)
     {
         // Try to get or create the session through MediatR
-        var session = await _mediator.Send(new JoinGetOrCreateSessionCommand(sessionId), Context.ConnectionAborted);
+        Context.Items["SessionId"] = sessionId;
+        await Groups.AddToGroupAsync(Context.ConnectionId, $"sess:{sessionId}");
+        await _mediator.Send(new JoinGetOrCreateSessionCommand(sessionId), Context.ConnectionAborted);
 
         // Now attach this connection to the SignalR group
-        await Groups.AddToGroupAsync(Context.ConnectionId, $"sess:{session.GroupId}");
 
         // Optionally tell the caller what happened
         //await Clients.Caller.SendAsync("SessionJoined", new { id = session.GroupId });
@@ -51,14 +52,20 @@ public class SessionHub : Hub
         await Clients.Caller.SendAsync("SessionJoined", new { id = "ACITIVE" });
         return await _mediator.Send(new GetActiveSessionsQuery());
     }
-    public async Task LeaveSession(string sessionId)
-    {
-        await _mediator.Send(new LeaveSessionCommand(sessionId), Context.ConnectionAborted);
-        await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"sess:{sessionId}");
-    }
+    //public async Task LeaveSession(string sessionId)
+    //{
+    //    await _mediator.Send(new LeaveSessionCommand(sessionId), Context.ConnectionAborted);
+    //    await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"sess:{sessionId}");
+    //}
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        await _mediator.Send(new LeaveAllUserSessionsCommand());
+        if (Context.Items.TryGetValue("SessionId", out var value) &&
+            value is string sessionId &&
+            !string.IsNullOrWhiteSpace(sessionId))
+        {
+            await _mediator.Send(new LeaveSessionCommand(sessionId));
+        }
+
         await base.OnDisconnectedAsync(exception);
     }
     //// Optional WS write path (instead of HTTP PUT)
