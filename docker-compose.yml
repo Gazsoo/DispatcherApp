@@ -1,0 +1,28 @@
+
+services:
+  webapp:
+    build: .
+    ports:
+      - "8080:19955"  # Access app at localhost:8080
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=19955
+      - ASPNETCORE_URLS=http://+:19955
+      - ASPNETCORE_HTTPS_PORTS=
+      - ConnectionStrings__DispatcherDb=Server=db;Database=MyDb;User Id=sa;Password=YourStrong!Password;TrustServerCertificate=True;
+    depends_on:
+      - db
+
+  # SQL Server
+  db:
+    image: mcr.microsoft.com/mssql/server:2025-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=YourStrong!Password
+    ports:
+      - "1434:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+
+volumes:
+  sql_data:
