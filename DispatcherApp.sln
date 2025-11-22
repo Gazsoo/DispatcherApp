@@ -45,7 +45,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project It
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
 		Dockerfile = Dockerfile
-		.github\workflows\main_dispatcherapp.yml = .github\workflows\main_dispatcherapp.yml
 	EndProjectSection
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "frontend-app", "src\frontend-app\frontend-app.esproj", "{6CADF96A-EC26-3B15-F2FF-B5891A230EA6}"
