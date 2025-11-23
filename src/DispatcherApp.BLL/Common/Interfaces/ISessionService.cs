@@ -9,6 +9,7 @@ namespace DispatcherApp.BLL.Common.Interfaces;
 public interface ISessionService
 {
     Task SendOutSessionsAcitvityAsync(CancellationToken ct = default);
+    Task<SessionResponse> CreateSessionAsync(int AssignmentId , string userId, CancellationToken ct = default);
     Task<SessionResponse> UpdateSessionStatusAsync(string sessionId,DispatcherSessionStatus status,CancellationToken ct = default);
     Task<SessionResponse> JoinOrCreateAsync(string sessionId, string currentUserId, CancellationToken ct = default);
     Task LeaveSessionAsync(string sessionId, string currentUserId, CancellationToken ct = default);

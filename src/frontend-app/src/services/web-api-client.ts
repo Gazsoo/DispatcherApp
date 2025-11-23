@@ -1418,6 +1418,58 @@ export class Client extends ApiClientBase {
         return Promise.resolve<SessionResponse[]>(null as any);
     }
 
+    session_CreateSession(assignmentId?: number | undefined, signal?: AbortSignal): Promise<SessionResponse> {
+        let url_ = this.baseUrl + "/api/Session?";
+        if (assignmentId === null)
+            throw new globalThis.Error("The parameter 'assignmentId' cannot be null.");
+        else if (assignmentId !== undefined)
+            url_ += "assignmentId=" + encodeURIComponent("" + assignmentId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "POST",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processSession_CreateSession(_response));
+        });
+    }
+
+    protected processSession_CreateSession(response: AxiosResponse): Promise<SessionResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<SessionResponse>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<SessionResponse>(null as any);
+    }
+
     session_GetActive(signal?: AbortSignal): Promise<SessionResponse[]> {
         let url_ = this.baseUrl + "/api/Session/active";
         url_ = url_.replace(/[?&]$/, "");
@@ -1595,6 +1647,57 @@ export class Client extends ApiClientBase {
     }
 
     protected processSession_UpdateStatus(response: AxiosResponse): Promise<SessionResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<SessionResponse>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<SessionResponse>(null as any);
+    }
+
+    session_Join(id: string, signal?: AbortSignal): Promise<SessionResponse> {
+        let url_ = this.baseUrl + "/api/Session/{id}/join";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processSession_Join(_response));
+        });
+    }
+
+    protected processSession_Join(response: AxiosResponse): Promise<SessionResponse> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {

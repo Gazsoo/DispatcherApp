@@ -1,16 +1,17 @@
-import { Link } from "react-router-dom";
+import { Link, Session, useNavigate } from "react-router-dom";
 import { Button, Card } from "../../ui";
 import { useApiCall } from "../../hooks/useApiClient";
 import { apiClient } from "../../../api/client";
 import { useEffect, useState } from "react";
 import { LoadingSpinner } from "../../ui/LoadingSpinner";
 import { ErrorDisplay } from "../../ui/ErrorDisplay";
-import { AssignmentResponse } from "../../../services/web-api-client";
+import { AssignmentResponse, SessionResponse } from "../../../services/web-api-client";
 
 const Assignments = () => {
     const { execute, isLoading, error } = useApiCall<AssignmentResponse[]>();
+    const { execute: executeJoin, isLoading: isJoining, error: joinError } = useApiCall<SessionResponse>();
     const [assignments, setAssignments] = useState<AssignmentResponse[]>([]);
-
+    const navigate = useNavigate();
     useEffect(() => {
         const fetchAssignments = async () => {
             const result = await execute(() => apiClient.assignment_GetAssignments());
@@ -31,7 +32,14 @@ const Assignments = () => {
             return '—';
         }
     };
-
+    const createSession = async (a: number | undefined): Promise<void> => {
+        if (!a) return;
+        const result = await executeJoin(() => apiClient.session_CreateSession(a));
+        console.log(result);
+        if (result?.groupId) {
+            navigate(`/dashboard/sessions/${result.groupId}`);
+        }
+    }
     if (isLoading) return <LoadingSpinner />;
     if (error) return <ErrorDisplay error={error} />;
 
@@ -50,6 +58,8 @@ const Assignments = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {assignments.map((a) => {
                         const names = (a.assignees ?? []).map(u => u.userName || u.email || 'Unknown').join(', ');
+
+
                         return (
                             <Card key={a.id} className="hover:shadow-lg transition-shadow cursor-pointer h-full">
                                 <div className="flex flex-col h-full justify-between">
@@ -76,7 +86,8 @@ const Assignments = () => {
 
                                     </div>
                                     <div className="pt-3">
-                                        <Button type="button" variant="secondary" className="w-full">Start Session</Button>
+
+                                        <Button type="button" onClick={_ => createSession(a.id)} variant="secondary" className="w-full">Start Session</Button>
                                     </div>
                                 </div>
                             </Card>

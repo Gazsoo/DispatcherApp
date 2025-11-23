@@ -1,4 +1,6 @@
 ﻿using DispatcherApp.BLL.Sessions.Commands;
+using DispatcherApp.BLL.Sessions.Commands.CreateSessionFromAssignment;
+using DispatcherApp.BLL.Sessions.Commands.GetOrCreateSessionCommand;
 using DispatcherApp.BLL.Sessions.Commands.UpdateSession;
 using DispatcherApp.BLL.Sessions.Commands.UpdateSessionState;
 using DispatcherApp.BLL.Sessions.Queries;
@@ -45,15 +47,18 @@ public class SessionController (IMediator mediator) : ControllerBase
     {
         return Ok(await _mediator.Send(new UpdateSessionStateCommand(id, status)));
     }
-    // POST api/<SessionController>
-    //[HttpPost]
-    //public void Post([FromBody] SessionCreateRequest request)
-    //{
-    //    return await _mediator.Send(new CreateSessionCommand
-    //    {
+    //POST api/<SessionController>
+    [HttpGet("{id}/join")]
+    public async Task<ActionResult<SessionResponse>> Join(string id)
+    {
+        return await _mediator.Send(new JoinGetOrCreateSessionCommand(id));
+    }
 
-    //    });
-    //}
+    [HttpPost]
+    public async Task<ActionResult<SessionResponse>> CreateSession(int assignmentId)
+    {
+        return await _mediator.Send(new CreateSessionFromAssignmentCommand(assignmentId));
+    }
 
     // PUT api/<SessionController>/5
     [HttpPut("{sessionId}")]

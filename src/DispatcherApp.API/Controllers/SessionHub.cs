@@ -1,5 +1,5 @@
 ﻿using DispatcherApp.BLL.Sessions.Commands;
-using DispatcherApp.BLL.Sessions.Commands.CreateSession;
+using DispatcherApp.BLL.Sessions.Commands.GetOrCreateSessionCommand;
 using DispatcherApp.BLL.Sessions.Commands.LeaveAllUserSessions;
 using DispatcherApp.BLL.Sessions.Commands.LeaveSession;
 using DispatcherApp.BLL.Sessions.Commands.UpdateSession;

@@ -111,6 +111,25 @@ public class SessionService (
             },
             ct);
     }
+    public async Task<SessionResponse> CreateSessionAsync(int assignmentId, string userId, CancellationToken ct = default)
+    {
+
+        var session = new DispatcherSession
+        {
+            GroupId = Guid.NewGuid().ToString(),
+            OwnerId = userId,
+            AssignmentId = null,
+            Status = DispatcherApp.Common.Constants.DispatcherSessionStatus.Started,
+            StartTime = _timeProvider.GetUtcNow(),
+            Participants = new List<SessionParticipant>(),
+            UpdatedAt = _timeProvider.GetUtcNow(),
+            Version = 1
+        };
+        await _sessionRepo.AddAsync(session, ct);
+        await _sessionRepo.SaveChangesAsync(ct);
+
+        return _mapper.Map<SessionResponse>(session);
+    }
     public async Task<DispatcherSession> GetOrCreate(string sessionId, string ownerUserId, CancellationToken ct = default)
     {
         if (await _sessionRepo.GetBySessionIdAsync(sessionId, ct) is DispatcherSession existingSession)
@@ -244,4 +263,6 @@ public class SessionService (
 
         return latest.Status != attempted.Status;
     }
+
+
 }
