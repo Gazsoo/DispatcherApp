@@ -2,10 +2,10 @@
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
 using DispatcherApp.API.Configurations;
+using DispatcherApp.API.Extentions;
 using DispatcherApp.API.Midleware;
 using DispatcherApp.API.Services;
 using DispatcherApp.BLL.Common.Configurations;
-using DispatcherApp.BLL.Common.Extentions;
 using DispatcherApp.BLL.Common.Interfaces;
 using DispatcherApp.Common.Abstractions;
 using Microsoft.AspNetCore.Mvc;

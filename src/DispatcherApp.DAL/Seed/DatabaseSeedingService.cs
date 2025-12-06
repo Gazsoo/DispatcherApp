@@ -27,7 +27,6 @@ public static class RoleSeederExtention
 
         await initialiser.InitialiseAsync();
         await initialiser.SeedAsync();
-        await Task.CompletedTask;
         return serviceProvider;
     }
 }

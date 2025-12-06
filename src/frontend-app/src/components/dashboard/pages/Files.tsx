@@ -4,7 +4,7 @@ import { LoadingSpinner } from "../../ui/LoadingSpinner";
 import { Button } from "../../ui";
 import { useFiles } from "../../hooks/useFiles";
 
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { useApiMutation } from "../../hooks/useApiClient";
 import type { FileParameter, FileUploadResponse } from "../../../services/web-api-client";
 import { apiClient } from "../../../api/client";
@@ -15,6 +15,11 @@ export default function Files() {
     const { mutate, reset } = useApiMutation<FileParameter, FileUploadResponse>((input) => apiClient.files_PostFile(input));
     const { files, isLoading, error, refetch } = useFiles();
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Refetch files when navigating back to this page
+    useEffect(() => {
+        refetch();
+    }, []);
 
     if (isLoading) return <LoadingSpinner />;
     if (error) return <ErrorDisplay error={error} />;
@@ -103,8 +108,8 @@ export default function Files() {
                                     onClick={(e) => handleDownload(e, file.id, file.fileName)}
                                     aria-label={`Download ${file.fileName}`}
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v6a1 1 0 11-2 0V5H5v10h4a1 1 0 110 2H4a1 1 0 01-1-1V3zm9.293 6.293a1 1 0 011.414 1.414L11 15.414V9a1 1 0 112 0v6.414l2.707-4.707a1 1 0 111.586 1.172l-4 7a1 1 0 01-1.686 0l-4-7a1 1 0 011.586-1.172L12.293 9.293z" clipRule="evenodd" />
+                                    <svg className="w-6 h-6 text-gray-800 dark:text-gray-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 14">
+                                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 1v12m0 0 4-4m-4 4L1 9" />
                                     </svg>
                                 </button>
                             </div>

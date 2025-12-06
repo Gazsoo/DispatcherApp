@@ -1,6 +1,7 @@
 import { Card } from "../../ui";
 import { Link } from "react-router-dom";
 import { useActivityHub } from "../../hooks/useActivityHub";
+import LogBlock from "../components/LogBlock";
 
 export default function Sessions() {
 
@@ -53,13 +54,7 @@ export default function Sessions() {
                 })}
             </div>
 
-            <div>
-                <label className="block text-sm font-medium mb-1">Log</label>
-                <textarea
-                    readOnly
-                    value={log.join("\n")}
-                    className="w-full h-48 border rounded p-2 font-mono text-xs" />
-            </div>
+            <LogBlock log={log} />
         </div>
     );
 }

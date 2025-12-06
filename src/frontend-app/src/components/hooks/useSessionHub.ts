@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as signalR from '@microsoft/signalr';
 import { JWTManager } from '../../auth/jwt/jwt-manager';
+import { DispatcherSessionStatus, ParticipantDto, SessionResponse } from '../../services/web-api-client';
+import { Session } from 'react-router-dom';
 
 
 
 export function useSessionHub(groupId: string | undefined, hubUrl?: string) {
     const [isConnected, setIsConnected] = useState(false);
+    const [sessionStatus, setSessionStatus] = useState<DispatcherSessionStatus>();
+    const [sessionParticipants, setSessionParticipants] = useState<ParticipantDto[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [log, setLog] = useState<string[]>([]);
 
@@ -57,7 +61,12 @@ export function useSessionHub(groupId: string | undefined, hubUrl?: string) {
                     }
                 });
 
-
+                conn.on('SessionUpdated', (msg: SessionResponse) => {
+                    append(`[session:${groupId}] SessionUpdated: ${JSON.stringify(msg)}`);
+                    if (!isMounted) return;
+                    setSessionParticipants(msg.participants ?? []);
+                    setSessionStatus(msg.status);
+                });
                 try {
                     await conn.start();
                     if (!isMounted) return;
@@ -91,5 +100,5 @@ export function useSessionHub(groupId: string | undefined, hubUrl?: string) {
         };
     }, [groupId, hubUrl, effectiveToken, append]);
 
-    return { connection, isConnected, error, log } as const;
+    return { connection, isConnected, error, log, sessionStatus, sessionParticipants } as const;
 }

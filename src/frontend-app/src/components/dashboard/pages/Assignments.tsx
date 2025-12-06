@@ -1,15 +1,19 @@
 import { Link, Session, useNavigate } from "react-router-dom";
-import { Button, Card } from "../../ui";
-import { useApiCall } from "../../hooks/useApiClient";
+import { Button, Card, Select } from "../../ui";
+import { useApiCall, useApiMutation } from "../../hooks/useApiClient";
 import { apiClient } from "../../../api/client";
 import { useEffect, useState } from "react";
 import { LoadingSpinner } from "../../ui/LoadingSpinner";
 import { ErrorDisplay } from "../../ui/ErrorDisplay";
-import { AssignmentResponse, SessionResponse } from "../../../services/web-api-client";
+import { AssignmentResponse, AssignmentStatus, AssignmentStatusUpdateRequest, AssignmentWithUsersResponse, SessionResponse } from "../../../services/web-api-client";
 
 const Assignments = () => {
     const { execute, isLoading, error } = useApiCall<AssignmentResponse[]>();
     const { execute: executeJoin, isLoading: isJoining, error: joinError } = useApiCall<SessionResponse>();
+    const { mutate: changeState, isLoading: isChangingState, error: stateError } = useApiMutation(
+        (x: { id: number, status: AssignmentStatusUpdateRequest }) =>
+            apiClient.assignment_UpdateAssignmentStatus(x.id, x.status)
+    );
     const [assignments, setAssignments] = useState<AssignmentResponse[]>([]);
     const navigate = useNavigate();
     useEffect(() => {
@@ -38,6 +42,20 @@ const Assignments = () => {
         console.log(result);
         if (result?.groupId) {
             navigate(`/dashboard/sessions/${result.groupId}`);
+        }
+    }
+    const onSelectState = async (e: React.ChangeEvent<HTMLSelectElement>, assignmentId: number | undefined) => {
+        const newState = e.target.value as AssignmentStatus;
+        if (assignmentId !== undefined) {
+            assignments.forEach((assignment) => {
+                if (assignment.id === assignmentId) {
+                    assignment.status = newState;
+                }
+            });
+            setAssignments([...assignments]);
+            await changeState({ id: assignmentId, status: { status: newState } });
+
+
         }
     }
     if (isLoading) return <LoadingSpinner />;
@@ -72,6 +90,10 @@ const Assignments = () => {
                                         <p className="text-gray-700 dark:text-gray-300 text-sm line-clamp-3 mb-2">
                                             {a.description || 'No description'}
                                         </p>
+                                        <p className="text-gray-700 dark:text-gray-300 text-sm line-clamp-3 mb-2">
+                                            {"Status: " + a.status || 'No status'}
+                                        </p>
+
                                         <div className="text-sm text-gray-700 dark:text-gray-300 truncate mb-1">
                                             <span className="font-medium">Assignees:</span> {names || '—'}
                                         </div>
@@ -89,6 +111,15 @@ const Assignments = () => {
 
                                         <Button type="button" onClick={_ => createSession(a.id)} variant="secondary" className="w-full">Start Session</Button>
                                     </div>
+                                    <p className="text-gray-700 dark:text-gray-300 text-sm line-clamp-3 mb-2 mt-2">
+                                        {"Set Status: "}
+                                    </p>
+                                    <Select value={a.status} onChange={e => onSelectState(e, a.id)}>
+                                        <option value="Pending" selected={a.status === 'Pending'}>Pending</option>
+                                        <option value="Cancelled" selected={a.status === 'Cancelled'}>Cancelled</option>
+                                        <option value="InProgress" selected={a.status === 'InProgress'}>In Progress</option>
+                                        <option value="Completed" selected={a.status === 'Completed'}>Completed</option>
+                                    </Select>
                                 </div>
                             </Card>
                         );

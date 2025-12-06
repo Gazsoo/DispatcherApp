@@ -13,8 +13,7 @@ export abstract class ApiClientBase {
         processor: (response: AxiosResponse) => Promise<any>
     ): Promise<any> {
         void url;
-        // Only stringify JSON responses. Do NOT stringify binary responses (Blob) because
-        // that corrupts the data (e.g. file downloads which use responseType: 'blob').
+        // Only stringify JSON responses. Do NOT stringify binary responses
         try {
             const contentType = response && response.headers ? response.headers['content-type'] : undefined;
             const isJson = typeof contentType === 'string' && contentType.indexOf('application/json') !== -1;
@@ -25,9 +24,6 @@ export abstract class ApiClientBase {
                 response.data = JSON.stringify(response.data);
             }
         } catch (e) {
-            // If anything goes wrong here, fall back to letting the processor handle the response.
-            // Avoid throwing from transformResult because we don't want to break all API calls.
-            // eslint-disable-next-line no-console
             console.warn('transformResult: failed to normalize response data', e);
         }
 

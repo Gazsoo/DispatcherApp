@@ -5,3 +5,5 @@ export { InfoField } from './InfoField';
 export { Select } from './Select';
 export { TextArea } from './TextArea';
 export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from './Table';
+export { DetailsCard } from './DetailsCard';
+export type { DetailItem } from './DetailsCard';
