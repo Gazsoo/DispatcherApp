@@ -19,6 +19,7 @@ public class DispatcherSession : IVersionedEntity
     public DateTimeOffset StartTime { get; set; }
     public DateTimeOffset? EndTime { get; set; }
     public int? AssignmentId { get; set; }
+    public File? LogFile { get; set; }
     public Assignment Assignment { get; set; } = null!;
     public DispatcherSessionType Type { get; set; }
     public DispatcherSessionStatus Status { get; set; }

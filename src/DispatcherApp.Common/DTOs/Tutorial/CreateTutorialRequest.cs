@@ -8,5 +8,6 @@ public class CreateTutorialRequest
     public string? Description { get; set; }
     public List<int> CategoryIds { get; set; } = new();
     public string CreatedById { get; set; } = string.Empty;
+    public int? PictureId { get; set; }
     public List<int> FilesId { get; set; } = new();
 }

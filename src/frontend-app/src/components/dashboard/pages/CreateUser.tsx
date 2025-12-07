@@ -116,7 +116,7 @@ export default function CreateUser() {
 
                     {isSuccess && !error && (
                         <div className="rounded-md bg-green-50 p-3 text-sm text-green-700">
-                            User created successfully. Share the temporary password so they can sign in and update their profile.
+                            User created successfully. Share the password so they can sign in and update their profile.
                         </div>
                     )}
 

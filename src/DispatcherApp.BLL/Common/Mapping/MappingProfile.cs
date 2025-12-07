@@ -46,5 +46,6 @@ public class MappingProfile : Profile
             .ForMember(
                 x => x.Participants,
                 i => i.MapFrom(src => src.Participants ?? Enumerable.Empty<SessionParticipant>()));
+
     }
 }

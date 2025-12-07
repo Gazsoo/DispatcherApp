@@ -6,8 +6,13 @@ import { useEffect, useState } from "react";
 import { LoadingSpinner } from "../../ui/LoadingSpinner";
 import { ErrorDisplay } from "../../ui/ErrorDisplay";
 import { AssignmentResponse, AssignmentStatus, AssignmentStatusUpdateRequest, AssignmentWithUsersResponse, SessionResponse } from "../../../services/web-api-client";
+import { formatDateTime } from "../../utils/timeHelper";
+import AssignmnetStatusSelect from "../components/SessionStatusSelect";
+import { useUser } from "../../context/userContext";
 
 const Assignments = () => {
+    const { user } = useUser();
+    const canCreateAssignments = user?.role?.includes("Administrator") || user?.role?.includes("Dispatcher");
     const { execute, isLoading, error } = useApiCall<AssignmentResponse[]>();
     const { execute: executeJoin, isLoading: isJoining, error: joinError } = useApiCall<SessionResponse>();
     const { mutate: changeState, isLoading: isChangingState, error: stateError } = useApiMutation(
@@ -24,26 +29,8 @@ const Assignments = () => {
             }
         };
         fetchAssignments();
-    }, [execute]);
+    }, []);
 
-    const formatDateTime = (value?: Date) => {
-        if (!value) return '—';
-        try {
-            const d = value instanceof Date ? value : new Date(value);
-            if (isNaN(d.getTime())) return '—';
-            return d.toLocaleString();
-        } catch {
-            return '—';
-        }
-    };
-    const createSession = async (a: number | undefined): Promise<void> => {
-        if (!a) return;
-        const result = await executeJoin(() => apiClient.session_CreateSession(a));
-        console.log(result);
-        if (result?.groupId) {
-            navigate(`/dashboard/sessions/${result.groupId}`);
-        }
-    }
     const onSelectState = async (e: React.ChangeEvent<HTMLSelectElement>, assignmentId: number | undefined) => {
         const newState = e.target.value as AssignmentStatus;
         if (assignmentId !== undefined) {
@@ -54,10 +41,18 @@ const Assignments = () => {
             });
             setAssignments([...assignments]);
             await changeState({ id: assignmentId, status: { status: newState } });
-
-
         }
     }
+
+    const createSession = async (a: number | undefined): Promise<void> => {
+        if (!a) return;
+        const result = await executeJoin(() => apiClient.session_CreateSession(a));
+        console.log(result);
+        if (result?.groupId) {
+            navigate(`/dashboard/sessions/${result.groupId}`);
+        }
+    }
+
     if (isLoading) return <LoadingSpinner />;
     if (error) return <ErrorDisplay error={error} />;
 
@@ -65,9 +60,10 @@ const Assignments = () => {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold">Assignments</h1>
-                <Link to="/dashboard/assignments/create">
-                    <Button variant="primary">Create Assignment</Button>
-                </Link>
+                {canCreateAssignments && (
+                    <Link to="/dashboard/assignments/create">
+                        <Button variant="primary">Create Assignment</Button>
+                    </Link>)}
             </div>
 
             {assignments.length === 0 ? (
@@ -109,17 +105,9 @@ const Assignments = () => {
                                     </div>
                                     <div className="pt-3">
 
-                                        <Button type="button" onClick={_ => createSession(a.id)} variant="secondary" className="w-full">Start Session</Button>
+                                        <Button type="button" onClick={_ => createSession(a.id)} variant="secondary" className="w-full mb-4">Start Session</Button>
                                     </div>
-                                    <p className="text-gray-700 dark:text-gray-300 text-sm line-clamp-3 mb-2 mt-2">
-                                        {"Set Status: "}
-                                    </p>
-                                    <Select value={a.status} onChange={e => onSelectState(e, a.id)}>
-                                        <option value="Pending" selected={a.status === 'Pending'}>Pending</option>
-                                        <option value="Cancelled" selected={a.status === 'Cancelled'}>Cancelled</option>
-                                        <option value="InProgress" selected={a.status === 'InProgress'}>In Progress</option>
-                                        <option value="Completed" selected={a.status === 'Completed'}>Completed</option>
-                                    </Select>
+                                    <AssignmnetStatusSelect assignment={a} onSelectState={onSelectState}></AssignmnetStatusSelect>
                                 </div>
                             </Card>
                         );

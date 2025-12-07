@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 public enum AssignmentStatus
 {
-    Pending,
-    InProgress,
-    Completed,
-    Cancelled
+    Pending = 0,
+    InProgress = 1,
+    Completed = 2,
+    Cancelled = 3
 }
 namespace DispatcherApp.Common.Entities
 {

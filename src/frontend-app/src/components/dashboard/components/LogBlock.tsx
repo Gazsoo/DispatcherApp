@@ -1,6 +1,3 @@
-
-
-
 const LogBlock = ({ log }: { log: string[] }) => {
     return (<div>
         <label className="block text-sm font-medium mb-1">Log</label>

@@ -14,7 +14,7 @@ public interface ISessionService
     Task<SessionResponse> JoinOrCreateAsync(string sessionId, string currentUserId, CancellationToken ct = default);
     Task LeaveSessionAsync(string sessionId, string currentUserId, CancellationToken ct = default);
     Task LeaveAllUserSessionsAsync(string currentUserId, CancellationToken ct = default);
-    Task<SessionResponse> GetSessionDataAsync(int sessionId, CancellationToken ct = default);
+    Task<SessionResponse> GetSessionDataAsync(string sessionId, CancellationToken ct = default);
     Task<IEnumerable<SessionResponse>> ListSessionsAsync(CancellationToken ct);
     Task<IEnumerable<SessionResponse>> ListActiveSessionsAsync(CancellationToken ct);
     Task<SessionResponse> UpdateSessionDataAsync(UpdateSessionCommand command,

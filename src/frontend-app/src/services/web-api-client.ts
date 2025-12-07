@@ -1518,7 +1518,7 @@ export class Client extends ApiClientBase {
         return Promise.resolve<SessionResponse[]>(null as any);
     }
 
-    session_Get(id: number, signal?: AbortSignal): Promise<SessionResponse> {
+    session_Get(id: string, signal?: AbortSignal): Promise<SessionResponse> {
         let url_ = this.baseUrl + "/api/Session/{id}";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
@@ -1719,6 +1719,66 @@ export class Client extends ApiClientBase {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<SessionResponse>(null as any);
+    }
+
+    session_Leave(id: string, logFileId?: number | undefined, signal?: AbortSignal): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/api/Session/{id}/leave?";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (logFileId === null)
+            throw new globalThis.Error("The parameter 'logFileId' cannot be null.");
+        else if (logFileId !== undefined)
+            url_ += "logFileId=" + encodeURIComponent("" + logFileId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            responseType: "blob",
+            method: "POST",
+            url: url_,
+            headers: {
+                "Accept": "application/octet-stream"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processSession_Leave(_response));
+        });
+    }
+
+    protected processSession_Leave(response: AxiosResponse): Promise<FileResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers["content-disposition"] : undefined;
+            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
+            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
+            if (fileName) {
+                fileName = decodeURIComponent(fileName);
+            } else {
+                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            }
+            return Promise.resolve({ fileName: fileName, status: status, data: new Blob([response.data], { type: response.headers["content-type"] }), headers: _headers });
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<FileResponse>(null as any);
     }
 
     session_UpdateSession(req: UpdateSessionRequest, sessionId: string, id?: string | undefined, signal?: AbortSignal): Promise<FileResponse> {
@@ -2356,6 +2416,7 @@ export interface AssignmentWithUsersResponse {
     name?: string;
     description?: string | undefined;
     type?: string | undefined;
+    status?: AssignmentStatus;
     value?: string | undefined;
     assignees?: UserResponse[];
 }
@@ -2476,8 +2537,10 @@ export interface DeleteFilesCommand {
 export interface SessionResponse {
     groupId?: string;
     assignmentId?: number;
+    logFile?: FileMetadataResponse | undefined;
     ownerId?: string;
     status?: DispatcherSessionStatus;
+    endTime?: Date;
     participants?: ParticipantDto[];
     userId?: string;
 }
@@ -2510,6 +2573,7 @@ export interface TutorialResponse {
     createdAt?: Date | undefined;
     updatedAt?: Date | undefined;
     contentType?: string | undefined;
+    picture?: FileResponse | undefined;
     files?: FileResponse[];
 }
 
@@ -2535,6 +2599,7 @@ export interface CreateTutorialRequest {
     description?: string | undefined;
     categoryIds?: number[];
     createdById?: string;
+    pictureId?: number | undefined;
     filesId?: number[];
 }
 

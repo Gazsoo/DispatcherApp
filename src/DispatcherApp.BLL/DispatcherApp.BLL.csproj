@@ -23,6 +23,7 @@
   <ItemGroup>
     <Folder Include="Assignments\" />
     <Folder Include="Assignments\Commands\CreateAssignment\" />
+    <Folder Include="Sessions\Commands\NewFolder\" />
     <Folder Include="Tutorials\" />
   </ItemGroup>
 

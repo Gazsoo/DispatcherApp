@@ -1,15 +1,18 @@
 import { Card } from "../../ui";
 import { Link } from "react-router-dom";
-import { useActivityHub } from "../../hooks/useActivityHub";
-import LogBlock from "../components/LogBlock";
+import { useSessionsLog } from "../../hooks/useSessions";
+import { LoadingSpinner } from "../../ui/LoadingSpinner";
+import { ErrorDisplay } from "../../ui/ErrorDisplay";
 
-export default function Sessions() {
+export default function SessionLog() {
 
-    const { sessions, log } = useActivityHub({ hubUrl: "/ws/sessions" });
+    const { sessions, isLoading, error } = useSessionsLog();
 
+    if (isLoading) return <LoadingSpinner />;
+    if (error) return <ErrorDisplay error={error} />;
     return (
         <div className="space-y-4 p-4 text-gray-800 dark:text-gray-100">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Activity (shared)</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Sessions</h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {sessions.length === 0 && (
@@ -20,7 +23,7 @@ export default function Sessions() {
                     return (
                         <Link
                             key={s.groupId}
-                            to={`/dashboard/sessions/${s.groupId}`}
+                            to={`/dashboard/sessionlog/${s.groupId}`}
                             role="button"
                             tabIndex={s.participants?.length || 0}
                             className="cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent rounded-xl"
@@ -44,21 +47,12 @@ export default function Sessions() {
 
                                 <div className="mt-2 text-sm text-gray-700 dark:text-gray-300 space-y-1">
                                     <div><span className="font-semibold">Assignment ID:</span> {s.assignmentId ?? '—'}</div>
-                                    {/* <div><span className="font-semibold">Owner:</span> {s.ownerId ?? '—'}</div> */}
-                                    <div>
-                                        <div
-                                            className="font-semibold">Participants:
-                                        </div>
-                                        {s.participants?.map(p => { return (<div><div>{p.name}</div></div>) })}
-                                    </div>
                                 </div>
                             </Card>
                         </Link>
                     );
                 })}
             </div>
-
-            <LogBlock log={log} />
         </div>
     );
 }

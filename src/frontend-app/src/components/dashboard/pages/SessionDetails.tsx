@@ -1,18 +1,38 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSessionHub } from "../../hooks/useSessionHub";
 import { Button, Card, DetailsCard } from "../../ui";
 import { useUser } from "../../context/userContext";
 import { useSessions } from "../../hooks/useSessions";
 import LogBlock from "../components/LogBlock";
+import { useApiCall, useApiMutation } from "../../hooks/useApiClient";
+import { apiClient } from "../../../api/client";
+import AssignmnetStatusSelect from "../components/SessionStatusSelect";
+import { AssignmentResponse, AssignmentStatus, AssignmentStatusUpdateRequest, SessionResponse } from "../../../services/web-api-client";
+import { useAssignment } from "../../hooks/useAssignment";
 
 const SessionDetails = () => {
     const { sessionId } = useParams();
     const { user } = useUser();
     const { sessions } = useSessions();
+    const { error: closeError, execute: closeSession, isLoading: isClosing } = useApiCall();
     const { connection, isConnected, error, log,
-        sessionStatus, sessionParticipants } = useSessionHub(sessionId, "/ws/sessions");
-
+        sessionStatus, sessionParticipants, sessionData } = useSessionHub(sessionId, "/ws/sessions");
+    const { assignment, setAssignment } = useAssignment(sessionData?.assignmentId);
+    const { mutate: changeState, isLoading: isChangingState, error: stateError } = useApiMutation(
+        (x: { id: number, status: AssignmentStatusUpdateRequest }) =>
+            apiClient.assignment_UpdateAssignmentStatus(x.id, x.status)
+    );
+    const onSelectState = async (e: React.ChangeEvent<HTMLSelectElement>, assignmentId: number | undefined) => {
+        const newState = e.target.value as AssignmentStatus;
+        if (assignmentId !== undefined) {
+            if (assignment) {
+                assignment.status = newState;
+                setAssignment({ ...assignment });
+            }
+            await changeState({ id: assignmentId, status: { status: newState } });
+        }
+    }
     const currentSession = useMemo(
         () => sessions.find((s) => s.groupId === sessionId),
         [sessions, sessionId]
@@ -34,16 +54,14 @@ const SessionDetails = () => {
                     <p className="text-sm text-gray-600">
                         Connection Status: <span className="font-medium">{isConnected ? "Connected" : "Disconnected"}</span>
                     </p>
-
                 </div>
-
-
             </div>
 
             {error && <Card className="p-4 text-red-600">Error: {error}</Card>}
 
             <DetailsCard
                 items={[
+                    { label: "Assignment ID", value: sessionData?.assignmentId || 'Unknown' },
                     { label: "Session Status", value: sessionStatus || 'Unknown' },
                     {
                         label: "Session Participants",
@@ -52,7 +70,18 @@ const SessionDetails = () => {
                             : 'Unknown'
                     },
                 ]}
-            />
+
+            >
+                {canClose &&
+                    <Button variant="dangerSubtle" onClick={x => closeSession(
+                        () => apiClient.session_UpdateStatus(sessionId ?? "", "Finished"))}>
+                        Finish Session
+                    </Button>
+                }
+                {assignment && <AssignmnetStatusSelect assignment={assignment} onSelectState={onSelectState}></AssignmnetStatusSelect>}
+
+            </DetailsCard>
+
             <LogBlock log={log} />
         </div>
     );

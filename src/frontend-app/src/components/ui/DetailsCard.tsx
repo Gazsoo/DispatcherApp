@@ -13,12 +13,14 @@ interface DetailsCardProps {
         content: ReactNode;
     };
     className?: string;
+    children?: ReactNode;
 }
 
 export const DetailsCard = ({
     items,
     description,
     className = '',
+    children,
 }: DetailsCardProps) => {
     return (
         <Card className={`p-6 space-y-6 ${className}`}>
@@ -45,6 +47,8 @@ export const DetailsCard = ({
                     </p>
                 </div>
             )}
+            {/* Additional Children */}
+            {children}
         </Card>
     );
 };

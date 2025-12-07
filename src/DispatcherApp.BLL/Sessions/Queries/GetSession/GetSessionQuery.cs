@@ -3,4 +3,4 @@ using MediatR;
 
 namespace DispatcherApp.BLL.Sessions.Queries.GetSession;
 // Include properties to be used as input for the query
-public record GetSessionQuery(int SessionId) : IRequest<SessionResponse>;
+public record GetSessionQuery(string SessionId) : IRequest<SessionResponse>;

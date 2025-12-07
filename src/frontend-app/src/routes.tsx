@@ -21,6 +21,8 @@ import RequireRole from "./components/auth/RequireRole";
 import Unauthorized from "./components/auth/Unauthorized";
 import Sessions from "./components/dashboard/pages/Sessions";
 import SessionDetails from "./components/dashboard/pages/SessionDetails";
+import SessionLog from "./components/dashboard/pages/SessionLog.tsx";
+import SessionLogDetails from "./components/dashboard/pages/SessionLogDetails.tsx";
 
 // Layout component that wraps all routes
 function RootLayout() {
@@ -75,6 +77,8 @@ export const router = createBrowserRouter([
           { path: "sessions", element: <Sessions /> },
           { path: "sessions/:sessionId", element: <SessionDetails /> },
           // { path: "settings", element: <Settings /> },
+          { path: "sessionlog", element: <SessionLog /> },
+          { path: "sessionlog/:sessionLogId", element: <SessionLogDetails /> },
           { path: "administration", element: <RequireRole roles={["Administrator"]}><Administration /></RequireRole> },
           { path: "administration/create", element: <RequireRole roles={["Administrator"]}><CreateUser /></RequireRole> },
           { path: "administration/:userId", element: <RequireRole roles={["Administrator"]}><EditUser /></RequireRole> },

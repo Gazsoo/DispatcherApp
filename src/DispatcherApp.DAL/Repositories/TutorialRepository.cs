@@ -19,18 +19,18 @@ public class TutorialRepository : ITutorialRepository
 
     public async Task<Tutorial?> GetByIdAsync(int id, bool includeFiles = false, CancellationToken ct = default)
     {
-        var query = _context.Tutorials.AsQueryable();
+        var query = _context.Tutorials.AsQueryable().AsSplitQuery();
         if (includeFiles)
-            query = query.Include(t => t.Files);
+            query = query.Include(t => t.Files).Include(t => t.Picture);
 
         return await query.FirstOrDefaultAsync(t => t.Id == id, ct);
     }
 
     public async Task<List<Tutorial>> GetAllAsync(bool includeFiles = false, CancellationToken ct = default)
     {
-        var query = _context.Tutorials.AsQueryable();
+        var query = _context.Tutorials.AsQueryable().AsSplitQuery();
         if (includeFiles)
-            query = query.Include(t => t.Files);
+            query = query.Include(t => t.Files).Include(t => t.Picture);
 
         return await query.ToListAsync(ct);
     }
