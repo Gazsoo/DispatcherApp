@@ -108,6 +108,9 @@ namespace DispatcherApp.DAL.Migrations
                     b.Property<string>("GroupId")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("LogFileId")
+                        .HasColumnType("int");
+
                     b.Property<string>("OwnerId")
                         .HasColumnType("nvarchar(max)");
 
@@ -136,6 +139,8 @@ namespace DispatcherApp.DAL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AssignmentId");
+
+                    b.HasIndex("LogFileId");
 
                     b.ToTable("DispatcherSessions");
                 });
@@ -197,6 +202,8 @@ namespace DispatcherApp.DAL.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("SessionId", "UserId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("SessionParticipant");
                 });
@@ -473,7 +480,13 @@ namespace DispatcherApp.DAL.Migrations
                         .HasForeignKey("AssignmentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("DispatcherApp.Common.Entities.File", "LogFile")
+                        .WithMany()
+                        .HasForeignKey("LogFileId");
+
                     b.Navigation("Assignment");
+
+                    b.Navigation("LogFile");
                 });
 
             modelBuilder.Entity("DispatcherApp.Common.Entities.File", b =>
@@ -494,7 +507,15 @@ namespace DispatcherApp.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Session");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DispatcherApp.Common.Entities.Tutorial", b =>

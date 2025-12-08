@@ -11,13 +11,9 @@
     <EnableDefaultStaticWebAssets>false</EnableDefaultStaticWebAssets>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Extentions\**" />
     <Compile Remove="Interfaces\**" />
-    <Content Remove="Extentions\**" />
     <Content Remove="Interfaces\**" />
-    <EmbeddedResource Remove="Extentions\**" />
     <EmbeddedResource Remove="Interfaces\**" />
-    <None Remove="Extentions\**" />
     <None Remove="Interfaces\**" />
   </ItemGroup>
 

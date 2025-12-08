@@ -50,7 +50,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 options.ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
             });
             // Add Identity
-            builder.Services.AddIdentityCore<IdentityUser> (options =>
+            builder.Services.AddIdentityCore<IdentityUser>(options =>
             {
                 // Configure identity options
                 options.Password.RequireDigit = true;
@@ -68,7 +68,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
             builder.Services.AddScoped<DatabaseSeedingService>();
             //builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
-            builder.Services.AddScoped<IFileStorageService, AzureBlobStorageService>();
+            if (!builder.Environment.IsProduction()) builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
+            else builder.Services.AddScoped<IFileStorageService, AzureBlobStorageService>();
+
             builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
             builder.Services.AddScoped<IFileRepository, FileRepository>();
             builder.Services.AddScoped<ITutorialRepository, TutorialRepository>();
@@ -106,7 +108,8 @@ namespace Microsoft.Extensions.DependencyInjection
                     clientBuilder.AddEmailClient(emailEndpoint);
                     builder.Services.AddSingleton<IEmailSender, AzureEmailService>();
                     builder.Services.AddSingleton<IEmailSender<IdentityUser>, AzureEmailService>();
-                } else
+                }
+                else
                 {
                     builder.Services.AddSingleton<IEmailSender<IdentityUser>, DummyEmailSender>();
                     builder.Services.AddSingleton<IEmailSender, DummyEmailSender>();

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace DispatcherApp.Common.DTOs.Session;
-public record SessionCreateRequest ()
+public record CreateSessionRequest (int AssignmentId)
 {
+    
 }

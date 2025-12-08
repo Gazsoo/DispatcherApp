@@ -1,5 +1,5 @@
 ﻿using DispatcherApp.BLL.Sessions.Commands;
-using DispatcherApp.BLL.Sessions.Commands.CreateSession;
+using DispatcherApp.BLL.Sessions.Commands.GetOrCreateSessionCommand;
 using DispatcherApp.BLL.Sessions.Commands.LeaveAllUserSessions;
 using DispatcherApp.BLL.Sessions.Commands.LeaveSession;
 using DispatcherApp.BLL.Sessions.Commands.UpdateSession;
@@ -28,7 +28,7 @@ public class SessionHub : Hub
 
         return Task.FromResult($"{Context.User?.Identity?.Name} hte cudd");
     }
-    public Task<SessionResponse> GetSession(int sessionId)
+    public Task<SessionResponse> GetSession(string sessionId)
         => _mediator.Send(new GetSessionQuery(sessionId), Context.ConnectionAborted);
 
     public async Task JoinSession(string sessionId)

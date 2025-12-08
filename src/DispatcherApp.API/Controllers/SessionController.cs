@@ -1,4 +1,7 @@
 ﻿using DispatcherApp.BLL.Sessions.Commands;
+using DispatcherApp.BLL.Sessions.Commands.CreateSessionFromAssignment;
+using DispatcherApp.BLL.Sessions.Commands.GetOrCreateSessionCommand;
+using DispatcherApp.BLL.Sessions.Commands.LeaveSession;
 using DispatcherApp.BLL.Sessions.Commands.UpdateSession;
 using DispatcherApp.BLL.Sessions.Commands.UpdateSessionState;
 using DispatcherApp.BLL.Sessions.Queries;
@@ -36,7 +39,7 @@ public class SessionController (IMediator mediator) : ControllerBase
 
     // GET api/<SessionController>/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<SessionResponse>> Get(int id)
+    public async Task<ActionResult<SessionResponse>> Get(string id)
     {
         return Ok(await _mediator.Send(new GetSessionQuery(id)));
     }
@@ -45,15 +48,24 @@ public class SessionController (IMediator mediator) : ControllerBase
     {
         return Ok(await _mediator.Send(new UpdateSessionStateCommand(id, status)));
     }
-    // POST api/<SessionController>
-    //[HttpPost]
-    //public void Post([FromBody] SessionCreateRequest request)
-    //{
-    //    return await _mediator.Send(new CreateSessionCommand
-    //    {
+    //POST api/<SessionController>
+    [HttpGet("{id}/join")]
+    public async Task<ActionResult<SessionResponse>> Join(string id)
+    {
+        return await _mediator.Send(new JoinGetOrCreateSessionCommand(id));
+    }
 
-    //    });
-    //}
+    [HttpPost("{id}/leave")]
+    public async Task<ActionResult> Leave(string id, int logFileId)
+    {
+        await _mediator.Send(new LeaveSessionCommand(id, logFileId));
+        return Ok();
+    }
+    [HttpPost]
+    public async Task<ActionResult<SessionResponse>> CreateSession(int assignmentId)
+    {
+        return await _mediator.Send(new CreateSessionFromAssignmentCommand(assignmentId));
+    }
 
     // PUT api/<SessionController>/5
     [HttpPut("{sessionId}")]

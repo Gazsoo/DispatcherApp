@@ -44,6 +44,8 @@ export function useActivityHub(options: UseActivityHubOptions = {}) {
                 setSessions(msg.sessions || []);
             });
 
+
+
             conn.onclose((err) => {
                 setIsConnected(false);
                 if (err) setError(err.message);

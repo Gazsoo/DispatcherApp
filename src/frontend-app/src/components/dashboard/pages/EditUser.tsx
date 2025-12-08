@@ -5,7 +5,7 @@ import { ErrorDisplay } from "../../ui/ErrorDisplay";
 import { useUser } from "../../hooks/useUser";
 import { useState, useEffect } from "react";
 import { useApiMutation } from "../../hooks/useApiClient";
-import { AssignmentCreateRequest, UserInfoResponse } from "../../../services/web-api-client";
+import { UserInfoResponse } from "../../../services/web-api-client";
 import { apiClient } from "../../../api/client";
 
 export default function EditUser() {

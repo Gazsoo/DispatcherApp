@@ -34,7 +34,6 @@ export default function CreateAssignment() {
         fetchUsers();
     }, [loadUsers]);
 
-    // Keep state as-is; generate options from a single source of truth
     const STATUSES: ReadonlyArray<AssignmentStatus> = [
         "Pending",
         "InProgress",

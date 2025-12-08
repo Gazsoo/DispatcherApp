@@ -19,8 +19,5 @@ internal sealed class UpdateSessionStateCommandHandler(
 
         return session;
 
-
-        // Implement your logic here
-        //throw new NotImplementedException();
     }
 }

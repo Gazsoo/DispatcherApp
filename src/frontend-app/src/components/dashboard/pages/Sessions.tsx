@@ -1,6 +1,7 @@
 import { Card } from "../../ui";
 import { Link } from "react-router-dom";
 import { useActivityHub } from "../../hooks/useActivityHub";
+import LogBlock from "../components/LogBlock";
 
 export default function Sessions() {
 
@@ -10,7 +11,7 @@ export default function Sessions() {
         <div className="space-y-4 p-4 text-gray-800 dark:text-gray-100">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Activity (shared)</h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {sessions.length === 0 && (
                     <div className="text-sm text-gray-500">No sessions received yet.</div>
                 )}
@@ -28,7 +29,7 @@ export default function Sessions() {
                                 <div className="flex items-center justify-between gap-2">
                                     <div className="truncate">
                                         <div className="text-sm font-medium truncate">{s.groupId}</div>
-                                        <div className="text-xs text-gray-500 truncate">{s.assignmentId ?? '—'}</div>
+                                        {/* <div className="text-xs text-gray-500 truncate">{s.assignmentId ?? '—'}</div> */}
                                     </div>
 
                                     <div className="flex items-center gap-2">
@@ -42,10 +43,14 @@ export default function Sessions() {
                                 </div>
 
                                 <div className="mt-2 text-sm text-gray-700 dark:text-gray-300 space-y-1">
-                                    <div><span className="font-semibold">Assignment:</span> {s.assignmentId ?? '—'}</div>
-                                    <div><span className="font-semibold">Owner:</span> {s.ownerId ?? '—'}</div>
-                                    <div><span className="font-semibold">User:</span> {s.ownerId ?? '—'}</div>
-                                    <div><span className="font-semibold">Participants:</span> {Array.isArray(s.participants) ? s.participants.join(', ') || '—' : String(s.participants)}</div>
+                                    <div><span className="font-semibold">Assignment ID:</span> {s.assignmentId ?? '—'}</div>
+                                    {/* <div><span className="font-semibold">Owner:</span> {s.ownerId ?? '—'}</div> */}
+                                    <div>
+                                        <div
+                                            className="font-semibold">Participants:
+                                        </div>
+                                        {s.participants?.map(p => { return (<div><div>{p.name}</div></div>) })}
+                                    </div>
                                 </div>
                             </Card>
                         </Link>
@@ -53,13 +58,7 @@ export default function Sessions() {
                 })}
             </div>
 
-            <div>
-                <label className="block text-sm font-medium mb-1">Log</label>
-                <textarea
-                    readOnly
-                    value={log.join("\n")}
-                    className="w-full h-48 border rounded p-2 font-mono text-xs" />
-            </div>
+            <LogBlock log={log} />
         </div>
     );
 }

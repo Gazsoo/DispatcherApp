@@ -15,8 +15,6 @@ using DispatcherApp.BLL.Assignments.Commands.CreateAssignment;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace DispatcherApp.API.Controllers;
-[Authorize]
-[Authorize(Roles = "Dispatcher,Administrator")]
 [Route("api/[controller]")]
 [ApiController]
 public class AssignmentController(IMediator mediator) : ControllerBase
@@ -24,12 +22,14 @@ public class AssignmentController(IMediator mediator) : ControllerBase
     private readonly IMediator _mediator = mediator;
 
     [HttpGet]
+    [Authorize(Roles = "Dispatcher,Administrator,User")]
     public async Task<ActionResult<IEnumerable<AssignmentResponse>>> GetAssignments()
     {
         var result = await _mediator.Send(new GetAssignmentListQuery());
         return Ok(result);
     }
     [HttpGet("my")]
+    [Authorize(Roles = "Dispatcher,Administrator,User")]
     public async Task<ActionResult<IEnumerable<AssignmentResponse>>> GetMyAssignments()
     {
         var result = await _mediator.Send(new GetMyAssignmentsQuery());
@@ -37,6 +37,7 @@ public class AssignmentController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize(Roles = "Dispatcher,Administrator,User")]
     public async Task<ActionResult<AssignmentWithUsersResponse>> GetAssignment(int id)
     {
         var result = await _mediator.Send(new GetAssignmentQuery(id));
@@ -44,6 +45,7 @@ public class AssignmentController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Dispatcher,Administrator")]
     public async Task<ActionResult<AssignmentWithUsersResponse>> CreateAssignment([FromBody] AssignmentCreateRequest request)
     {
         var result = await _mediator.Send(new CreateAssignmentCommand(request));
@@ -51,6 +53,7 @@ public class AssignmentController(IMediator mediator) : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Dispatcher,Administrator")]
     public async Task<ActionResult<AssignmentWithUsersResponse>> UpdateAssignment(int id, [FromBody] AssignmentUpdateRequest request)
     {
         var result = await _mediator.Send(new UpdateAssignmentCommand(id, request));
@@ -65,6 +68,7 @@ public class AssignmentController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost("{id}/assignees")]
+    [Authorize(Roles = "Dispatcher,Administrator")]
     public async Task<ActionResult<AssignmentWithUsersResponse>> AddAssignees(int id, [FromBody] AssignmentAssigneesRequest request)
     {
         var result = await _mediator.Send(new AddAssignmentAssigneesCommand(id, request));
@@ -72,6 +76,7 @@ public class AssignmentController(IMediator mediator) : ControllerBase
     }
 
     [HttpDelete("{id}/assignees/{userId}")]
+    [Authorize(Roles = "Dispatcher,Administrator")]
     public async Task<ActionResult<AssignmentWithUsersResponse>> RemoveAssignee(int id, string userId)
     {
         var result = await _mediator.Send(new RemoveAssignmentAssigneeCommand(id, userId));
@@ -79,6 +84,7 @@ public class AssignmentController(IMediator mediator) : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Dispatcher,Administrator")]
     public async Task<IActionResult> DeleteAssignment(int id)
     {
         await _mediator.Send(new DeleteAssignmentCommand(id));

@@ -28,6 +28,7 @@ export default function Administrations() {
         return fullName || fallback || "Unknown user";
     };
 
+
     const onDeleteUser = async (userId: string, userName: string) => {
         const confirmed = window.confirm(`Delete ${userName}?`);
         if (!confirmed) return;

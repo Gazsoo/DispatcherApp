@@ -10,7 +10,8 @@ namespace DispatcherApp.Common.Abstractions.Repository;
 public interface ISessionRepository
 {
     Task<DispatcherSession> AddParticipant(SessionParticipant user, string sessionId, CancellationToken ct = default);
-    Task<DispatcherSession?> GetByIdAsync(int id, CancellationToken ct = default);
+    Task<DispatcherSession?> GetByIdAsync(string id, CancellationToken ct = default);
+    Task<int> AddLogFile(int logFileId, string sessionId, CancellationToken ct = default);
     Task<IEnumerable<DispatcherSession>> GetAll(CancellationToken ct = default);
     Task<IEnumerable<DispatcherSession>> GetActiveSessions(CancellationToken ct = default);
     Task<DispatcherSession?> GetBySessionIdAsync(string id, CancellationToken ct = default);

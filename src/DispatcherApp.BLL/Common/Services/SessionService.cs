@@ -36,7 +36,7 @@ public class SessionService (
     private readonly IMapper _mapper = mapper;
     private readonly ILogger<SessionService> _logger = logger;
 
-    public async Task<SessionResponse> GetSessionDataAsync(int sessionId, CancellationToken ct)
+    public async Task<SessionResponse> GetSessionDataAsync(string sessionId, CancellationToken ct)
     {
         var sesssion = await _sessionRepo.GetByIdAsync(sessionId, ct);
         Guard.Against.NotFound(sessionId, nameof(sessionId));
@@ -58,14 +58,21 @@ public class SessionService (
         string sessionId,
         DispatcherSessionStatus status,
         CancellationToken ct = default)
-        => await ApplySessionUpdateAsync(
+    {
+
+        var response = await ApplySessionUpdateAsync(
             sessionId,
             session =>
             {
+                session.EndTime = status == DispatcherSessionStatus.Finished 
+                    ?_timeProvider.GetUtcNow() 
+                    : session.EndTime;
                 session.Status = status;
                 return Task.CompletedTask;
             },
             ct);
+        return response;
+    }
 
     private async Task<SessionResponse> SendSessionUpdateAsync(DispatcherSession ds, CancellationToken ct)
     {
@@ -111,6 +118,25 @@ public class SessionService (
             },
             ct);
     }
+    public async Task<SessionResponse> CreateSessionAsync(int assignmentId, string userId, CancellationToken ct = default)
+    {
+
+        var session = new DispatcherSession
+        {
+            GroupId = Guid.NewGuid().ToString(),
+            OwnerId = userId,
+            AssignmentId = assignmentId,
+            Status = DispatcherApp.Common.Constants.DispatcherSessionStatus.Started,
+            StartTime = _timeProvider.GetUtcNow(),
+            Participants = new List<SessionParticipant>(),
+            UpdatedAt = _timeProvider.GetUtcNow(),
+            Version = 1
+        };
+        await _sessionRepo.AddAsync(session, ct);
+        await _sessionRepo.SaveChangesAsync(ct);
+
+        return _mapper.Map<SessionResponse>(session);
+    }
     public async Task<DispatcherSession> GetOrCreate(string sessionId, string ownerUserId, CancellationToken ct = default)
     {
         if (await _sessionRepo.GetBySessionIdAsync(sessionId, ct) is DispatcherSession existingSession)
@@ -146,12 +172,6 @@ public class SessionService (
                 {
                     session.Participants.Remove(participant);
                 }
-
-                if (session.Participants.Count == 0)
-                {
-                    session.Status = DispatcherSessionStatus.Finished;
-                }
-
                 await _sessionRepo.SaveChangesAsync();
             },
             ct);
@@ -225,7 +245,6 @@ public class SessionService (
                     _logger.LogInformation("Session {SessionId} already updated with equivalent state; returning latest version {Version}", sessionId, latest.Version);
                     return await SendSessionUpdateAsync(latest, ct);
                 }
-
                 throw new ConcurrencyException("The session was updated by another process.", ex);
             }
         }
@@ -244,4 +263,5 @@ public class SessionService (
 
         return latest.Status != attempted.Status;
     }
+
 }

@@ -14,5 +14,6 @@ public class TutorialResponse
     public DateTime? CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public string? ContentType { get; set; }
+    public FileResponse? Picture { get; set; }
     public ICollection<FileResponse> Files { get; set; } = new List<FileResponse>();
 }

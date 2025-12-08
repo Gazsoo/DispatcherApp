@@ -16,8 +16,9 @@ export default function CreateTutorial() {
     const [uploads, setUploads] = useState<File[]>([]);
     const [selectedFileIds, setSelectedFileIds] = useState<number[]>([]);
     const { files: availableFiles, isLoading: isFilesLoading, error: filesError } = useFiles();
-    // Important: pass a bound function so `this` inside the generated client stays intact
+
     const { mutate, error, isLoading } = useApiMutation<CreateTutorialRequest, CreateTutorialResponse>((payload) => apiClient.tutorial_CreateTutorial(payload));
+
     const onFileChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
         const list = e.target.files;
         if (!list) return;
@@ -75,7 +76,6 @@ export default function CreateTutorial() {
                 <form onSubmit={onSubmit} className="space-y-4">
                     <Input id="title" name="title" label="Title" placeholder="Enter tutorial title" required />
                     <TextArea id="description" name="description" label="Description" placeholder="Add a detailed description" rows={6} />
-                    <Input id="url" name="url" label="URL (optional)" placeholder="https://..." type="url" />
 
                     <div>
                         <label htmlFor="files" className="block text-sm font-medium mb-2">Upload new files</label>

@@ -1,7 +1,7 @@
 import { apiClient } from "../api/client";
 
 export type DownloadResult =
-    | { success: true; filename: string }
+    | { success: true; filename: string, blob: Blob }
     | { success: false; reason: string; details?: string };
 
 export async function downloadFileById(fileId: number, fallback?: string): Promise<DownloadResult> {
@@ -31,7 +31,7 @@ export async function downloadFileById(fileId: number, fallback?: string): Promi
         a.remove();
         setTimeout(() => URL.revokeObjectURL(objectUrl), 1500);
 
-        return { success: true, filename };
+        return { success: true, filename, blob };
     } catch (err: any) {
         return { success: false, reason: 'exception', details: String(err) };
     }
