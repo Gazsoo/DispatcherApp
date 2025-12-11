@@ -37,10 +37,10 @@ public class AssignmentService : IAssignmentService
         _timeProvider = timeProvider;
     }
 
-    public async Task<IEnumerable<AssignmentResponse>> GetAssignmentListAsync(CancellationToken ct = default)
+    public async Task<IEnumerable<AssignmentWithUsersResponse>> GetAssignmentListAsync(CancellationToken ct = default)
     {
         var assignments = await _repository.GetAllAsync();
-        return _mapper.Map<IEnumerable<AssignmentResponse>>(assignments);
+        return (await MapWithUsersAsync(assignments, ct));
     }
 
     public async Task<AssignmentWithUsersResponse> GetAssignmentAsync(int id, CancellationToken ct = default)
@@ -200,6 +200,15 @@ public class AssignmentService : IAssignmentService
 
         response.Assignees = _mapper.Map<List<UserResponse>>(users);
         return response;
+    }
+    private async Task<IEnumerable<AssignmentWithUsersResponse>> MapWithUsersAsync(IEnumerable<Assignment> assignments, CancellationToken ct)
+    {
+        var list = new List<AssignmentWithUsersResponse>();
+        foreach (var ass in assignments)
+        {
+            list.Add(await MapWithUsersAsync(ass, ct));
+        }    
+        return list;
     }
 
     private async Task AddAssigneesToAssignmentAsync(Assignment assignment, IEnumerable<string> userIds, CancellationToken ct)

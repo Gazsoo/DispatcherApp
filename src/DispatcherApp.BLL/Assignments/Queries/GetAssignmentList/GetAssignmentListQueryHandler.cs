@@ -7,7 +7,7 @@ using MediatR;
 
 namespace DispatcherApp.BLL.Assignments.Queries.GetAssignmentList;
 
-internal sealed class GetAssignmentListQueryHandler : IRequestHandler<GetAssignmentListQuery, IEnumerable<AssignmentResponse>>
+internal sealed class GetAssignmentListQueryHandler : IRequestHandler<GetAssignmentListQuery, IEnumerable<AssignmentWithUsersResponse>>
 {
     private readonly IAssignmentService _assignmentService;
 
@@ -16,7 +16,7 @@ internal sealed class GetAssignmentListQueryHandler : IRequestHandler<GetAssignm
         _assignmentService = assignmentService;
     }
 
-    public async Task<IEnumerable<AssignmentResponse>> Handle(GetAssignmentListQuery request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<AssignmentWithUsersResponse>> Handle(GetAssignmentListQuery request, CancellationToken cancellationToken)
     {
         return await _assignmentService.GetAssignmentListAsync(cancellationToken);
     }

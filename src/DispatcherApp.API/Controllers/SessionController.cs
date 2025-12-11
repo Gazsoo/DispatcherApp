@@ -26,12 +26,14 @@ public class SessionController (IMediator mediator) : ControllerBase
 
     // GET: api/<SessionController>
     [HttpGet()]
+    [Authorize(Roles = "Dispatcher,Administrator,User")]
     public async Task<ActionResult<IEnumerable<SessionResponse>>> Get()
     {
         return Ok(await _mediator.Send(new GetAllSessionsQuery()));
     }
     // GET: api/<SessionController>
     [HttpGet("active")]
+    [Authorize(Roles = "Dispatcher,Administrator,User")]
     public async Task<ActionResult<IEnumerable<SessionResponse>>> GetActive()
     {
         return Ok( await _mediator.Send(new GetActiveSessionsQuery()));
@@ -39,29 +41,35 @@ public class SessionController (IMediator mediator) : ControllerBase
 
     // GET api/<SessionController>/5
     [HttpGet("{id}")]
+    [Authorize(Roles = "Dispatcher,Administrator,User")]
     public async Task<ActionResult<SessionResponse>> Get(string id)
     {
         return Ok(await _mediator.Send(new GetSessionQuery(id)));
     }
+
     [HttpPatch("{id}/{status}")]
+    [Authorize(Roles = "Dispatcher,Administrator,User")]
     public async Task<ActionResult<SessionResponse>> UpdateStatus(string id, DispatcherSessionStatus status)
     {
         return Ok(await _mediator.Send(new UpdateSessionStateCommand(id, status)));
     }
     //POST api/<SessionController>
     [HttpGet("{id}/join")]
+    [Authorize(Roles = "Dispatcher,Administrator,User")]
     public async Task<ActionResult<SessionResponse>> Join(string id)
     {
         return await _mediator.Send(new JoinGetOrCreateSessionCommand(id));
     }
 
     [HttpPost("{id}/leave")]
+    [Authorize(Roles = "Dispatcher,Administrator,User")]
     public async Task<ActionResult> Leave(string id, int logFileId)
     {
         await _mediator.Send(new LeaveSessionCommand(id, logFileId));
         return Ok();
     }
     [HttpPost]
+    [Authorize(Roles = "Dispatcher,Administrator,User")]
     public async Task<ActionResult<SessionResponse>> CreateSession(int assignmentId)
     {
         return await _mediator.Send(new CreateSessionFromAssignmentCommand(assignmentId));
@@ -69,6 +77,7 @@ public class SessionController (IMediator mediator) : ControllerBase
 
     // PUT api/<SessionController>/5
     [HttpPut("{sessionId}")]
+    [Authorize(Roles = "Dispatcher,Administrator,User")]
     public async Task<IActionResult> UpdateSession(string id, [FromBody] UpdateSessionRequest req, CancellationToken ct)
     {
         var result = await _mediator.Send(new UpdateSessionCommand(
@@ -86,9 +95,4 @@ public class SessionController (IMediator mediator) : ControllerBase
         return Ok(result);
     }
 
-    // DELETE api/<SessionController>/5
-    [HttpDelete("{id}")]
-    public void Delete(int id)
-    {
-    }
 }

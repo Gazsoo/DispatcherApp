@@ -1,6 +1,8 @@
 
 services:
   webapp:
+    depends_on:
+      - db
     build: .
     ports:
       - "8080:19955"  # Access app at localhost:8080
@@ -10,8 +12,7 @@ services:
       - ASPNETCORE_URLS=http://+:19955
       - ASPNETCORE_HTTPS_PORTS=
       - ConnectionStrings__DispatcherDb=Server=db;Database=MyDb;User Id=sa;Password=YourStrong!Password;TrustServerCertificate=True;
-    depends_on:
-      - db
+
 
   # SQL Server
   db:

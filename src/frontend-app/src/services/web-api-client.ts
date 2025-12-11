@@ -1317,59 +1317,6 @@ export class Client extends ApiClientBase {
         return Promise.resolve<FileResponse>(null as any);
     }
 
-    home_Index(signal?: AbortSignal): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/api/Home";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            responseType: "blob",
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/octet-stream"
-            },
-            signal
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processHome_Index(_response));
-        });
-    }
-
-    protected processHome_Index(response: AxiosResponse): Promise<FileResponse> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers["content-disposition"] : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return Promise.resolve({ fileName: fileName, status: status, data: new Blob([response.data], { type: response.headers["content-type"] }), headers: _headers });
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<FileResponse>(null as any);
-    }
-
     session_GetAll(signal?: AbortSignal): Promise<SessionResponse[]> {
         let url_ = this.baseUrl + "/api/Session";
         url_ = url_.replace(/[?&]$/, "");
@@ -1567,53 +1514,6 @@ export class Client extends ApiClientBase {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<SessionResponse>(null as any);
-    }
-
-    session_Delete(id: number, signal?: AbortSignal): Promise<void> {
-        let url_ = this.baseUrl + "/api/Session/{id}";
-        if (id === undefined || id === null)
-            throw new globalThis.Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "DELETE",
-            url: url_,
-            headers: {
-            },
-            signal
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processSession_Delete(_response));
-        });
-    }
-
-    protected processSession_Delete(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
     }
 
     session_UpdateStatus(id: string, status: DispatcherSessionStatus, signal?: AbortSignal): Promise<SessionResponse> {
@@ -2416,6 +2316,9 @@ export interface AssignmentWithUsersResponse {
     name?: string;
     description?: string | undefined;
     type?: string | undefined;
+    createdAt?: Date;
+    plannedTime?: Date;
+    completedAt?: Date | undefined;
     status?: AssignmentStatus;
     value?: string | undefined;
     assignees?: UserResponse[];

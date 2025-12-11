@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DispatcherApp.API.Controllers;
 [Route("api/[controller]")]
-[Authorize(Roles = "Administrator, Dispatcher")]
+[Authorize(Roles = "Administrator")]
 [ApiController]
 public class UserController : ControllerBase
 {
