@@ -17,6 +17,7 @@ internal sealed class UpdateUserInfoCommandHandler : IRequestHandler<UpdateUserI
 
     public async Task<UserInfoResponse> Handle(UpdateUserInfoCommand request, CancellationToken cancellationToken)
     {
+        
         return await _userProfileService.UpdateAsync(request.UserId, request.UserInfo, cancellationToken);
     }
 }

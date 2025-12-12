@@ -47,11 +47,8 @@ public class UserService : IUserService
         {
             await _repository.UpdateEmailAsync(user, request.Email, ct);
         }
-
-
         await _repository.UpdateAsync(user, ct);
 
-        _logger.LogInformation("User info updated for {UserId}", request.UserId);
         return _mapper.Map<UserInfoResponse>(user);
     }
 

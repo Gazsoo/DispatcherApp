@@ -28,12 +28,10 @@ const FileLink = ({ file }: FileLinkProps) => {
         <Link
             key={file.id}
             to={`/dashboard/files/${file.id}`}
-        // className="p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:shadow-md transition-all"
         >
             <div className="flex items-start justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:shadow-md transition-all">
                 <div className="flex-1 min-w-0">
                     <h3 className="text-lg font-semibold truncate">{file.fileName}</h3>
-                    {/* <p className="text-sm text-gray-500 mt-1">{file.contentType}</p> */}
                 </div>
                 <div className="flex items-center ml-2 space-x-2">
                     <button

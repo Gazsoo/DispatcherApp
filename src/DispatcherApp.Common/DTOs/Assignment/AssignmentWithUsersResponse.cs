@@ -10,7 +10,10 @@ public class AssignmentWithUsersResponse
     public int Id { get; set; }
     public required string Name { get; set; }
     public string? Description { get; set; }
-    public string? Type { get; set; } 
+    public string? Type { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime PlannedTime { get; set; }
+    public DateTime? CompletedAt { get; set; }
     public AssignmentStatus Status { get; set; }
     public string? Value { get; set; }
     public List<UserResponse> Assignees { get; set; } = new List<UserResponse>();

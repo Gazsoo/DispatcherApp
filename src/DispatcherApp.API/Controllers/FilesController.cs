@@ -17,6 +17,7 @@ namespace DispatcherApp.API.Controllers;
 public class FilesController (IMediator mediator) : ControllerBase
 {
     [HttpGet]
+    [Authorize(Roles = "Dispatcher,Administrator")]
     public async Task<ActionResult<IEnumerable<FileMetadataResponse>>> GetFilesAsync()
     {
         var result = await mediator.Send(new GetFilesQuery());
@@ -24,6 +25,7 @@ public class FilesController (IMediator mediator) : ControllerBase
     }
 
     [HttpGet("{fileId}/download")]
+    [Authorize(Roles = "Dispatcher,Administrator,User")]
     public async Task<FileContentResult> DownloadFile(int fileId)
     {
         var result = await mediator.Send(new DownloadFileQuery(fileId));
@@ -31,6 +33,7 @@ public class FilesController (IMediator mediator) : ControllerBase
     }
 
     [HttpGet("{fileId}")]
+    [Authorize(Roles = "Dispatcher,Administrator,User")]
     public async Task<ActionResult<FileMetadataResponse>> GetFileMetadata(int fileId)
     {
         var result = await mediator.Send(new GetFileQuery(fileId));
@@ -38,6 +41,7 @@ public class FilesController (IMediator mediator) : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Dispatcher,Administrator,User")]
     public async Task<ActionResult<FileUploadResponse>> PostFileAsync([FromForm] UploadFileCommand uploadCommand)
     {
         var result = await mediator.Send(uploadCommand);
@@ -45,6 +49,7 @@ public class FilesController (IMediator mediator) : ControllerBase
     }
 
     [HttpDelete("{fileId}")]
+    [Authorize(Roles = "Administrator")]
     public async Task<ActionResult> DeleteFile(int fileId)
     {
         var result = await mediator.Send(new DeleteFileCommand(fileId));
@@ -52,6 +57,7 @@ public class FilesController (IMediator mediator) : ControllerBase
     }
 
     [HttpDelete]
+    [Authorize(Roles = "Administrator")]
     public async Task<ActionResult> DeleteMutipleFiles([FromBody] DeleteFilesCommand deleteCommand)
     {
         var result = await mediator.Send(deleteCommand);

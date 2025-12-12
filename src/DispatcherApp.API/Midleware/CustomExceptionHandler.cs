@@ -31,7 +31,6 @@ public class CustomExceptionHandler : IExceptionHandler
             await _exceptionHandlers[exceptionType].Invoke(httpContext, exception);
             return true;
         }
-        //_logger.LogError(exception, "Unhandled exception occurred: {ExceptionType}", exceptionType.Name);
 
         await HandleUnhandledException(httpContext, exception);
         return true; 

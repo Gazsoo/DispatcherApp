@@ -49,73 +49,53 @@ public sealed class UserProfileService : IUserProfileService
 
     public async Task<UserInfoResponse> GetAsync(string userId, CancellationToken ct = default)
     {
-        try
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                _logger.LogWarning("Profile lookup for non-existent user {UserId}", userId);
-            }
-            Guard.Against.NotFound(userId, user);
 
-            var claims = await _userManager.GetClaimsAsync(user);
-            var roles = await _userManager.GetRolesAsync(user);
+        var user = await _userManager.FindByIdAsync(userId);
+        Guard.Against.NotFound(userId, user);
 
-            return BuildResponse(user, claims, roles);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to fetch profile for {UserId}", userId);
-            throw;
-        }
+        var claims = await _userManager.GetClaimsAsync(user);
+        var roles = await _userManager.GetRolesAsync(user);
+
+        return BuildResponse(user, claims, roles);
+
     }
 
     public async Task<UserInfoResponse> UpdateAsync(string userId, UserInfoResponse profile, CancellationToken ct = default)
     {
-        try
+
+        var user = await _userManager.FindByIdAsync(profile.Id);
+        if (user == null)
         {
-            var user = await _userManager.FindByIdAsync(profile.Id);
-            if (user == null)
-            {
-                _logger.LogWarning("Profile update for non-existent user {UserId}", userId);
-            }
-            Guard.Against.NotFound(userId, user);
-
-            if (!string.Equals(user.Email, profile.Email, StringComparison.OrdinalIgnoreCase))
-            {
-                var emailResult = await _userManager.SetEmailAsync(user, profile.Email);
-                if (!emailResult.Succeeded)
-                {
-                    _logger.LogWarning("Failed to update email for {UserId}: {Errors}", userId,
-                        string.Join(", ", emailResult.Errors.Select(e => e.Description)));
-                    throw CreateIdentityValidationException("Email", emailResult.Errors);
-                }
-
-            }
-
-            user.PhoneNumber = profile.Phone;
-            user.TwoFactorEnabled = profile.TwoFactorEnabled;
-
-            var claims = await _userManager.GetClaimsAsync(user);
-            await UpsertClaimAsync(user, claims, ClaimTypes.GivenName, profile.FirstName);
-            await UpsertClaimAsync(user, claims, ClaimTypes.Surname, profile.LastName);
-
-            var updateResult = await _userManager.UpdateAsync(user);
-            if (!updateResult.Succeeded)
-            {
-                _logger.LogWarning("Failed to persist profile changes for {UserId}: {Errors}", userId,
-                    string.Join(", ", updateResult.Errors.Select(e => e.Description)));
-                throw CreateIdentityValidationException("Profile", updateResult.Errors);
-            }
-            await _userRepository.SetRoleAsync(user, profile.Role, ct);
-            var roles = await _userManager.GetRolesAsync(user);
-            return BuildResponse(user, claims, roles);
+            _logger.LogWarning("Profile update for non-existent user {UserId}", userId);
         }
-        catch (Exception ex)
+        Guard.Against.NotFound(userId, user);
+
+        if (!string.Equals(user.Email, profile.Email, StringComparison.OrdinalIgnoreCase))
         {
-            _logger.LogError(ex, "Failed to update profile for {UserId}", userId);
-            throw;
+            var emailResult = await _userManager.SetEmailAsync(user, profile.Email);
+            if (!emailResult.Succeeded)
+            {
+                _logger.LogWarning("Failed to update email for {UserId}: {Errors}", userId,
+                    string.Join(", ", emailResult.Errors.Select(e => e.Description)));
+                throw CreateIdentityValidationException("Email", emailResult.Errors);
+            }
         }
+
+        user.PhoneNumber = profile.Phone;
+        user.TwoFactorEnabled = profile.TwoFactorEnabled;
+
+        var claims = await _userManager.GetClaimsAsync(user);
+        await UpsertClaimAsync(user, claims, ClaimTypes.GivenName, profile.FirstName);
+        await UpsertClaimAsync(user, claims, ClaimTypes.Surname, profile.LastName);
+
+        var updateResult = await _userManager.UpdateAsync(user);
+        if (!updateResult.Succeeded)
+        {
+            throw CreateIdentityValidationException("Profile", updateResult.Errors);
+        }
+        await _userRepository.SetRoleAsync(user, profile.Role, ct);
+        var roles = await _userManager.GetRolesAsync(user);
+        return BuildResponse(user, claims, roles);
     }
 
     private static UserInfoResponse BuildResponse(

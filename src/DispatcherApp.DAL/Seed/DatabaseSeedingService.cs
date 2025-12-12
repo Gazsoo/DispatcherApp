@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
-using DispatcherApp.DAL.Data;
+﻿using System.Text;
 using DispatcherApp.Common.Constants;
 using DispatcherApp.Common.Entities;
+using DispatcherApp.DAL.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using File = DispatcherApp.Common.Entities.File;
 
@@ -55,16 +49,27 @@ public class DatabaseSeedingService
     }
     public async Task InitialiseAsync()
     {
-        try
+        int maxRetries = 5;
+
+        for (int i = 0; i < maxRetries; i++)
         {
-            await Task.CompletedTask;
-            await _context.Database.EnsureDeletedAsync();
-            await _context.Database.MigrateAsync();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An error occurred while initialising the database.");
-            throw;
+            try
+            {
+                await Task.CompletedTask;
+                await _context.Database.EnsureDeletedAsync();
+                await _context.Database.MigrateAsync();
+            }
+            catch (SqlException ex)
+            {
+                // Log warning and wait, but DO NOT THROW yet.
+                _logger.LogWarning($"Database not ready yet (Error {ex.Number}). Retrying in 3s... (Attempt {i + 1}/{maxRetries})");
+                await Task.Delay(3000);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while initialising the database.");
+                throw;
+            }
         }
     }
     public async Task SeedAsync()
@@ -81,12 +86,33 @@ public class DatabaseSeedingService
     }
     public async Task TrySeedAsync()
     {
+        if (_context.Tutorials.Any() && _userManager.Users.Any())
+        {
+            // DB seeded
+            return;
+        }
         // Admin
         var administratorRole = new IdentityRole(Roles.Administrator);
         administratorRole.Id = "c90ee222-ccd2-4857-8888-161752decd99";
         if (_roleManager.Roles.All(r => r.Name != administratorRole.Name))
         {
             await _roleManager.CreateAsync(administratorRole);
+        }
+
+        // User
+        var userRole = new IdentityRole(Roles.User);
+        userRole.Id = "913d93ba-4195-4b96-b34e-e33b41e7aec4";
+        if (_roleManager.Roles.All(r => r.Name != userRole.Name))
+        {
+            await _roleManager.CreateAsync(userRole);
+        }
+
+        // Dispatcher
+        var dispatcherRole = new IdentityRole(Roles.Dispatcher);
+        dispatcherRole.Id = "dd051e4a-2296-4602-b785-82500e438b36";
+        if (_roleManager.Roles.All(r => r.Name != dispatcherRole.Name))
+        {
+            await _roleManager.CreateAsync(dispatcherRole);
         }
 
         // Other roles
@@ -105,7 +131,6 @@ public class DatabaseSeedingService
             Email = "administrator@localhost",
             EmailConfirmed = true
             };
-
         if (_userManager.Users.All(u => u.UserName != administrator.UserName))
         {
             await _userManager.CreateAsync(administrator, "Administrator1!");
@@ -114,36 +139,77 @@ public class DatabaseSeedingService
                 await _userManager.AddToRolesAsync(administrator, new[] { administratorRole.Name });
             }
         }
+        var user = new IdentityUser
+        {
+            UserName = "user@localhost",
+            Email = "user@localhost",
+            EmailConfirmed = true
+        };
+        if (_userManager.Users.All(u => u.UserName != user.UserName))
+        {
+            await _userManager.CreateAsync(user, "User1!");
+            if (!string.IsNullOrWhiteSpace(userRole.Name))
+            {
+                await _userManager.AddToRolesAsync(user, new[] { userRole.Name });
+            }
+        }
+        var dispatcher = new IdentityUser
+        {
+            UserName = "dispatcher@localhost",
+            Email = "dispatcher@localhost",
+            EmailConfirmed = true
+        };
+        if (_userManager.Users.All(u => u.UserName != dispatcher.UserName))
+        {
+            await _userManager.CreateAsync(dispatcher, "Dispatcher1!");
+            if (!string.IsNullOrWhiteSpace(dispatcherRole.Name))
+            {
+                await _userManager.AddToRolesAsync(dispatcher, new[] { dispatcherRole.Name });
+            }
+        }
+
         var now = _timeProvider.GetUtcNow().UtcDateTime;
+        var file = new File
+        {
+            FileName = "sample.txt",
+            ContentType = "text/plain",
+            FileSize = 1024,
+            OriginalFileName = "sample_original.txt",
+            StoragePath = "files/sample_original.txt",
+            UploadedAt = now,
+        };
+        
         var tutorial = new Tutorial { 
             CreatedAt = now,
             Description = "This is a sample tutorial",
             Title = "Sample Tutorial",
-            Url = "https://example.com/sample-tutorial",
+            Url = "",
             UpdatedAt = now,
             Files = new List<File>
             {
-                new File
-                {
-                    FileName = "sample.txt",
-                    ContentType = "text/plain",
-                    FileSize = 1024,
-                    OriginalFileName = "sample_original.txt",
-                    StoragePath = "files/sample.txt",
-                    UploadedAt = now,
-                }
+                file
             }
         };
+        using (FileStream fs = System.IO.File.Create("wwwroot/uploads/files/sample_original.txt"))
+        {
+            byte[] info = new UTF8Encoding(true).GetBytes("This is some text in the file.");
+            // Add some information to the file.
+            fs.Write(info, 0, info.Length);
+        }
         _context.Tutorials.Add(tutorial);
         await _context.SaveChangesAsync();
 
         var assignment1 = new Assignment
         {
-            Name = "Task1",
+            Name = "Sample Task1",
+            Description = "Sample Description 1",
+            PlannedTime = now,
         };
         var assignment2 = new Assignment
         {
-            Name = "Task2",
+            Name = "Sample Task2",
+            Description = "Sample Description 2",
+            PlannedTime = now,
         };
         _context.Assignments.Add(assignment1);
         _context.Assignments.Add(assignment2);
@@ -154,8 +220,30 @@ public class DatabaseSeedingService
             UserId = administrator.Id,
             AssignedAt = now
         };
+        var assignmentUser2 = new AssignmentUser
+        {
+            Assignment = assignment2,
+            UserId = user.Id,
+            AssignedAt = now
+        };
+        var assignmentUser3 = new AssignmentUser
+        {
+            Assignment = assignment2,
+            UserId = dispatcher.Id,
+            AssignedAt = now
+        };
 
         _context.AssignmentUsers.Add(assignmentUser1);
+        _context.AssignmentUsers.Add(assignmentUser2);
+        _context.AssignmentUsers.Add(assignmentUser3);
+
+
+        _context.DispatcherSessions.Add(new DispatcherSession
+        {
+            GroupId = "0b60f76b-1c0b-4e95-99b1-dc0acd73c77a",
+            LogFile = file,
+            OwnerId = dispatcher.Id
+        });
         await _context.SaveChangesAsync();
 
     }

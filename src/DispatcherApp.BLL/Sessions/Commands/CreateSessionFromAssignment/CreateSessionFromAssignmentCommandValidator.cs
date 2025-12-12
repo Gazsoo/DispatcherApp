@@ -5,6 +5,8 @@ public class CreateSessionFromAssignmentCommandValidator : AbstractValidator<Cre
 {
     public CreateSessionFromAssignmentCommandValidator()
     {
-        // Add validation rules here
+        RuleFor(x => x.AssignmentId)
+                    .NotEmpty()
+                    .WithMessage("Assignment ID is required and cannot be empty.");
     }
 }

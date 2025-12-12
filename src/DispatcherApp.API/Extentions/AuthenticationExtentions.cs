@@ -51,7 +51,7 @@ namespace DispatcherApp.API.Extentions;
                         var accessToken = context.Request.Query["access_token"];
                         var path = context.HttpContext.Request.Path;
 
-                        // Must match your MapHub path exactly
+                        // ws authentication token from query string
                         if (!string.IsNullOrEmpty(accessToken) &&
                             path.StartsWithSegments("/ws/sessions"))
                         {

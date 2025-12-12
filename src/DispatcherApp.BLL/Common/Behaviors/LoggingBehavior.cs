@@ -39,8 +39,6 @@ public sealed class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRe
                     IAlreadyLoggedException => (LogLevel?)null,
                     ValidationException => LogLevel.Information,
                     ForbiddenAccessException => LogLevel.Warning,
-                    //EmailNotConfirmedException => LogLevel.Warning,
-                    //InvalidCredentialsException => LogLevel.Warning,
                     ConcurrencyException => LogLevel.Warning,
                     Ardalis.GuardClauses.NotFoundException => LogLevel.Information,
                     _ => LogLevel.Error

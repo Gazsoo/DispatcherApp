@@ -86,7 +86,6 @@ export default function FileDetails() {
                 items={[
                     { label: "Content type", value: file.contentType || "Unknown" },
                     { label: "File size", value: formattedSize },
-                    { label: "Uploaded by", value: file.createdByName || "—" },
                     { label: "Uploaded at", value: file.uploadedAt ? new Date(file.uploadedAt).toLocaleString() : "—" },
                 ]}
                 description={{
