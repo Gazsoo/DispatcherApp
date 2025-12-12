@@ -190,7 +190,13 @@ public class DatabaseSeedingService
                 file
             }
         };
-        using (FileStream fs = System.IO.File.Create("wwwroot/uploads/files/sample_original.txt"))
+        string directoryPath = "wwwroot/uploads/files";
+        string filePath = Path.Combine(directoryPath, "sample_original.txt");
+
+        // Create the directory if it doesn't exist
+        Directory.CreateDirectory(directoryPath);
+
+        using (FileStream fs = System.IO.File.Create(filePath))
         {
             byte[] info = new UTF8Encoding(true).GetBytes("This is some text in the file.");
             // Add some information to the file.
