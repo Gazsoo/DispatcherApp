@@ -35,7 +35,6 @@ namespace Microsoft.Extensions.DependencyInjection;
                               .AllowCredentials();
                     });
                 });
-            builder.Configuration.AddApiConfigurations();
             builder.Services.AddHttpContextAccessor();
             builder.Services
                 .AddControllers()
@@ -61,7 +60,6 @@ namespace Microsoft.Extensions.DependencyInjection;
                 options.SuppressModelStateInvalidFilter = true);
 
             builder.Services.AddEndpointsApiExplorer();
-            //builder.Services.AddIdentityApiEndpoints<IdentityUser>();
 
             builder.Services.ConfigureApplicationCookie(options =>
             {
@@ -115,15 +113,5 @@ namespace Microsoft.Extensions.DependencyInjection;
     {
         return builder
             .UseMiddleware<UserContextMiddleware>();
-    }
-    public static void AddKeyVaultIfConfigured(this IHostApplicationBuilder builder)
-    {
-        var keyVaultUri = builder.Configuration["AZURE_KEY_VAULT_ENDPOINT"];
-        if (!string.IsNullOrWhiteSpace(keyVaultUri))
-        {
-            builder.Configuration.AddAzureKeyVault(
-                new Uri(keyVaultUri),
-                new DefaultAzureCredential());
-        }
     }
     }

@@ -44,56 +44,19 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<bool> ConfirmEmailAsync(string userId, string token)
     {
-        try
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
         {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                _logger.LogWarning("Email confirmation attempt for non-existent user: {UserId}", userId);
-                return false;
-            }
-            var result = await _userManager.ConfirmEmailAsync(user, token);
-            if (result.Succeeded)
-            {
-                _logger.LogInformation("Email confirmed for user: {UserId}", userId);
-                return true;
-            }
-
-            _logger.LogWarning("Email confirmation failed for user: {UserId}", userId);
-            return false;
+            _logger.LogWarning("Email confirmation attempt for non-existent user: {UserId}", userId);
+            throw new InvalidCredentialsException();
         }
-        catch (Exception ex)
+        var result = await _userManager.ConfirmEmailAsync(user, token);
+        if (result.Succeeded)
         {
-            _logger.LogError(ex, "Error during email confirmation for user: {UserId}", userId);
-            return false;
-        }
-    }
-
-    public async Task<bool> ForgotPasswordAsync(string email, string resetUrl)
-    {
-        try
-        {
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null || !await _userManager.IsEmailConfirmedAsync(user))
-            {
-                _logger.LogWarning("Password reset attempt for invalid user: {Email}", email);
-                return true;
-            }
-
-            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var finalResetUrl = $"{resetUrl}?email={user.Email}&token={WebUtility.UrlEncode(resetToken)}";
-
-            await _emailSender.SendEmailAsync(email, "Reset your password",
-                $"Reset your password by clicking <a href='{finalResetUrl}'>here</a>");
-
-            _logger.LogInformation("Password reset email sent to: {Email}", email);
+            _logger.LogInformation("Email confirmed for user: {UserId}", userId);
             return true;
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error during forgot password for: {Email}", email);
-            return false;
-        }
+        throw new ForbiddenAccessException();
     }
 
     public async Task<AuthResponse?> LoginAsync(LoginRequest request)
@@ -122,7 +85,6 @@ public class AuthenticationService : IAuthenticationService
         var accessToken = await _tokenService.GenerateAccessTokenAsync(user);
         var refreshToken = await _tokenService.GenerateRefreshTokenAsync(user);
 
-        _logger.LogInformation("Successful login for user: {Email}", request.Email);
 
         return new AuthResponse
         {
@@ -186,8 +148,7 @@ public class AuthenticationService : IAuthenticationService
         var existingUser = await _userManager.FindByEmailAsync(request.Email);
         if (existingUser != null)
         {
-            _logger.LogWarning("Registration attempt for existing user: {Email}", request.Email);
-            return false;
+            throw new InvalidCredentialsException();
         }
 
         var user = new IdentityUser
@@ -197,22 +158,17 @@ public class AuthenticationService : IAuthenticationService
             EmailConfirmed = false
         };
 
-
         var createResult = await _userManager.CreateAsync(user, request.Password);
         if (!createResult.Succeeded)
         {
-            _logger.LogWarning("User creation failed for: {Email}. Errors: {Errors}",
-                request.Email, string.Join(", ", createResult.Errors.Select(e => e.Description)));
-            return false;
+            throw new ValidationException("User could not be created");
         }
 
         var roleToAssign = string.IsNullOrWhiteSpace(request.Role) ? Roles.User : request.Role;
         var roleResult = await _userManager.AddToRoleAsync(user, roleToAssign);
         if (!roleResult.Succeeded)
         {
-            _logger.LogWarning("Failed to assign role {Role} to user: {Email}. Errors: {Errors}",
-                roleToAssign, request.Email, string.Join(", ", roleResult.Errors.Select(e => e.Description)));
-            return false;
+            throw new ValidationException("Role could not be assigned");
         }
 
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -221,70 +177,7 @@ public class AuthenticationService : IAuthenticationService
         await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
             $"Please confirm your email by clicking <a href='{confirmationUrl}'>here</a>");
 
-        _logger.LogInformation("User registered successfully: {Email}", request.Email);
         return true;
-        
-    }
-
-    public async Task<bool> ResendConfirmationEmailAsync(string email, string confirmationBaseUrl)
-    {
-        try
-        {
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
-            {
-                _logger.LogWarning("Resend confirmation attempt for non-existent user: {Email}", email);
-                return false;
-            }
-
-            if (await _userManager.IsEmailConfirmedAsync(user))
-            {
-                _logger.LogInformation("Resend confirmation attempt for already confirmed user: {Email}", email);
-                return true;
-            }
-
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var confirmationUrl = $"{confirmationBaseUrl}?userId={user.Id}&token={WebUtility.UrlEncode(token)}";
-
-            await _emailSender.SendEmailAsync(email, "Confirm your email",
-                $"Please confirm your email by clicking <a href='{confirmationUrl}'>here</a>");
-
-            _logger.LogInformation("Confirmation email resent to: {Email}", email);
-            return true;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error during resend confirmation email for: {Email}", email);
-            return false;
-        }
-    }
-
-    public async Task<bool> ResetPasswordAsync(ResetPasswordRequest request)
-    {
-        try
-        {
-            var user = await _userManager.FindByEmailAsync(request.Email);
-            if (user == null)
-            {
-                _logger.LogWarning("Password reset attempt for non-existent user: {Email}", request.Email);
-                return false;
-            }
-
-            var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
-            if (result.Succeeded)
-            {
-                _logger.LogInformation("Password reset successfully for user: {Email}", request.Email);
-                return true;
-            }
-
-            _logger.LogWarning("Password reset failed for user: {Email}", request.Email);
-            return false;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error during password reset for user: {Email}", request.Email);
-            return false;
-        }
     }
 
 }

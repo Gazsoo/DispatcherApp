@@ -24,15 +24,8 @@ public class TutorialController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<TutorialResponse>> GetTutorial(int tutorialId, CancellationToken cancellationToken)
     {
-        try
-        {
-            var result = await _mediator.Send(new GetTutorialQuery(tutorialId), cancellationToken);
-            return Ok(result);
-        }
-        catch (NotFoundException)
-        {
-            return NotFound();
-        }
+        var result = await _mediator.Send(new GetTutorialQuery(tutorialId), cancellationToken);
+        return Ok(result);
     }
 
     [HttpGet]

@@ -4,6 +4,7 @@ import { dashboardNavigation } from "../../config/navigation";
 import { useAuth } from "../hooks/useAuth";
 import { useUser } from "../context/userContext";
 import UserBadge from "./components/UserBadge";
+import { Button } from "../ui";
 
 export default function Sidebar() {
     const location = useLocation();
@@ -43,12 +44,13 @@ export default function Sidebar() {
             <div className="mt-auto p-4 space-y-3">
                 <UserBadge />
 
-                <button
+                <Button
+                    variant="primary"
                     onClick={logout}
-                    className="w-full text-left px-4 py-2 rounded-lg border hover:bg-accent/10 text-content-light dark:text-content-dark"
+                    className="w-full text-left px-4 py-2"
                 >
                     Log out
-                </button>
+                </Button>
             </div>
         </aside>
     );

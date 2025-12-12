@@ -14,7 +14,6 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace DispatcherApp.API.Controllers;
 [Authorize]
@@ -24,14 +23,12 @@ public class SessionController (IMediator mediator) : ControllerBase
 {
     private readonly IMediator _mediator = mediator;
 
-    // GET: api/<SessionController>
     [HttpGet()]
     [Authorize(Roles = "Dispatcher,Administrator,User")]
     public async Task<ActionResult<IEnumerable<SessionResponse>>> Get()
     {
         return Ok(await _mediator.Send(new GetAllSessionsQuery()));
     }
-    // GET: api/<SessionController>
     [HttpGet("active")]
     [Authorize(Roles = "Dispatcher,Administrator,User")]
     public async Task<ActionResult<IEnumerable<SessionResponse>>> GetActive()
@@ -39,7 +36,6 @@ public class SessionController (IMediator mediator) : ControllerBase
         return Ok( await _mediator.Send(new GetActiveSessionsQuery()));
     }
 
-    // GET api/<SessionController>/5
     [HttpGet("{id}")]
     [Authorize(Roles = "Dispatcher,Administrator,User")]
     public async Task<ActionResult<SessionResponse>> Get(string id)
@@ -53,7 +49,6 @@ public class SessionController (IMediator mediator) : ControllerBase
     {
         return Ok(await _mediator.Send(new UpdateSessionStateCommand(id, status)));
     }
-    //POST api/<SessionController>
     [HttpGet("{id}/join")]
     [Authorize(Roles = "Dispatcher,Administrator,User")]
     public async Task<ActionResult<SessionResponse>> Join(string id)

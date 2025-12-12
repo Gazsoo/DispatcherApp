@@ -214,6 +214,7 @@ public class SessionService (
     {
         const int maxAttempts = 2;
 
+        // Optimistic concurrency control with retry
         for (var attempt = 0; attempt < maxAttempts; attempt++)
         {
             var session = await _sessionRepo.GetBySessionIdAsync(sessionId, ct);
@@ -248,7 +249,6 @@ public class SessionService (
                 throw new ConcurrencyException("The session was updated by another process.", ex);
             }
         }
-
         throw new ConcurrencyException("Unable to persist session due to repeated concurrent updates.");
     }
 

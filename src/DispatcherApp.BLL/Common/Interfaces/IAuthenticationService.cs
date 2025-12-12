@@ -16,7 +16,4 @@ public interface IAuthenticationService
     Task<AuthResponse?> RefreshTokenAsync(RefreshRequest request);
     Task<bool> RegisterAsync(RegisterRequest request, string confirmationBaseUtl);
     Task<bool> ConfirmEmailAsync(string userId, string token);
-    Task<bool> ResendConfirmationEmailAsync(string email, string confirmationBaseUrl);
-    Task<bool> ForgotPasswordAsync(string email, string resetUrl);
-    Task<bool> ResetPasswordAsync(ResetPasswordRequest request);
 }

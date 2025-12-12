@@ -79,20 +79,36 @@ public class TokenService : ITokenService
         rng.GetBytes(randomNumber);
         var refreshToken = Convert.ToBase64String(randomNumber);
 
-        //TODO: Store the refresh token with the user in the database
         await _userManager.UpdateSecurityStampAsync(user);
 
         return refreshToken;
     }
 
-    public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task<bool> ValidateRefreshTokenAsync(IdentityUser user, string refreshToken)
     {
-        await Task.CompletedTask; //TODO: Implement actual validation logic
+        await Task.CompletedTask;
         return !string.IsNullOrEmpty(refreshToken) && refreshToken.Length > 0;
     }
+
+    public ClaimsPrincipal GetPrincipalFromExpiredToken(string? token)
+    {
+        var tokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = false,
+            ValidateIssuer = false,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey)),
+            ValidateLifetime = false // we are checking expired tokens here
+        };
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+
+        if (securityToken is not JwtSecurityToken jwtSecurityToken ||
+            !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            throw new SecurityTokenException("Invalid token");
+
+        return principal;
+    }
+
 }
