@@ -56,7 +56,7 @@ public class DatabaseSeedingService
             try
             {
                 await Task.CompletedTask;
-                await _context.Database.EnsureDeletedAsync();
+                //await _context.Database.EnsureDeletedAsync();
                 await _context.Database.MigrateAsync();
             }
             catch (SqlException ex)
